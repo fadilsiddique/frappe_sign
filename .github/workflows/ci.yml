@@ -1,0 +1,186 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            frontend/yarn.lock
+
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # Installs frontend/ too (root postinstall), for the frontend pre-commit hooks.
+      - name: Install node packages
+        run: yarn install --frozen-lockfile
+
+      - name: Run pre-commit (ruff, mypy, semgrep, eslint, prettier, vue-tsc)
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
+  frontend:
+    name: Frontend build and Vitest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - run: yarn test
+      - run: yarn build
+      - name: Guest bundle budget (250 KB gzipped)
+        run: yarn size
+
+  tests:
+    # Floor (v16.0.0 tags) and ceiling (version-16 heads), each with and without ERPNext (D15).
+    name: Server (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: v16.0.0 with ERPNext
+            frappe_ref: v16.0.0
+            erpnext_ref: v16.0.0
+          - name: v16.0.0 without ERPNext
+            frappe_ref: v16.0.0
+            erpnext_ref: ''
+          - name: version-16 with ERPNext
+            frappe_ref: version-16
+            erpnext_ref: version-16
+          - name: version-16 without ERPNext
+            frappe_ref: version-16
+            erpnext_ref: ''
+
+    services:
+      redis-cache:
+        image: redis:alpine
+        ports:
+          - 13000:6379
+      redis-queue:
+        image: redis:alpine
+        ports:
+          - 11000:6379
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
+    env:
+      BENCH: /home/runner/frappe-bench
+      SITE: test_site
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ matrix.frappe_ref }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: pip-${{ runner.os }}-${{ matrix.frappe_ref }}-
+
+      - name: Install MariaDB client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mariadb-client
+
+      - name: Create bench at frappe ${{ matrix.frappe_ref }}
+        run: |
+          pip install frappe-bench
+          bench init --skip-redis-config-generation --skip-assets --no-procfile --no-backups \
+            --frappe-branch "${{ matrix.frappe_ref }}" --python "$(which python)" "$BENCH"
+
+      - name: Get ERPNext ${{ matrix.erpnext_ref }}
+        if: matrix.erpnext_ref != ''
+        working-directory: ${{ env.BENCH }}
+        run: bench get-app --skip-assets --branch "${{ matrix.erpnext_ref }}" erpnext
+
+      - name: Get frappe_sign
+        working-directory: ${{ env.BENCH }}
+        run: |
+          bench get-app --skip-assets frappe_sign "$GITHUB_WORKSPACE"
+          bench setup requirements --dev
+          # The www shell tests render the built SPA shells.
+          bench build --app frappe_sign
+        env:
+          CI: 'Yes'
+
+      - name: Create site and install
+        working-directory: ${{ env.BENCH }}
+        run: |
+          bench new-site --db-host 127.0.0.1 --db-root-password root --admin-password admin "$SITE"
+          if [ -n "${{ matrix.erpnext_ref }}" ]; then bench --site "$SITE" install-app erpnext; fi
+          bench --site "$SITE" install-app frappe_sign
+          bench --site "$SITE" list-apps
+
+      - name: Check the ERPNext matrix cell
+        working-directory: ${{ env.BENCH }}
+        run: |
+          if bench --site "$SITE" list-apps | grep -q '^erpnext'; then has_erpnext=yes; else has_erpnext=no; fi
+          expected=$([ -n "${{ matrix.erpnext_ref }}" ] && echo yes || echo no)
+          echo "erpnext installed: $has_erpnext (expected $expected)"
+          [ "$has_erpnext" = "$expected" ]
+
+      - name: Migrate
+        working-directory: ${{ env.BENCH }}
+        run: bench --site "$SITE" migrate
+
+      - name: Run tests
+        working-directory: ${{ env.BENCH }}
+        run: |
+          bench --site "$SITE" set-config allow_tests true
+          bench --site "$SITE" run-tests --app frappe_sign
+        env:
+          TYPE: server
