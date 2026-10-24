@@ -3,12 +3,22 @@ name = "frappe_sign"
 authors = [
     { name = "Upscape Technologies", email = "info@upscapetech.com"}
 ]
-description = "Sign App For Frappe"
-requires-python = ">=3.14"
+description = "E-signatures for Frappe and ERPNext v16"
+requires-python = ">=3.14,<3.15"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
-    # "frappe~=16.0.0" # Installed and managed by bench.
+    # frappe is installed and managed by bench, see [tool.bench.frappe-dependencies].
+    # pypdf and cryptography are pinned exactly by frappe (pypdf 6.6.0 and cryptography 46 in
+    # v16.0.0), so these ranges must include every v16 pin.
+    "pypdf>=6.6.0,<7.0.0",
+    "reportlab>=4.4.0,<6.0.0",
+    # pyhanko 0.35+ needs cryptography 47+, but frappe v16.0.0 pins cryptography~=46.0.3. A wider
+    # range makes pip upgrade cryptography past frappe's pin, so stay on 0.34 until the floor moves.
+    "pyhanko>=0.34.0,<0.35.0",
+    "arabic-reshaper>=3.0.0,<4.0.0",
+    "python-bidi>=0.6.0,<0.7.0",
+    "qrcode>=8.0,<9.0",
 ]
 
 [build-system]
@@ -16,8 +26,12 @@ requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
 
 # These dependencies are only installed when developer mode is enabled
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
+
 [tool.bench.dev-dependencies]
-# package_name = "~=1.1.0"
+# Test only: rasterizes pages for visual snapshot tests.
+pypdfium2 = ">=4.30.0,<6.0.0"
 
 # These apt dependencies will be installed from Ubuntu repositories when you host your app on Frappe Cloud
 [deploy.dependencies.apt]
