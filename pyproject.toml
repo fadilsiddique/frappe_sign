@@ -32,6 +32,7 @@ frappe = ">=16.0.0,<17.0.0"
 [tool.bench.dev-dependencies]
 # Test only: rasterizes pages for visual snapshot tests.
 pypdfium2 = ">=4.30.0,<6.0.0"
+mypy = ">=2.4.0,<3.0.0"
 
 # These apt dependencies will be installed from Ubuntu repositories when you host your app on Frappe Cloud
 [deploy.dependencies.apt]
@@ -40,6 +41,8 @@ packages = []
 [tool.ruff]
 line-length = 110
 target-version = "py314"
+# Semgrep rule test cases break lint rules on purpose.
+extend-exclude = [".semgrep"]
 
 [tool.ruff.lint]
 select = [
@@ -77,3 +80,22 @@ typing-modules = ["frappe.types.DF"]
 quote-style = "double"
 indent-style = "tab"
 docstring-code-format = true
+
+# Strict typing for the layers with the most logic (CLAUDE.md). Run with
+# `mypy` from the app root or `pre-commit run mypy --all-files`.
+[tool.mypy]
+python_version = "3.14"
+files = ["frappe_sign/services", "frappe_sign/pdf", "frappe_sign/crypto"]
+strict = true
+follow_imports = "silent"
+warn_unused_configs = true
+
+# frappe and erpnext ship no type information; treat them as Any.
+[[tool.mypy.overrides]]
+module = ["frappe", "frappe.*", "erpnext", "erpnext.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["arabic_reshaper", "arabic_reshaper.*", "bidi", "bidi.*"]
+ignore_missing_imports = true

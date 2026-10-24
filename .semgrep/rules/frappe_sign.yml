@@ -1,0 +1,56 @@
+# Project rules that enforce the golden rules in CLAUDE.md.
+# Test cases live in frappe_sign.py next to this file: `semgrep --test .semgrep/rules`.
+
+rules:
+  - id: frappe-sign-ignore-permissions
+    message: >-
+      ignore_permissions is allowed only in frappe_sign/services/signing.py, after a guest token
+      or session check, with a comment naming that check (golden rule 6).
+    languages: [python]
+    severity: ERROR
+    paths:
+      exclude:
+        - "frappe_sign/services/signing.py"
+    pattern-either:
+      - patterns:
+          - pattern: $F(..., ignore_permissions=$V, ...)
+          - pattern-not: $F(..., ignore_permissions=False, ...)
+          - pattern-not: $F(..., ignore_permissions=0, ...)
+      - patterns:
+          - pattern: $X.ignore_permissions = $V
+          - pattern-not: $X.ignore_permissions = False
+          - pattern-not: $X.ignore_permissions = 0
+
+  - id: frappe-sign-commit-outside-jobs
+    message: >-
+      frappe.db.commit() is allowed only in jobs/ entry points and scheduler functions
+      (golden rule 5). Services and APIs leave the transaction to the request or job.
+    languages: [python]
+    severity: ERROR
+    paths:
+      exclude:
+        - "frappe_sign/jobs/"
+        - "frappe_sign/tests/"
+    pattern: frappe.db.commit()
+
+  - id: frappe-sign-agpl-pdf-library
+    message: >-
+      PyMuPDF (fitz) is AGPL and must never be used (golden rule 1, D2). Use pypdf, reportlab
+      or pyHanko.
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: import fitz
+      - pattern: import pymupdf
+      - pattern: from fitz import $X
+      - pattern: from pymupdf import $X
+
+  - id: frappe-sign-public-file
+    message: >-
+      Every File the app creates must have is_private=1 (golden rule 8, D11).
+    languages: [python]
+    severity: ERROR
+    patterns:
+      - pattern: 'frappe.get_doc({..., "doctype": "File", ...})'
+      - pattern-not: 'frappe.get_doc({..., "is_private": 1, ...})'
+      - pattern-not: 'frappe.get_doc({..., "is_private": True, ...})'
