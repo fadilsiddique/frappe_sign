@@ -1,0 +1,8 @@
+# The frontend follows the frappe-ui convention (2 spaces), unlike the Python
+# and Desk JS in the rest of the repo, which use tabs.
+root = false
+
+[*]
+indent_style = space
+indent_size = 2
+max_line_length = off

@@ -12,3 +12,9 @@ required_apps = ["frappe"]
 fixtures = [
 	{"dt": "Role", "filters": [["role_name", "in", ["Sign Manager", "Sign User"]]]},
 ]
+
+# SPA shells: www/sign.html (staff) and www/s.html (guest signing), built from frontend/.
+website_route_rules = [
+	{"from_route": "/sign/<path:app_path>", "to_route": "sign"},
+	{"from_route": "/s/<path:app_path>", "to_route": "s"},
+]

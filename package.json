@@ -1,0 +1,10 @@
+{
+	"private": true,
+	"name": "frappe_sign",
+	"description": "Bench builds the /sign and /s SPAs through this file: `bench build` runs `yarn build` only in an app's root.",
+	"scripts": {
+		"postinstall": "cd frontend && yarn install --frozen-lockfile",
+		"dev": "cd frontend && yarn dev",
+		"build": "cd frontend && yarn build"
+	}
+}

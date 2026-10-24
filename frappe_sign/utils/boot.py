@@ -1,0 +1,31 @@
+"""Boot data for the SPA shells in www/ (DESIGN 7.1)."""
+
+import frappe
+from frappe.utils.jinja_globals import is_rtl
+
+STAFF_ROLES = frozenset({"Sign Manager", "Sign User", "System Manager"})
+EMPTY_BRANDING = {"company": None, "logo": None, "brand_color": None}
+
+
+def base_boot(user: str | None, branding: dict | None = None) -> dict:
+	"""Language, direction and branding. `messages` (translations) is filled with the Arabic UI (P3.5)."""
+	return {
+		"user": user,
+		"lang": frappe.local.lang or "en",
+		"dir": "rtl" if is_rtl() else "ltr",
+		"branding": branding or dict(EMPTY_BRANDING),
+		"messages": {},
+	}
+
+
+def profile_branding(company: str | None) -> dict:
+	"""Branding from the Sign Profile of `company`, or of the only profile when there is one."""
+	if not company:
+		profiles = frappe.get_all("Sign Profile", pluck="name", limit=2)
+		company = profiles[0] if len(profiles) == 1 else None
+	if not company:
+		return dict(EMPTY_BRANDING)
+	values = frappe.db.get_value("Sign Profile", company, ["logo", "brand_color"], as_dict=True)
+	if not values:
+		return dict(EMPTY_BRANDING)
+	return {"company": company, "logo": values.logo, "brand_color": values.brand_color}

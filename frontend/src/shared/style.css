@@ -1,0 +1,7 @@
+@import 'frappe-ui/style.css';
+
+html,
+body,
+#app {
+  height: 100%;
+}

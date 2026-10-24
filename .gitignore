@@ -53,3 +53,10 @@ jspm_packages/
 
 # Aider AI Chat
 .aider*
+
+# Frontend build output (yarn build in frontend/); bench build regenerates it
+frappe_sign/public/frontend/
+frappe_sign/www/sign.html
+frappe_sign/www/s.html
+# bench build links node_modules into public/; "node_modules/" does not match a symlink
+frappe_sign/public/node_modules
