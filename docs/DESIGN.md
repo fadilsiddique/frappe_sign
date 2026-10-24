@@ -608,7 +608,7 @@ Standard REST covers plain reads and lists.
 
 ### 8.4 Errors
 
-`frappe_sign/exceptions.py`: `EnvelopeNotOpen` (409), `NotYourTurn` (409), `OtpRequired` (401), `OtpInvalid` (401), `LinkExpired` (410), `InvalidTransition` (409), `FieldValidationError` (422), `CertificateError` (500). Each subclasses `frappe.ValidationError`, sets `http_status_code`, and carries a stable `code` string returned in the response for the frontend.
+`frappe_sign/exceptions.py`: `EnvelopeNotOpen` (409), `NotYourTurn` (409), `OtpRequired` (401), `OtpInvalid` (401), `LinkExpired` (410), `InvalidTransition` (409), `FieldValidationError` (422), `CertificateError` (500), `ImmutableRecord` (409, an insert-only record or an envelope past Draft changed outside a service, 2.6). Each subclasses `frappe.ValidationError`, sets `http_status_code`, and carries a stable `code` string returned in the response for the frontend.
 
 ### 8.5 Domain events
 
