@@ -1,0 +1,165 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/PageMode /UseNone
+/Pages 2 0 R
+/Type /Catalog
+/Names 10 0 R
+/OpenAction 13 0 R
+/AcroForm 15 0 R
+>>
+endobj
+2 0 obj
+<<
+/Count 1
+/Kids [ 3 0 R ]
+/Type /Pages
+>>
+endobj
+3 0 obj
+<<
+/Contents 4 0 R
+/MediaBox [ 0 0 595.2756 841.8898 ]
+/Parent 2 0 R
+/Resources <<
+/Font 5 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/AA <<
+/O <<
+/S /JavaScript
+/JS (app\056alert\050\047frappe\137sign fixture\072 page open\047\051\073)
+>>
+>>
+/Annots [ 14 0 R ]
+>>
+endobj
+4 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ]
+/Length 140
+>>
+stream
+GapQh0E=F,0U\H3T\pNYT^QKk?tc>IP,;W#U1^23ihPEM_M(M8&8Hm/Ob1-3V4NBpV1h6,Y(B,H;.;gWC4(#5HCdH,Ajo:*;6#mJ@WG%P=fOf/IU5T\?AYOG8<uSu(<@U%/c^^),1$~>
+endstream
+endobj
+5 0 obj
+<<
+/F1 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+7 0 obj
+<<
+/Author (anonymous)
+/CreationDate (D\07220000101000000\05300\04700\047)
+/Creator (anonymous)
+/Keywords ()
+/ModDate (D\07220000101000000\05300\04700\047)
+/Producer (ReportLab PDF Library \055 \050opensource\051)
+/Subject (unspecified)
+/Title (untitled)
+/Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Type /EmbeddedFile
+/Length 31
+>>
+stream
+frappe_sign fixture attachment
+
+endstream
+endobj
+9 0 obj
+<<
+/Type /Filespec
+/F (payload\056txt)
+/EF <<
+/F 8 0 R
+>>
+>>
+endobj
+10 0 obj
+<<
+/EmbeddedFiles 11 0 R
+/JavaScript <<
+/Names [ (fixture) 12 0 R ]
+>>
+>>
+endobj
+11 0 obj
+<<
+/Names [ (payload\056txt) 9 0 R ]
+>>
+endobj
+12 0 obj
+<<
+/S /JavaScript
+/JS (app\056alert\050\047frappe\137sign fixture\072 document JavaScript\047\051\073)
+>>
+endobj
+13 0 obj
+<<
+/S /JavaScript
+/JS (app\056alert\050\047frappe\137sign fixture\072 OpenAction\047\051\073)
+>>
+endobj
+14 0 obj
+<<
+/Type /Annot
+/Subtype /Widget
+/FT /Tx
+/T (fixture\137field)
+/Rect [ 72 600 300 624 ]
+/F 4
+/P 3 0 R
+>>
+endobj
+15 0 obj
+<<
+/Fields [ 14 0 R ]
+>>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000015 00000 n 
+0000000133 00000 n 
+0000000192 00000 n 
+0000000519 00000 n 
+0000000750 00000 n 
+0000000781 00000 n 
+0000000888 00000 n 
+0000001177 00000 n 
+0000001278 00000 n 
+0000001354 00000 n 
+0000001444 00000 n 
+0000001500 00000 n 
+0000001622 00000 n 
+0000001735 00000 n 
+0000001856 00000 n 
+trailer
+<<
+/Size 16
+/Root 1 0 R
+/Info 7 0 R
+/ID [ <1c178198fbdfa51b25995d89d4102043> <1c178198fbdfa51b25995d89d4102043> ]
+>>
+startxref
+1897
+%%EOF
