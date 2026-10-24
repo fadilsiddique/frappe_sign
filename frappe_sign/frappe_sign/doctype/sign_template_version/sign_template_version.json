@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "autoname": "format:{template}-V{version_no}",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "template",
+  "version_no",
+  "source_sha256",
+  "column_break_main",
+  "published_by",
+  "published_on",
+  "snapshot_section",
+  "snapshot"
+ ],
+ "fields": [
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Template",
+   "options": "Sign Template",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "version_no",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Version",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "description": "Hash of the uploaded PDF",
+   "fieldname": "source_sha256",
+   "fieldtype": "Data",
+   "label": "Source SHA-256",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "published_by",
+   "fieldtype": "Link",
+   "label": "Published by",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "published_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Published on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "snapshot_section",
+   "fieldtype": "Section Break",
+   "label": "Snapshot"
+  },
+  {
+   "description": "Template, roles and fields at publish time",
+   "fieldname": "snapshot",
+   "fieldtype": "JSON",
+   "label": "Snapshot",
+   "read_only": 1,
+   "reqd": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Template Version",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager"
+  },
+  {
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign User"
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

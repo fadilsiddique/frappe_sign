@@ -8,3 +8,7 @@ app_license = "mit"
 # ERPNext is optional (D4). ERPNext code lives in frappe_sign/erpnext/ and is loaded only when
 # "erpnext" is in frappe.get_installed_apps().
 required_apps = ["frappe"]
+
+fixtures = [
+	{"dt": "Role", "filters": [["role_name", "in", ["Sign Manager", "Sign User"]]]},
+]

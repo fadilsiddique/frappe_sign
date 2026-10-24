@@ -1,0 +1,150 @@
+{
+ "actions": [],
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "field_key",
+  "role_label",
+  "field_type",
+  "page",
+  "column_break_rect",
+  "x",
+  "y",
+  "w",
+  "h",
+  "anchor_tag",
+  "rules_section",
+  "required",
+  "read_only",
+  "prefill_path",
+  "column_break_rules",
+  "options",
+  "font_size",
+  "validation_regex"
+ ],
+ "fields": [
+  {
+   "fieldname": "field_key",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Field key",
+   "reqd": 1
+  },
+  {
+   "fieldname": "role_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Role label",
+   "reqd": 1
+  },
+  {
+   "fieldname": "field_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Field type",
+   "options": "Signature\nInitials\nFull Name\nEmail\nDate Signed\nText\nNumber\nCheckbox\nDropdown\nCompany Stamp\nAttachment",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "description": "1-based. 0 means the position comes from an anchor.",
+   "fieldname": "page",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Page"
+  },
+  {
+   "fieldname": "column_break_rect",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "0..1 from the left of the visible page box",
+   "fieldname": "x",
+   "fieldtype": "Float",
+   "label": "X",
+   "precision": "9"
+  },
+  {
+   "description": "0..1 from the top of the visible page box",
+   "fieldname": "y",
+   "fieldtype": "Float",
+   "label": "Y",
+   "precision": "9"
+  },
+  {
+   "fieldname": "w",
+   "fieldtype": "Float",
+   "label": "Width",
+   "precision": "9"
+  },
+  {
+   "fieldname": "h",
+   "fieldtype": "Float",
+   "label": "Height",
+   "precision": "9"
+  },
+  {
+   "description": "Set when the field was placed by sign_field()",
+   "fieldname": "anchor_tag",
+   "fieldtype": "Data",
+   "label": "Anchor tag"
+  },
+  {
+   "fieldname": "rules_section",
+   "fieldtype": "Section Break",
+   "label": "Rules"
+  },
+  {
+   "default": "1",
+   "fieldname": "required",
+   "fieldtype": "Check",
+   "label": "Required"
+  },
+  {
+   "description": "Prefilled and locked",
+   "fieldname": "read_only",
+   "fieldtype": "Check",
+   "label": "Read only"
+  },
+  {
+   "description": "Field path such as customer_name, or a Jinja expression",
+   "fieldname": "prefill_path",
+   "fieldtype": "Data",
+   "label": "Prefill path"
+  },
+  {
+   "fieldname": "column_break_rules",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Dropdown options, one per line",
+   "fieldname": "options",
+   "fieldtype": "Small Text",
+   "label": "Options"
+  },
+  {
+   "default": "11",
+   "fieldname": "font_size",
+   "fieldtype": "Float",
+   "label": "Font size"
+  },
+  {
+   "fieldname": "validation_regex",
+   "fieldtype": "Data",
+   "label": "Validation regex"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Template Field",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

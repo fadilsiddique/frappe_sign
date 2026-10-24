@@ -1,0 +1,132 @@
+{
+ "actions": [],
+ "autoname": "field:company",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "sealing_certificate",
+  "sender_email_account",
+  "authorised_signatory",
+  "branding_section",
+  "logo",
+  "stamp_image",
+  "column_break_branding",
+  "brand_color",
+  "legal_footer",
+  "messaging_section",
+  "whatsapp_enabled"
+ ],
+ "fields": [
+  {
+   "description": "Becomes a link to Company when ERPNext is installed",
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Company",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "sealing_certificate",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sealing certificate",
+   "options": "Sign Certificate"
+  },
+  {
+   "fieldname": "sender_email_account",
+   "fieldtype": "Link",
+   "label": "Sender email account",
+   "options": "Email Account"
+  },
+  {
+   "description": "Default company-side signer",
+   "fieldname": "authorised_signatory",
+   "fieldtype": "Link",
+   "label": "Authorised signatory",
+   "options": "User"
+  },
+  {
+   "fieldname": "branding_section",
+   "fieldtype": "Section Break",
+   "label": "Branding"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo"
+  },
+  {
+   "description": "Private file. Default image for Company Stamp fields.",
+   "fieldname": "stamp_image",
+   "fieldtype": "Attach Image",
+   "label": "Stamp image"
+  },
+  {
+   "fieldname": "column_break_branding",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "brand_color",
+   "fieldtype": "Color",
+   "label": "Brand color"
+  },
+  {
+   "description": "Printed on the certificate and on emails",
+   "fieldname": "legal_footer",
+   "fieldtype": "Small Text",
+   "label": "Legal footer"
+  },
+  {
+   "fieldname": "messaging_section",
+   "fieldtype": "Section Break",
+   "label": "Messaging"
+  },
+  {
+   "description": "Takes effect only when frappe_whatsapp is installed",
+   "fieldname": "whatsapp_enabled",
+   "fieldtype": "Check",
+   "label": "WhatsApp enabled"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Profile",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

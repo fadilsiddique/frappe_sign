@@ -1,0 +1,187 @@
+{
+ "actions": [],
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "role_label",
+  "routing_order",
+  "kind",
+  "full_name",
+  "email",
+  "mobile",
+  "column_break_party",
+  "party_type",
+  "party",
+  "contact",
+  "progress_section",
+  "status",
+  "viewed_on",
+  "signed_on",
+  "decline_reason",
+  "delegated_to",
+  "column_break_progress",
+  "token_hash",
+  "token_expires_on",
+  "intermediate_file",
+  "intermediate_sha256"
+ ],
+ "fields": [
+  {
+   "fieldname": "role_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Role label"
+  },
+  {
+   "default": "1",
+   "fieldname": "routing_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Routing order",
+   "non_negative": 1
+  },
+  {
+   "default": "Signer",
+   "fieldname": "kind",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Kind",
+   "options": "Signer\nApprover\nCC",
+   "reqd": 1
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full name"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "Mobile",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_party",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Link",
+   "label": "Party type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "label": "Party",
+   "options": "party_type"
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Link",
+   "label": "Contact",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "progress_section",
+   "fieldtype": "Section Break",
+   "label": "Progress"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Pending\nSent\nViewed\nSigned\nDeclined\nDelegated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "viewed_on",
+   "fieldtype": "Datetime",
+   "label": "Viewed on",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "signed_on",
+   "fieldtype": "Datetime",
+   "label": "Signed on",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "decline_reason",
+   "fieldtype": "Small Text",
+   "label": "Decline reason",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Row name of the new recipient",
+   "fieldname": "delegated_to",
+   "fieldtype": "Data",
+   "label": "Delegated to",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_progress",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "token_hash",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Token hash",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "token_expires_on",
+   "fieldtype": "Datetime",
+   "label": "Token expires on",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Private PDF rendered when this recipient finished",
+   "fieldname": "intermediate_file",
+   "fieldtype": "Link",
+   "label": "Intermediate file",
+   "no_copy": 1,
+   "options": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "intermediate_sha256",
+   "fieldtype": "Data",
+   "label": "Intermediate SHA-256",
+   "no_copy": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Envelope Recipient",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

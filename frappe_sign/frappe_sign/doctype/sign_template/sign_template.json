@@ -1,0 +1,259 @@
+{
+ "actions": [],
+ "autoname": "format:STPL-{#####}",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "company",
+  "is_active",
+  "column_break_main",
+  "published_version",
+  "source_section",
+  "source_type",
+  "reference_doctype",
+  "print_format",
+  "letter_head",
+  "column_break_source",
+  "pdf_file",
+  "page_metrics",
+  "signing_section",
+  "signing_order",
+  "otp_mode",
+  "email_template",
+  "column_break_signing",
+  "expiry_days",
+  "reminder_days",
+  "roles_section",
+  "roles",
+  "fields_section",
+  "fields",
+  "after_signing_section",
+  "post_sign_action",
+  "post_sign_config"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Company"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is active"
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "published_version",
+   "fieldtype": "Link",
+   "label": "Published version",
+   "no_copy": 1,
+   "options": "Sign Template Version",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_section",
+   "fieldtype": "Section Break",
+   "label": "Source"
+  },
+  {
+   "default": "Print Format",
+   "fieldname": "source_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Source type",
+   "options": "Print Format\nUploaded PDF",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "DocType",
+   "mandatory_depends_on": "eval:doc.source_type==\"Print Format\"",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval:doc.source_type==\"Print Format\"",
+   "fieldname": "print_format",
+   "fieldtype": "Link",
+   "label": "Print format",
+   "options": "Print Format"
+  },
+  {
+   "depends_on": "eval:doc.source_type==\"Print Format\"",
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter head",
+   "options": "Letter Head"
+  },
+  {
+   "fieldname": "column_break_source",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.source_type==\"Uploaded PDF\"",
+   "description": "Private file",
+   "fieldname": "pdf_file",
+   "fieldtype": "Attach",
+   "label": "PDF file",
+   "mandatory_depends_on": "eval:doc.source_type==\"Uploaded PDF\""
+  },
+  {
+   "description": "[{page, width, height, rotation}] in points",
+   "fieldname": "page_metrics",
+   "fieldtype": "JSON",
+   "label": "Page metrics",
+   "read_only": 1
+  },
+  {
+   "fieldname": "signing_section",
+   "fieldtype": "Section Break",
+   "label": "Signing"
+  },
+  {
+   "default": "Sequential",
+   "fieldname": "signing_order",
+   "fieldtype": "Select",
+   "label": "Signing order",
+   "options": "Sequential\nParallel",
+   "reqd": 1
+  },
+  {
+   "default": "Off",
+   "fieldname": "otp_mode",
+   "fieldtype": "Select",
+   "label": "OTP mode",
+   "options": "Off\nEmail\nWhatsApp",
+   "reqd": 1
+  },
+  {
+   "description": "Invitation",
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "label": "Email template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_signing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Overrides Sign Settings when set",
+   "fieldname": "expiry_days",
+   "fieldtype": "Int",
+   "label": "Expiry days",
+   "non_negative": 1
+  },
+  {
+   "description": "Overrides Sign Settings when set",
+   "fieldname": "reminder_days",
+   "fieldtype": "Int",
+   "label": "Reminder days",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "roles_section",
+   "fieldtype": "Section Break",
+   "label": "Roles"
+  },
+  {
+   "fieldname": "roles",
+   "fieldtype": "Table",
+   "label": "Roles",
+   "options": "Sign Template Role"
+  },
+  {
+   "fieldname": "fields_section",
+   "fieldtype": "Section Break",
+   "label": "Fields"
+  },
+  {
+   "fieldname": "fields",
+   "fieldtype": "Table",
+   "label": "Fields",
+   "options": "Sign Template Field"
+  },
+  {
+   "fieldname": "after_signing_section",
+   "fieldtype": "Section Break",
+   "label": "After signing"
+  },
+  {
+   "default": "None",
+   "fieldname": "post_sign_action",
+   "fieldtype": "Select",
+   "label": "Post sign action",
+   "options": "None\nSubmit\nApply Workflow Action\nCreate Mapped Document\nSet Field Value\nCall Method"
+  },
+  {
+   "depends_on": "eval:doc.post_sign_action && doc.post_sign_action!=\"None\"",
+   "description": "Action parameters",
+   "fieldname": "post_sign_config",
+   "fieldtype": "JSON",
+   "label": "Post sign config"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Template",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign User"
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

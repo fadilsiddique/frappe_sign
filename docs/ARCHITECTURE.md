@@ -59,7 +59,7 @@ flowchart TB
 | `erpnext/` | `services/`, `erpnext` (guarded) | Be imported by core code; only loaded via hooks registry when ERPNext is installed |
 | `jobs/` | `services/` | Hold logic; they are transaction boundaries only. Every enqueued function is a `jobs/` entry point; services are never enqueued directly |
 | DocType controllers | `utils/`, `exceptions`, `compat`, `crypto/pkcs12.py` | Hold business logic beyond validation and state guards |
-| `utils/`, `exceptions.py`, `compat.py` | `frappe` | Import any other app layer; any layer except `pdf/` and `crypto/` may import them |
+| `utils/`, `exceptions.py`, `compat.py` | `frappe`, each other (`utils/` raises `exceptions.py` errors) | Import any other app layer; any layer except `pdf/` and `crypto/` may import them |
 
 ## Request flow: a customer signs a Quotation
 

@@ -1,0 +1,151 @@
+{
+ "actions": [],
+ "autoname": "format:STRG-{#####}",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "event",
+  "enabled",
+  "column_break_main",
+  "template",
+  "mode",
+  "event_details_section",
+  "workflow_state",
+  "watch_field",
+  "date_field",
+  "days_offset",
+  "condition_section",
+  "condition"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "DocType",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event",
+   "options": "Submit\nSave\nWorkflow State\nValue Change\nDate",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Template",
+   "options": "Sign Template",
+   "reqd": 1
+  },
+  {
+   "default": "Create Draft",
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Create Draft\nSend",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event_details_section",
+   "fieldtype": "Section Break",
+   "label": "Event details"
+  },
+  {
+   "depends_on": "eval:doc.event==\"Workflow State\"",
+   "fieldname": "workflow_state",
+   "fieldtype": "Data",
+   "label": "Workflow state",
+   "mandatory_depends_on": "eval:doc.event==\"Workflow State\""
+  },
+  {
+   "depends_on": "eval:doc.event==\"Value Change\"",
+   "fieldname": "watch_field",
+   "fieldtype": "Data",
+   "label": "Watch field",
+   "mandatory_depends_on": "eval:doc.event==\"Value Change\""
+  },
+  {
+   "depends_on": "eval:doc.event==\"Date\"",
+   "fieldname": "date_field",
+   "fieldtype": "Data",
+   "label": "Date field",
+   "mandatory_depends_on": "eval:doc.event==\"Date\""
+  },
+  {
+   "depends_on": "eval:doc.event==\"Date\"",
+   "description": "Days after the date (negative for before)",
+   "fieldname": "days_offset",
+   "fieldtype": "Int",
+   "label": "Days offset"
+  },
+  {
+   "fieldname": "condition_section",
+   "fieldtype": "Section Break",
+   "label": "Condition"
+  },
+  {
+   "description": "Optional. Evaluated with frappe.safe_eval; doc is the source document.",
+   "fieldname": "condition",
+   "fieldtype": "Code",
+   "label": "Condition",
+   "options": "PythonExpression"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Trigger",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

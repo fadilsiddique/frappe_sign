@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "autoname": "format:SCERT-{#####}",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "company",
+  "kind",
+  "storage",
+  "key_section",
+  "p12_file",
+  "p12_password",
+  "remote_config",
+  "details_section",
+  "subject",
+  "issuer",
+  "column_break_details",
+  "valid_from",
+  "valid_to",
+  "fingerprint_sha256"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company"
+  },
+  {
+   "default": "Self-signed",
+   "fieldname": "kind",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Kind",
+   "options": "Self-signed\nCA-issued\nAATL"
+  },
+  {
+   "default": "PKCS#12 File",
+   "fieldname": "storage",
+   "fieldtype": "Select",
+   "label": "Storage",
+   "options": "PKCS#12 File\nRemote",
+   "reqd": 1
+  },
+  {
+   "fieldname": "key_section",
+   "fieldtype": "Section Break",
+   "label": "Key"
+  },
+  {
+   "depends_on": "eval:doc.storage==\"PKCS#12 File\"",
+   "description": "Private file",
+   "fieldname": "p12_file",
+   "fieldtype": "Attach",
+   "label": "PKCS#12 file",
+   "mandatory_depends_on": "eval:doc.storage==\"PKCS#12 File\""
+  },
+  {
+   "depends_on": "eval:doc.storage==\"PKCS#12 File\"",
+   "fieldname": "p12_password",
+   "fieldtype": "Password",
+   "label": "PKCS#12 password"
+  },
+  {
+   "depends_on": "eval:doc.storage==\"Remote\"",
+   "description": "PKCS#11 or CSC endpoint (later release)",
+   "fieldname": "remote_config",
+   "fieldtype": "JSON",
+   "label": "Remote config"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Certificate details"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Small Text",
+   "label": "Subject",
+   "read_only": 1
+  },
+  {
+   "fieldname": "issuer",
+   "fieldtype": "Small Text",
+   "label": "Issuer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Datetime",
+   "label": "Valid from",
+   "read_only": 1
+  },
+  {
+   "fieldname": "valid_to",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Valid to",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fingerprint_sha256",
+   "fieldtype": "Data",
+   "label": "Fingerprint (SHA-256)",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Certificate",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "Sign Manager",
+   "select": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

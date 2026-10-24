@@ -1,0 +1,148 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "envelope",
+  "seq",
+  "event",
+  "at",
+  "column_break_main",
+  "recipient_row",
+  "actor",
+  "ip",
+  "user_agent",
+  "payload_section",
+  "payload",
+  "chain_section",
+  "prev_hash",
+  "hash"
+ ],
+ "fields": [
+  {
+   "fieldname": "envelope",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Envelope",
+   "options": "Sign Envelope",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "seq",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Sequence",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Event",
+   "options": "Created\nSent\nDelivered\nViewed\nOTP Sent\nOTP Verified\nConsented\nField Filled\nSigned\nDeclined\nDelegated\nReminded\nVoided\nExpired\nSource Changed\nSealed\nCompleted\nDownloaded",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "At (UTC)",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "recipient_row",
+   "fieldtype": "Data",
+   "label": "Recipient row",
+   "read_only": 1
+  },
+  {
+   "description": "User or recipient email",
+   "fieldname": "actor",
+   "fieldtype": "Data",
+   "label": "Actor",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ip",
+   "fieldtype": "Data",
+   "label": "IP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user_agent",
+   "fieldtype": "Small Text",
+   "label": "User agent",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payload_section",
+   "fieldtype": "Section Break",
+   "label": "Payload"
+  },
+  {
+   "fieldname": "payload",
+   "fieldtype": "JSON",
+   "label": "Payload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "chain_section",
+   "fieldtype": "Section Break",
+   "label": "Hash chain"
+  },
+  {
+   "fieldname": "prev_hash",
+   "fieldtype": "Data",
+   "label": "Previous hash",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "hash",
+   "fieldtype": "Data",
+   "label": "Hash",
+   "read_only": 1,
+   "reqd": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Event",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager"
+  }
+ ],
+ "sort_field": "seq",
+ "sort_order": "DESC",
+ "states": []
+}

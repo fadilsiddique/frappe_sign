@@ -19,7 +19,8 @@ ALLOWED_IMPORTS: dict[str, set[str]] = {
 	"erpnext": {"erpnext", "services"} | SHARED,
 	"jobs": {"services"} | SHARED,
 	"doctype": {"doctype", "crypto.pkcs12"} | SHARED,
-	"utils": {"utils"},
+	# utils/, exceptions.py and compat.py form one shared tier and may use each other.
+	"utils": SHARED,
 	"exceptions": set(),
 	"compat": set(),
 	"www": {"services"} | SHARED,

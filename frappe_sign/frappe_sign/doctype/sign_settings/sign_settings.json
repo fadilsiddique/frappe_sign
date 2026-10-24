@@ -1,0 +1,141 @@
+{
+ "actions": [],
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "defaults_section",
+  "default_expiry_days",
+  "default_reminder_days",
+  "otp_validity_minutes",
+  "column_break_defaults",
+  "max_upload_mb",
+  "max_pages",
+  "timestamping_section",
+  "tsa_urls",
+  "consent_section",
+  "consent_text",
+  "consent_version",
+  "enabled_doctypes_section",
+  "enabled_doctypes"
+ ],
+ "fields": [
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "default": "14",
+   "fieldname": "default_expiry_days",
+   "fieldtype": "Int",
+   "label": "Default expiry days",
+   "non_negative": 1
+  },
+  {
+   "default": "3",
+   "description": "0 disables reminders",
+   "fieldname": "default_reminder_days",
+   "fieldtype": "Int",
+   "label": "Default reminder days",
+   "non_negative": 1
+  },
+  {
+   "default": "10",
+   "fieldname": "otp_validity_minutes",
+   "fieldtype": "Int",
+   "label": "OTP validity (minutes)",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_defaults",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "20",
+   "fieldname": "max_upload_mb",
+   "fieldtype": "Int",
+   "label": "Max upload (MB)",
+   "non_negative": 1
+  },
+  {
+   "default": "200",
+   "fieldname": "max_pages",
+   "fieldtype": "Int",
+   "label": "Max pages",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "timestamping_section",
+   "fieldtype": "Section Break",
+   "label": "Timestamping"
+  },
+  {
+   "description": "RFC 3161 timestamp servers, one URL per line, tried in order",
+   "fieldname": "tsa_urls",
+   "fieldtype": "Small Text",
+   "label": "TSA URLs"
+  },
+  {
+   "fieldname": "consent_section",
+   "fieldtype": "Section Break",
+   "label": "Consent"
+  },
+  {
+   "description": "Electronic records disclosure shown to signers",
+   "fieldname": "consent_text",
+   "fieldtype": "Text Editor",
+   "label": "Consent text"
+  },
+  {
+   "default": "0",
+   "description": "Increases each time the consent text changes",
+   "fieldname": "consent_version",
+   "fieldtype": "Int",
+   "label": "Consent version",
+   "read_only": 1
+  },
+  {
+   "fieldname": "enabled_doctypes_section",
+   "fieldtype": "Section Break",
+   "label": "Enabled DocTypes"
+  },
+  {
+   "description": "DocTypes that get the sign status fields and the Send for Signature button",
+   "fieldname": "enabled_doctypes",
+   "fieldtype": "Table",
+   "label": "Enabled DocTypes",
+   "options": "Sign Enabled DocType"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Sign Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

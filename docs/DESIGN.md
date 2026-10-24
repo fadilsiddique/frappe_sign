@@ -107,7 +107,7 @@ Customize Form does not allow a Data to Link change, so `erpnext/setup.py` write
 | p12_file | Attach | Private |
 | p12_password | Password | Encrypted with site key |
 | remote_config | JSON | Phase 3 (PKCS#11 or CSC endpoint) |
-| subject, issuer | Data, read only | Parsed on save |
+| subject, issuer | Small Text, read only | Parsed on save. Distinguished names can exceed 140 characters |
 | valid_from, valid_to | Datetime, read only | Parsed on save |
 | fingerprint_sha256 | Data, read only | |
 
@@ -242,7 +242,8 @@ Field types that need a note:
 | event | Select | Created, Sent, Delivered, Viewed, OTP Sent, OTP Verified, Consented, Field Filled, Signed, Declined, Delegated, Reminded, Voided, Expired, Source Changed, Sealed, Completed, Downloaded |
 | at | Datetime(6) | UTC, stored naive. Only Sign Event uses UTC; the UI converts it for display |
 | actor | Data | User or recipient email |
-| ip, user_agent | Data | |
+| ip | Data | |
+| user_agent | Small Text | Browser user agents often exceed 140 characters (also on Sign Session) |
 | payload | JSON | Event specific (hashes, consent version) |
 | prev_hash, hash | Data | Chain |
 
@@ -265,8 +266,10 @@ Created with `frappe.custom.doctype.custom_field.custom_field.create_custom_fiel
 
 ### 2.6 Integrity rules
 
-- Sign Event, Sign Capture and Sign Template Version: no write or delete permission for any role. Controllers raise in `validate` when the document is not new, and in `on_trash`.
-- A Sign Envelope past Draft rejects changes to anything except fields the service sets via `db_set`.
+- Sign Event, Sign Capture and Sign Template Version: no write or delete permission for any role. Controllers raise `ImmutableRecord` in `before_validate` when the document is not new, and in `on_trash`. The guards run in `before_validate` because `flags.ignore_validate` skips `validate` but not `before_validate`.
+- A Sign Envelope past Draft rejects changes to anything except fields the service sets via `db_set`. A Draft with `send_state = Queued` is also locked, because the render job is reading it. Only Draft envelopes can be deleted.
+- Service-owned fields (status, states, files, hashes, dates, recipient progress and tokens) cannot be set through `save()`, even on a Draft. They are `no_copy`, so Duplicate starts a clean Draft.
+- Sign Event has a unique key on `(envelope, seq)`, so the database refuses a forked chain.
 - Services never call `save()` on an envelope past Draft. To add a recipient (delegation), insert the child row directly with `parent`, `parenttype` and `parentfield` set. Then move that recipient's Sign Envelope Field rows to the new row with `db_set`.
 - Tokens, session secrets and OTPs are stored only as SHA-256 hashes.
 

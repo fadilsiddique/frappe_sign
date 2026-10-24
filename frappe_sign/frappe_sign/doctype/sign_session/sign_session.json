@@ -1,0 +1,141 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-10-24 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "envelope",
+  "recipient_row",
+  "session_hash",
+  "verified_on",
+  "last_seen_on",
+  "expires_on",
+  "column_break_main",
+  "otp_hash",
+  "otp_attempts",
+  "otp_sent_on",
+  "otp_expires_on",
+  "client_section",
+  "ip",
+  "user_agent"
+ ],
+ "fields": [
+  {
+   "fieldname": "envelope",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Envelope",
+   "options": "Sign Envelope",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "recipient_row",
+   "fieldtype": "Data",
+   "label": "Recipient row",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "session_hash",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Session hash",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "verified_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Verified on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_seen_on",
+   "fieldtype": "Datetime",
+   "label": "Last seen on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expires_on",
+   "fieldtype": "Datetime",
+   "label": "Expires on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "otp_hash",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "OTP hash",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "otp_attempts",
+   "fieldtype": "Int",
+   "label": "OTP attempts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "otp_sent_on",
+   "fieldtype": "Datetime",
+   "label": "OTP sent on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "otp_expires_on",
+   "fieldtype": "Datetime",
+   "label": "OTP expires on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "client_section",
+   "fieldtype": "Section Break",
+   "label": "Client"
+  },
+  {
+   "fieldname": "ip",
+   "fieldtype": "Data",
+   "label": "IP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user_agent",
+   "fieldtype": "Small Text",
+   "label": "User agent",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-24 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Session",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "read": 1,
+   "report": 1,
+   "role": "Sign Manager"
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
