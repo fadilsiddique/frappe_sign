@@ -71,7 +71,7 @@ Conventions for every task:
 
 | ID | Task | Done when |
 | --- | --- | --- |
-| P1.15 | `shared/coords.ts`, PDF viewer component (lazy pages), `useDragResize` | Vitest against `coords.json` |
+| [x] P1.15 | `shared/coords.ts`, PDF viewer component (lazy pages), `useDragResize` | Vitest against `coords.json` |
 | P1.16 | Template designer: palette, placement, properties, roles, undo/redo, publish | Designer saves fields that the server overlays at identical positions (fixture round trip test) |
 | P1.17 | Send wizard (upload source), envelope list and detail with audit timeline | Manual QA checklist in PR |
 | P1.18 | `bench frappe-sign verify` command, `/sign-verify` page | Command reports OK on good, first bad event on tampered |
