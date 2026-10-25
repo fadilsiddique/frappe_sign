@@ -140,6 +140,13 @@ Status values: **Accepted**, **Proposed**, **Superseded**.
 - **Why:** Handlers write data (write-back attaches files and calls `db_set`). Writes made in an after-commit callback are never committed, and services must not commit. A handler in its own job also cannot roll back a signature.
 - **Rejected:** `frappe.db.after_commit` callbacks.
 
+## D18. Plain-language staff app is the main surface
+
+- **Status:** Accepted
+- **Decision:** The UI calls an envelope a "Signature request" ("Request" for short); DocType names, fields and APIs keep the D13 names. Setup (company seal, profiles, enabled DocTypes, settings) and Print Format templates are done in the staff app at `/sign`, which uses a frappe-ui `Sidebar` shell. Desk keeps its forms for admins, plus the "Send for Signature" button on documents. The company brand color appears only on the guest signing page and in emails; the staff app stays neutral. `/sign/envelopes` becomes `/sign/requests`, with a redirect from the old path.
+- **Why:** In the Phase 2 pilot setup the user could not find the order of setup steps across five Desk forms, could not make a Quotation template from `/sign/templates`, and did not know the words Envelope, CC, Party Contact or OTP mode.
+- **Rejected:** Keeping setup in Desk forms with better descriptions; a top bar shell; renaming the DocTypes.
+
 ---
 
 ## History
@@ -148,3 +155,4 @@ Status values: **Accepted**, **Proposed**, **Superseded**.
 - 2026-10-25: Golden rule 6 (CLAUDE.md) also allows `ignore_permissions` in `services/audit.py`, to insert Sign Events that no role may create.
 - 2026-10-24: Doc review before Phase 0. D2: LGPL scope stated. D3: intermediate PDF rendered in `finish` under the row lock. D17 added. DESIGN, ARCHITECTURE, PLAN and CLAUDE.md updated to match.
 - 2026-10-25: D10 changed after Gate 1 review: link tokens are derived from the site key, so reminders keep earlier links working; resend still rotates.
+- 2026-10-25: D18 added after the Phase 2 pilot setup: plain-language staff app as the main surface (UX_PLAN.md decisions 1 to 5, confirmed by the user).

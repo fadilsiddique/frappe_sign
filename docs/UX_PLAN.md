@@ -6,7 +6,7 @@ This plan makes Frappe Sign easy to understand and pleasant to use, before Phase
 
 1. Read `CLAUDE.md`, this file, `PLAN.md` Phase 2.5 and `DESIGN.md` section 7.
 2. Load the skills `ui-design`, `frontend-design` and `frappe-app-dev` (its `frontend-vue.md` and `frontend-desk.md` references) before any screen work.
-3. Confirm the open decisions (last section) with the user. The recommended answer is marked.
+3. Read the confirmed decisions (last section, and D18 in DECISIONS.md). Do not ask again.
 4. Look at the "before" screenshots in `docs/ux/before/`.
 5. Start with U.1. Do not change screens before the user picks a direction in U.1.
 
@@ -46,7 +46,7 @@ The user could not find their way. These are the causes, from a screen audit on 
 
 The register is product clarity, not marketing. Frappe Sign should feel like Frappe's own newer apps (CRM, Helpdesk, Gameplan): calm, dense where it helps, with one clear primary action per screen.
 
-- **Shell:** frappe-ui `Sidebar` with the app name and the company logo at the top. Below it: Home, To sign, Sent, Templates, Settings, then "Back to Desk" at the bottom. A user menu sits at the bottom. On phones, `MobileShell` and `MobileNav`.
+- **Shell (D18):** frappe-ui `Sidebar` with the app name and the company logo at the top. Below it: Home, To sign, Sent, Templates, Settings, then "Back to Desk" at the bottom. A user menu sits at the bottom. On phones, `MobileShell` and `MobileNav`.
 - **Type:** frappe-ui scale. Page titles 20px semibold, body 14px, secondary text 13px gray-6 or darker. Nothing under 12px except badges.
 - **Color:** neutral surfaces. Color only for status badges and role colors. On the guest page only, the company brand color comes from the Sign Profile.
 - **Surfaces:** fewer boxed cards. Lists are full-width rows with dividers. Use a card only where the content is a separate object, such as a template thumbnail.
@@ -205,10 +205,10 @@ Each screen task is done only when all of these hold:
 - **Sizes:** the guest bundle stays under 250 KB gzipped.
 - **Copy:** no em dashes.
 
-## Open decisions (confirm at the start of the session)
+## Decisions (confirmed by the user on 2026-10-25, recorded as D18)
 
-1. **Call an envelope a "Signature request" in the UI.** Recommended. DocType names stay (D13).
-2. **Move setup and Print Format template creation into the staff app,** and keep the Desk forms for admins. Recommended. Users then need Desk only for the "Send for Signature" button.
-3. **App shell:** frappe-ui `Sidebar` like CRM and Helpdesk (recommended), or a top bar as today.
-4. **Brand color:** the company brand color on the guest page and the emails only. The staff app stays neutral. Recommended.
-5. **Route rename** `/sign/envelopes` to `/sign/requests`, with a redirect. Recommended, since emails and Desk links use the old path.
+1. The UI calls an envelope a "Signature request" ("Request" for short). DocType names stay (D13).
+2. Setup and Print Format template creation move into the staff app. Desk keeps its forms for admins and the "Send for Signature" button.
+3. The app shell is a frappe-ui `Sidebar`, like CRM and Helpdesk.
+4. The company brand color appears on the guest page and in emails only. The staff app stays neutral.
+5. `/sign/envelopes` becomes `/sign/requests`, with a redirect from the old path.
