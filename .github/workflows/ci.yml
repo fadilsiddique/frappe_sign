@@ -131,10 +131,14 @@ jobs:
           key: pip-${{ runner.os }}-${{ matrix.frappe_ref }}-${{ hashFiles('pyproject.toml') }}
           restore-keys: pip-${{ runner.os }}-${{ matrix.frappe_ref }}-
 
-      - name: Install MariaDB client
+      # wkhtmltopdf (patched Qt build, as Frappe recommends) for the Print Format and anchor tests.
+      - name: Install MariaDB client and wkhtmltopdf
         run: |
           sudo apt-get update
           sudo apt-get install -y mariadb-client
+          wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+          sudo apt-get install -y ./wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+          wkhtmltopdf --version
 
       - name: Create bench at frappe ${{ matrix.frappe_ref }}
         run: |
@@ -176,6 +180,11 @@ jobs:
       - name: Migrate
         working-directory: ${{ env.BENCH }}
         run: bench --site "$SITE" migrate
+
+      # Headless Chromium for Print Formats that use the chrome generator (into $BENCH/chromium).
+      - name: Download Chromium
+        working-directory: ${{ env.BENCH }}
+        run: bench --site "$SITE" execute frappe.utils.print_utils.find_or_download_chromium_executable
 
       - name: Run tests
         working-directory: ${{ env.BENCH }}

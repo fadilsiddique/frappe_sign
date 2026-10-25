@@ -20,6 +20,8 @@
   "source_section",
   "reference_doctype",
   "reference_name",
+  "print_format",
+  "letter_head",
   "column_break_source",
   "party_type",
   "party",
@@ -145,6 +147,21 @@
    "fieldtype": "Dynamic Link",
    "label": "Reference name",
    "options": "reference_doctype"
+  },
+  {
+   "depends_on": "reference_doctype",
+   "description": "Rendered from the reference document at send. Copied from a Print Format template.",
+   "fieldname": "print_format",
+   "fieldtype": "Link",
+   "label": "Print Format",
+   "options": "Print Format"
+  },
+  {
+   "depends_on": "print_format",
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter Head",
+   "options": "Letter Head"
   },
   {
    "fieldname": "column_break_source",
@@ -337,7 +354,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-25 03:00:00.000000",
+ "modified": "2026-10-25 18:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Sign",
  "name": "Sign Envelope",

@@ -18,6 +18,7 @@ from frappe.utils.password import get_encryption_key
 from frappe_sign.exceptions import FieldValidationError, InvalidTransition, throw
 from frappe_sign.pdf.pages import extract_pages
 from frappe_sign.pdf.sanitize import sanitize
+from frappe_sign.pdf.source import render_print
 from frappe_sign.pdf.types import PdfError
 from frappe_sign.services import audit, events, notify, settings
 from frappe_sign.services.errors import pdf_message
@@ -38,7 +39,7 @@ SIGNING_KINDS = ("Signer", "Approver")
 # Recipients whose turn has come and who have not finished.
 WAITING = ("Sent", "Viewed")
 DONE = ("Signed", "Declined", "Delegated")
-UPLOADED_PDF = "Uploaded PDF"
+PRINT_FORMAT = "Print Format"
 RECIPIENT_FIELDS = ("role_label", "full_name", "email", "mobile", "party_type", "party", "contact")
 
 
@@ -89,6 +90,8 @@ def create_draft(payload: dict[str, Any]) -> Any:
 		"reference_name": payload.get("reference_name"),
 		"party_type": payload.get("party_type"),
 		"party": payload.get("party"),
+		"print_format": payload.get("print_format"),
+		"letter_head": payload.get("letter_head"),
 	}
 	if version:
 		frappe.has_permission("Sign Template Version", "read", doc=version, throw=True)
@@ -125,9 +128,12 @@ def from_template(snapshot: dict[str, Any], given: list[dict[str, Any]]) -> dict
 			row["email"] = frappe.db.get_value("User", role["fixed_user"], "email")
 			row["full_name"] = row.get("full_name") or frappe.utils.get_fullname(role["fixed_user"])
 		recipients.append(row)
+	from_print = snapshot.get("source_type") == PRINT_FORMAT
 	return {
 		"title": snapshot.get("title"),
 		"company": snapshot.get("company"),
+		"print_format": snapshot.get("print_format") if from_print else None,
+		"letter_head": snapshot.get("letter_head") if from_print else None,
 		"signing_order": snapshot.get("signing_order") or "Sequential",
 		"otp_mode": snapshot.get("otp_mode") or "Off",
 		"recipients": recipients,
@@ -168,6 +174,7 @@ def send(name: str) -> None:
 
 
 def check_sendable(doc: Any) -> None:
+	from_print = is_print_source(doc)
 	signing = [row for row in doc.recipients if row.kind in SIGNING_KINDS]
 	if not signing:
 		throw(FieldValidationError, _("Add at least one Signer or Approver."))
@@ -189,7 +196,7 @@ def check_sendable(doc: Any) -> None:
 					field.field_key, field.role_label
 				),
 			)
-		if cint(field.page) < 1:
+		if cint(field.page) < 1 and not from_print:
 			throw(
 				FieldValidationError,
 				_("Field {0} is placed by an anchor, which needs a Print Format source.").format(
@@ -198,7 +205,9 @@ def check_sendable(doc: Any) -> None:
 			)
 	if doc.otp_mode == "WhatsApp":
 		throw(FieldValidationError, _("WhatsApp verification is not available yet. Use Email or Off."))
-	if not doc.template_version and not doc.source_file:
+	if from_print and not (doc.reference_doctype and doc.reference_name):
+		throw(FieldValidationError, _("Choose the document whose Print Format is sent."))
+	if not from_print and not doc.template_version and not doc.source_file:
 		throw(FieldValidationError, _("Attach the PDF to send."))
 	if not notify.can_send_email(doc.company):
 		throw(FieldValidationError, _("Set up an outgoing Email Account before sending."))
@@ -256,14 +265,21 @@ def mark_send_failed(name: str, reason: str) -> None:
 	notify.send_failed(name, reason)
 
 
+def is_print_source(doc: Any) -> bool:
+	"""The envelope is rendered from its reference document's Print Format (D5)."""
+	if doc.print_format:
+		return True
+	return (
+		bool(doc.template_version) and load_snapshot(doc.template_version).get("source_type") == PRINT_FORMAT
+	)
+
+
 def source_pdf(doc: Any) -> bytes:
+	if is_print_source(doc):
+		return render_print(doc.reference_doctype, doc.reference_name, doc.print_format, doc.letter_head)
 	if not doc.template_version:
 		return read_file_url(doc.source_file)
 	snapshot = load_snapshot(doc.template_version)
-	if snapshot.get("source_type") != UPLOADED_PDF:
-		raise SendFailed(
-			_("Print Format sources are not available yet. Use a template with an uploaded PDF.")
-		)
 	pdf = read_file_url(snapshot["pdf_file"])
 	expected = frappe.db.get_value("Sign Template Version", doc.template_version, "source_sha256")
 	if expected and sha256_hex(pdf) != expected:

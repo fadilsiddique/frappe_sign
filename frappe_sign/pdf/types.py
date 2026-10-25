@@ -49,6 +49,12 @@ class SealError(PdfError):
 	code = "seal_error"
 
 
+class PdfRenderFailed(PdfError):
+	"""The Print Format could not be rendered to a PDF (template error, generator missing)."""
+
+	code = "pdf_render_failed"
+
+
 @dataclass(frozen=True)
 class Rect:
 	"""Normalized rect: 0..1, top-left origin, visible page box."""

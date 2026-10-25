@@ -12,6 +12,7 @@ from frappe_sign.pdf.types import (
 	PdfEncrypted,
 	PdfError,
 	PdfInvalid,
+	PdfRenderFailed,
 	PdfTooLarge,
 	PdfTooManyPages,
 )
@@ -24,6 +25,8 @@ def pdf_message(error: PdfError) -> str:
 		return _("The PDF is too large. {0}").format(str(error))
 	if isinstance(error, PdfTooManyPages):
 		return _("The PDF has too many pages. {0}").format(str(error))
+	if isinstance(error, PdfRenderFailed):
+		return _("The Print Format could not be rendered as a PDF: {0}").format(str(error))
 	if isinstance(error, PdfInvalid):
 		return _("The file is not a readable PDF.")
 	return _("The PDF could not be processed: {0}").format(str(error))

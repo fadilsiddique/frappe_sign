@@ -1,1 +1,57 @@
-"""Stage 1: render a Print Format with frappe.get_print(..., as_pdf=True), or take uploaded bytes."""
+"""Stage 1: render a Print Format with frappe.get_print(..., as_pdf=True), or take uploaded bytes.
+
+get_print uses the Print Format's own `pdf_generator` (wkhtmltopdf or chrome) when
+`frappe.local.form_dict` has none, so render() never passes one (D5). In v16.0.0, get_print writes
+`pdf_generator` to form_dict and does not restore it: a stale value would pick the generator of an
+earlier render in the same request or job. render() removes it for the call and restores the
+caller's form_dict afterwards.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+import frappe
+
+from frappe_sign.pdf.types import PdfRenderFailed
+
+DEFAULT_GENERATOR = "wkhtmltopdf"
+# Generators whose output the anchor tests cover (ARCHITECTURE, Compatibility).
+TESTED_GENERATORS = ("wkhtmltopdf", "chrome")
+
+
+@dataclass(frozen=True)
+class RenderedPrint:
+	pdf: bytes
+	generator: str
+
+
+def render_print(doctype: str, name: str, print_format: str | None, letter_head: str | None) -> bytes:
+	return render(doctype, name, print_format, letter_head).pdf
+
+
+def render(doctype: str, name: str, print_format: str | None, letter_head: str | None) -> RenderedPrint:
+	"""The Print Format as PDF bytes. The session user needs print permission on the document."""
+	local = frappe.local
+	saved = local.form_dict
+	local.form_dict = frappe._dict({key: value for key, value in saved.items() if key != "pdf_generator"})
+	try:
+		pdf = frappe.get_print(
+			doctype, name, print_format or None, letterhead=letter_head or None, as_pdf=True
+		)
+	except frappe.PermissionError:
+		raise
+	except Exception as error:
+		raise PdfRenderFailed(f"{print_format or 'Standard'}: {error}") from error
+	finally:
+		local.form_dict = saved
+	if not isinstance(pdf, bytes) or not pdf.startswith(b"%PDF"):
+		raise PdfRenderFailed(f"{print_format or 'Standard'} did not render to a PDF")
+	return RenderedPrint(pdf=pdf, generator=print_generator(print_format))
+
+
+def print_generator(print_format: str | None) -> str:
+	"""The generator get_print uses for this Print Format: its own setting, else wkhtmltopdf."""
+	if not print_format or print_format == "Standard":
+		return DEFAULT_GENERATOR
+	return frappe.get_cached_value("Print Format", print_format, "pdf_generator") or DEFAULT_GENERATOR

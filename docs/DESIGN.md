@@ -196,6 +196,7 @@ Field types that need a note:
 | signing_order | Select | Copied from template |
 | otp_mode | Select | Copied from template |
 | source_file | Attach | Private. Uploaded PDF of an envelope without a template; editable in Draft |
+| print_format, letter_head | Link Print Format, Link Letter Head | Set when the PDF is rendered from the reference document (D5). Copied from a Print Format template, or chosen in the Desk print view; editable in Draft |
 | original_file | Link File | Frozen PDF |
 | page_metrics | JSON | Read only. `[{page, width, height, rotation, left, bottom}]` of the frozen PDF |
 | original_sha256 | Data | |
@@ -516,7 +517,7 @@ def seal_pdf(pdf: bytes, *, signer: Signer, tsa_urls: list[str],
 - **Concurrency.** See 5.4. Exactly one seal per envelope.
 - **Idempotency.** Each stage's output hash is logged; a retried job reuses stored intermediates.
 - **Drift.** Rendering happens once, at send (D6).
-- **Generator.** In v16.0.0, `get_print` reads the Print Format's `pdf_generator` when none is passed, so `source.py` does not pass it. `get_print` writes `pdf_generator`, `letterhead` and other keys to `frappe.local.form_dict`. `source.py` saves `form_dict` and restores it after the call.
+- **Generator.** In v16.0.0, `get_print` reads the Print Format's `pdf_generator` when none is passed, so `source.py` does not pass it. `get_print` writes `pdf_generator`, `letterhead` and other keys to `frappe.local.form_dict`. `source.py` removes `pdf_generator` from `form_dict` for the call (a value left by an earlier render in the same request or job would win) and restores the caller's `form_dict` afterwards. Render failures (template error, generator missing) raise `PdfRenderFailed`; permission errors pass through.
 - **Memory.** Process page by page where possible; caps from settings.
 - **Certificate renderer.** The certificate is drawn with reportlab, not rendered from HTML with `get_pdf`. wkhtmltopdf is not on every v16 server or CI runner, and reportlab reuses the overlay's fonts and Arabic shaping. Services format dates and translate the labels (`CertificateData.labels`).
 
