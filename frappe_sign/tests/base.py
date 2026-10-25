@@ -12,15 +12,20 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import get_files_path, now_datetime
 
+from frappe_sign.tests.factories import make_email_account
 from frappe_sign.utils.users import run_as
 
 
 class SignTestCase(IntegrationTestCase):
+	needs_email_account = True
+
 	def setUp(self):
 		super().setUp()
 		self._started = now_datetime()
 		frappe.set_user("Administrator")  # nosemgrep: frappe-setuser
 		self.addCleanup(self._clean_up)
+		if self.needs_email_account:
+			make_email_account()
 
 	def _clean_up(self):
 		frappe.set_user("Administrator")  # nosemgrep: frappe-setuser

@@ -4,6 +4,8 @@ The frontend switches UI states on `code`, never on the message text, so a code 
 once released.
 """
 
+from typing import NoReturn
+
 import frappe
 
 
@@ -80,7 +82,7 @@ class RecipientDone(FrappeSignError):
 	code = "recipient_done"
 
 
-def throw(exc_class: type[FrappeSignError], message: str, **data) -> None:
+def throw(exc_class: type[FrappeSignError], message: str, **data) -> NoReturn:
 	"""frappe.throw that also carries `data` for the frontend (shown as `code` and `data` by api/)."""
 	frappe.msgprint(message, title=frappe._("Error"), indicator="red")
 	error = exc_class(message)

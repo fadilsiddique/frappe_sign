@@ -141,3 +141,20 @@ def fixture_pdf(name: str = "a4_simple.pdf") -> bytes:
 	from pathlib import Path
 
 	return (Path(__file__).resolve().parent / "fixtures" / "pdfs" / name).read_bytes()
+
+
+def make_email_account(email_id: str = "sign-test@example.com"):
+	"""A default outgoing Email Account; tests never connect to it (frappe skips SMTP in tests)."""
+	if frappe.db.exists("Email Account", {"email_id": email_id}):
+		return frappe.get_doc("Email Account", {"email_id": email_id})
+	return frappe.get_doc(
+		{
+			"doctype": "Email Account",
+			"email_account_name": "Frappe Sign Test",
+			"email_id": email_id,
+			"enable_outgoing": 1,
+			"default_outgoing": 1,
+			"smtp_server": "localhost",
+			"no_smtp_authentication": 1,
+		}
+	).insert()

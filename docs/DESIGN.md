@@ -636,7 +636,7 @@ frappe_sign_events = {
 }
 ```
 
-`services/events.publish(name, envelope)` resolves handlers with `frappe.get_hooks("frappe_sign_events")`. It enqueues one `jobs.events.run` job per handler with `enqueue_after_commit=True` (D17). The job commits, so handler writes persist and a failing handler never rolls back a signature.
+`services/events.publish(name, envelope)` resolves handlers with `frappe.get_hooks("frappe_sign_events")`. It enqueues one `jobs.events.run` job per handler with `enqueue_after_commit=True` (D17). The job commits, so handler writes persist and a failing handler never rolls back a signature. Handlers run as the envelope `sender`: a guest's action would otherwise run them as Guest, and write-back needs the sender's permissions, as post-sign actions do (4.6).
 
 ### 8.6 Jobs
 

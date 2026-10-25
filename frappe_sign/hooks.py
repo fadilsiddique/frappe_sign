@@ -18,3 +18,12 @@ website_route_rules = [
 	{"from_route": "/sign/<path:app_path>", "to_route": "sign"},
 	{"from_route": "/s/<path:app_path>", "to_route": "s"},
 ]
+
+# Domain events (D17, DESIGN 8.5). Each handler runs in its own job as the envelope sender.
+frappe_sign_events = {
+	"envelope_sent": ["frappe_sign.services.notify.on_sent"],
+	"recipient_signed": ["frappe_sign.services.notify.on_signed"],
+	"envelope_completed": ["frappe_sign.services.notify.on_completed"],
+	"envelope_declined": ["frappe_sign.services.notify.on_declined"],
+	"envelope_voided": ["frappe_sign.services.notify.on_voided"],
+}
