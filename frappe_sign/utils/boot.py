@@ -30,3 +30,17 @@ def profile_branding(company: str | None) -> dict:
 	if not values:
 		return dict(EMPTY_BRANDING)
 	return {"company": company, "logo": values.logo, "brand_color": values.brand_color}
+
+
+def desk_boot(bootinfo) -> None:
+	"""boot_session hook: what public/js/desk.js needs to add its buttons (DESIGN 4.1)."""
+	if frappe.session.user == "Guest":
+		return
+	bootinfo.frappe_sign = {
+		"enabled_doctypes": frappe.get_all(
+			"Sign Enabled DocType",
+			filters={"parenttype": "Sign Settings", "parent": "Sign Settings"},
+			pluck="reference_doctype",
+		),
+		"can_send": bool(STAFF_ROLES & set(frappe.get_roles())),
+	}

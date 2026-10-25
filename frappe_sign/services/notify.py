@@ -220,6 +220,21 @@ def notify_sender(envelope: Any, subject: str) -> None:
 	)
 
 
+def notify_user(
+	user: str, subject: str, document_type: str | None = None, document_name: str | None = None
+) -> None:
+	"""A Desk alert for any user, such as the result of a bulk send."""
+	make_notification_logs(
+		{
+			"type": "Alert",
+			"subject": subject,
+			"document_type": document_type,
+			"document_name": document_name,
+		},
+		[frappe.db.get_value("User", user, "email") or user],
+	)
+
+
 def publish_realtime(envelope: str) -> None:
 	status = frappe.db.get_value("Sign Envelope", envelope, ["status", "sealing_state"], as_dict=True) or {}
 	frappe.publish_realtime(

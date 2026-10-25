@@ -11,7 +11,7 @@ from frappe.rate_limiter import rate_limit
 from werkzeug.wrappers import Response
 
 from frappe_sign.api.errors import with_error_code
-from frappe_sign.services import audit, doctypes, resolvers, sealing
+from frappe_sign.services import audit, doctypes, documents, resolvers, sealing
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
 from frappe_sign.utils.dates import format_utc
@@ -198,3 +198,41 @@ def remove_sign_fields(doctype: str) -> dict:
 def resolve_recipients(template: str, doctype: str | None = None, name: str | None = None) -> list:
 	"""The template's roles with the recipients found on the document (DESIGN 4.3)."""
 	return resolvers.resolve_recipients(template, doctype, name)
+
+
+@frappe.whitelist()
+@with_error_code
+def document_templates(doctype: str) -> list:
+	"""Published templates for the Desk send dialog, the Sign Settings default first."""
+	return documents.templates_for(doctype)
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def send_from_document(
+	doctype: str,
+	name: str,
+	template: str,
+	recipients: list | str,
+	message: str | None = None,
+	print_format: str | None = None,
+	letter_head: str | None = None,
+) -> dict:
+	"""Desk send dialog: create the envelope from the template and send it."""
+	envelope = documents.send_from_document(
+		doctype,
+		name,
+		template,
+		frappe.parse_json(recipients) or [],
+		message=message,
+		print_format=print_format,
+		letter_head=letter_head,
+	)
+	return {"name": envelope, "send_state": "Queued"}
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def bulk_send(doctype: str, names: list | str, template: str) -> dict:
+	"""List view: one envelope per selected document, queued (jobs.bulk.run)."""
+	return {"queued": documents.queue_bulk_send(doctype, frappe.parse_json(names) or [], template)}

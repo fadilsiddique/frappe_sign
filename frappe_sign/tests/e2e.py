@@ -9,7 +9,7 @@ Both refuse to run unless the site has allow_tests set, so they never touch a wo
 import frappe
 from frappe.utils import get_datetime, now_datetime
 
-from frappe_sign.tests.cleanup import purge_envelope, purge_since, purge_template
+from frappe_sign.tests.cleanup import purge_envelope, purge_profile, purge_since, purge_template
 from frappe_sign.tests.factories import make_email_account
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, publish_template, send_now
 from frappe_sign.utils.users import run_as
@@ -72,3 +72,146 @@ def prepare_staff() -> dict:
 	started = now_datetime()
 	make_email_account(skip_smtp_check=True)
 	return {"now": str(started)}
+
+
+# ERPNext: a Quotation sent from its Desk form (P2.5) and signed end to end (Gate 2).
+
+ERPNEXT_PURGE = (
+	("Quotation", ("Quotation Item", "Sales Taxes and Charges", "Payment Schedule")),
+	("Sales Order", ("Sales Order Item", "Sales Taxes and Charges", "Payment Schedule")),
+	("Customer", ()),
+	("Contact", ("Contact Email", "Contact Phone", "Dynamic Link")),
+	("Item", ("Item Default", "UOM Conversion Detail", "Item Barcode")),
+	("Item Price", ()),
+	("Print Format", ()),
+	("Sign Template", ("Sign Template Role", "Sign Template Field")),
+	("Sign Template Version", ()),
+	("Comment", ()),
+	("Communication", ()),
+	("Notification Log", ()),
+	("Error Log", ()),
+	("Sign Trigger Log", ()),
+	("Access Log", ()),
+)
+
+
+def prepare_quotation(submit: bool = True, items: int = 3, post_sign_action: str = "None") -> dict:
+	"""A Quotation for Gulf Trading LLC, Quotation enabled for signing and a published template."""
+	require_test_site()
+	from frappe_sign.tests.doctypes import enable_doctypes
+	from frappe_sign.tests.erpnext.helpers import make_quotation
+	from frappe_sign.tests.erpnext.quotation import publish_quotation_template
+	from frappe_sign.tests.factories import make_profile
+
+	started = now_datetime()
+	enable_doctypes("Quotation")
+	with run_as("Administrator"):
+		make_email_account(skip_smtp_check=True)
+		make_profile()
+		quotation = make_quotation(items=items, submit=submit)
+		template = publish_quotation_template(
+			customer_only=True,
+			post_sign_action=post_sign_action,
+			post_sign_config=SALES_ORDER_ACTION if post_sign_action == "Create Mapped Document" else None,
+		)
+	frappe.db.commit()  # nosemgrep: frappe-manual-commit (e2e fixtures commit for the browser)
+	return {"quotation": quotation.name, "template": template, "started": str(started)}
+
+
+SALES_ORDER_ACTION = frappe.as_json(
+	{"method": "erpnext.selling.doctype.quotation.quotation.make_sales_order", "save": 1}
+)
+
+
+def document_state(doctype: str, name: str) -> dict:
+	"""The newest envelope of a document and the document's signature fields."""
+	require_test_site()
+	envelope = frappe.db.get_value(
+		"Sign Envelope",
+		{"reference_doctype": doctype, "reference_name": name},
+		["name", "status", "send_state", "send_error", "sealing_state"],
+		as_dict=True,
+		order_by="creation desc",
+	)
+	values = frappe.db.get_value(doctype, name, ["sign_status", "sign_envelope", "docstatus"], as_dict=True)
+	attachments = frappe.get_all(
+		"File", filters={"attached_to_doctype": doctype, "attached_to_name": name}, pluck="file_name"
+	)
+	orders = (
+		frappe.get_all("Sales Order Item", filters={"prevdoc_docname": name}, pluck="parent", distinct=True)
+		if doctype == "Quotation"
+		else []
+	)
+	return {
+		"envelope": envelope,
+		"document": values,
+		"attachments": attachments,
+		"sales_orders": [
+			frappe.db.get_value("Sales Order", order, ["name", "docstatus"], as_dict=True) for order in orders
+		],
+	}
+
+
+def render_if_queued(envelope: str) -> dict:
+	"""Run the render job inline when no worker has picked it up."""
+	require_test_site()
+	from frappe_sign.jobs import render
+
+	if frappe.db.get_value("Sign Envelope", envelope, "send_state") == "Queued":
+		with run_as(frappe.db.get_value("Sign Envelope", envelope, "sender")):
+			render.run(envelope)
+	return frappe.db.get_value(
+		"Sign Envelope", envelope, ["status", "send_state", "send_error"], as_dict=True
+	)
+
+
+def signing_token(envelope: str, email: str) -> str | None:
+	"""The /s/<token> link from the newest invitation email to `email` for this envelope."""
+	require_test_site()
+	import email as email_parser
+	import re
+
+	reference = frappe.db.get_value("Sign Envelope", envelope, ["reference_doctype", "reference_name"])
+	for queue in frappe.get_all(
+		"Email Queue",
+		filters={"reference_name": ["in", [envelope, reference[1]]]},
+		fields=["name", "message"],
+		order_by="creation desc",
+	):
+		recipients = frappe.get_all(
+			"Email Queue Recipient", filters={"parent": queue.name}, pluck="recipient"
+		)
+		if email not in recipients:
+			continue
+		message = email_parser.message_from_string(queue.message)
+		for part in message.walk():
+			if part.get_content_type() == "text/html":
+				body = part.get_payload(decode=True).decode()
+				found = re.search(r"/s/([A-Za-z0-9_-]{20,})", body)
+				if found:
+					return found.group(1)
+	return None
+
+
+def purge_quotation(started: str) -> dict:
+	"""Delete what prepare_quotation and the browser created since `started`, and the fields."""
+	require_test_site()
+	from frappe_sign.tests.doctypes import disable_doctypes
+
+	since = get_datetime(started)
+	result = purge_created(started)
+	for doctype, children in ERPNEXT_PURGE:
+		names = frappe.get_all(doctype, filters={"creation": [">=", since]}, pluck="name")
+		for child in children:
+			if names:
+				frappe.db.delete(child, {"parent": ["in", names]})
+		if names:
+			frappe.db.delete(doctype, {"name": ["in", names]})
+		result[doctype] = len(names)
+	for profile in frappe.get_all("Sign Profile", filters={"creation": [">=", since]}, pluck="name"):
+		purge_profile(profile)
+	frappe.db.delete("Email Queue", {"creation": [">=", since]})
+	frappe.db.delete("Version", {"creation": [">=", since]})
+	frappe.db.commit()  # nosemgrep: frappe-manual-commit (e2e fixtures commit for the browser)
+	disable_doctypes("Quotation")
+	return result

@@ -2,6 +2,21 @@
 
 Tick each item on a site with an outgoing Email Account and a Sign Profile with a sealing certificate. Items marked (auto) are also covered by the Playwright tests in `e2e/` (`yarn e2e` in `frontend/`, see `frontend/playwright.config.ts`).
 
+## P2.5: Desk (Quotation)
+
+Enable Quotation in Sign Settings (System Manager) and publish a Print Format template for it.
+
+- [ ] (auto) Quotation form: "Send for Signature" opens a dialog with the template and the Customer's contact filled in.
+- [ ] (auto) "Send" queues the envelope; it becomes Sent once the worker has rendered it.
+- [ ] After sending, reload: the dashboard shows "Signature: Sent", and "Signature > Signature Envelope" opens `/sign/envelopes/<id>`.
+- [ ] A Quotation whose Customer has no contact: the email cell is empty and "Send" asks for it.
+- [ ] "Customize" opens `/sign/new` with the Quotation and template chosen.
+- [ ] No template for the DocType: the button explains where to make one.
+- [ ] (auto) Print view: "Send for Signature" appears for Quotation and not for a DocType that is not enabled; the envelope uses the Print Format and Letter Head on screen.
+- [ ] (auto) List view: select rows, Actions, "Send for Signature"; a notification reports how many were sent and which were skipped.
+- [ ] A user without Sign User or Sign Manager sees none of the buttons.
+- [ ] Cancelled documents show no "Send for Signature" button.
+
 ## P1.17: Send wizard, envelope list and detail
 
 ### Send wizard (`/sign/new`)
