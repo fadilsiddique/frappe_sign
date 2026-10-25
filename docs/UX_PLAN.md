@@ -8,7 +8,7 @@ This plan makes Frappe Sign easy to understand and pleasant to use, before Phase
 2. Load the skills `ui-design`, `frontend-design` and `frappe-app-dev` (its `frontend-vue.md` and `frontend-desk.md` references) before any screen work.
 3. Read the confirmed decisions (last section, and D18 in DECISIONS.md). Do not ask again.
 4. Look at the "before" screenshots in `docs/ux/before/`.
-5. Start with U.1. Do not change screens before the user picks a direction in U.1.
+5. U.1 is done: the user chose a direction (see "Chosen direction" below). Build from this file, not from the prototype's other direction.
 
 ## What is wrong today
 
@@ -54,6 +54,22 @@ The register is product clarity, not marketing. Frappe Sign should feel like Fra
 - **States:** every list and page gets an empty state that says what to do next, a `Skeleton` while loading, and an inline error with a retry. Use toasts instead of `msgprint` in the staff app.
 - **Lanes:** in every list, the avatar, status and action columns have fixed widths and line up from row to row.
 
+### Chosen direction (U.1, 2026-10-25)
+
+The U.1 prototype showed two directions on a Design canvas (https://claude.ai/artifact/8cAiSfS9KB1HoEwjzV3tis, private to the user). The user chose:
+
+- **Staff app: Direction B, "Guided desk".**
+  - The page area is gray-50 with white panels. The sidebar is white, and the active item has a gray-200 background.
+  - Each page has a 56 px header bar with the title and the primary action.
+  - Home puts the work queue beside a setup panel. Sent puts a grouped list beside a preview pane.
+  - Defaults: comfortable density, list layout, full row detail. The board view (Sent by stage, as columns) is not in scope.
+- **Guest page: Direction A, "Quiet list".**
+  - The document comes first, under a white header with the company logo and name.
+  - The consent is a bottom sheet over the document.
+  - The other parts: a slim progress bar, a floating "Next" button, a signature bottom sheet, a review list and a done screen.
+
+The words, tokens and states in this section apply to both.
+
 ### Words
 
 These are UI labels only. DocType names, fields and APIs stay as they are (D13).
@@ -78,30 +94,42 @@ These are UI labels only. DocType names, fields and APIs stay as they are (D13).
 
 ### Home `/sign`
 
-- **Until setup is done:** a "Get started" checklist at the top. Each step shows Done or To do and opens the right place:
+Two columns: the work queue (wide) and a side panel (320 px). The side panel goes under the queue on narrow screens.
+
+- **Until setup is done, the side panel is "Set up signing":** numbered steps joined by a line. A done step shows a tick and a one-line summary, such as "Self-signed, valid until 24 Oct 2029". The first open step is expanded, with one sentence and its button, and that button is the page's primary action. Any step expands on click. The steps:
   1. Email account
   2. Company seal (certificate)
   3. Company profile
   4. Documents you sign (enabled DocTypes)
   5. First template
   6. Send a test
-- **"Needs your signature":** rows with document title, sender, how long ago, and a **Sign** button that opens `/s/<token>`.
-- **"Waiting on others":** rows with title, an avatar stack of signers with done ticks, "2 of 3 signed", the sent date and the expiry.
-- **Small figures:** completed this month and expiring soon, as plain text, not cards.
-- **Primary action:** "New request".
+- **After setup, the side panel shows:**
+  - This month: Completed, Waiting and Declined, as figures in one panel, not as separate cards.
+  - Expiring soon: each request, who has not signed, and a Remind button.
+  - A seal status line: "Company seal valid until 24 Oct 2029".
+- **"For you to sign" panel:** rows with a page thumbnail, the title, "Ahmed Khan asked you to approve, 2 hours ago", the role ("You sign" or "You approve") and a **Sign** or **Approve** button that opens `/s/<token>`.
+- **"Waiting on others" panel:** grouped as "Waiting on customers and suppliers" and "Waiting on your team". Each row has:
+  - The title, and "Next: Omar Farouk, opened it 3 hours ago".
+  - Numbered order dots: green when signed, blue for the next person.
+  - "1 of 2", and the expiry.
+- **Empty states:** "You are all caught up" and "Nothing sent yet", each with the next step.
+- **Primary action:** "New request" once setup is done. Before that, it is an outline button.
+- **Sidebar:** "To sign" has a count badge. While setup is open, "Settings" shows "3 left".
 
 ### Sent `/sign/requests` (today `/sign/envelopes`; keep a redirect)
 
-- A table with these columns:
-  - Document, with its DocType and number below
-  - Recipients, as avatars with a status ring each
-  - Progress, for example "1 of 2"
-  - Status badge
-  - Sent date
-  - Expires
-- Search box. Tabs with counts: All, Waiting, Drafts, Completed, Closed.
-- Filters: DocType, sender, date.
-- Each row opens the detail. Row actions (Remind, Copy link, Void) go in a menu at the end of the row.
+A split view: the list on the left (about 400 px) and a preview of the selected request on the right. The preview goes under the list on narrow screens.
+
+- **Toolbar:** filter pills with counts, then a search box and a Filter button (DocType, sender, date). The pills are Open, Completed, Closed and All. Open is the default, and it holds waiting requests and drafts.
+- **List:** grouped under headings with counts: Waiting on customers and suppliers, Waiting on your team, Drafts, Completed, Closed.
+  - Each row: the title, the "Next: ..." line, the progress ("1 of 2") and a short expiry ("Ends 5 Nov", amber when it ends in 3 days or less).
+  - The selected row has a gray background and a dark bar at its start edge. The keyboard moves the selection.
+- **Preview pane:**
+  - The status badge, "Sent 22 Oct by Mariam Haddad", the title, and the source document as a link.
+  - The primary action, which fits the state: Remind, Download signed PDF, Continue (draft), or Send again (declined, expired). Other actions go in a menu.
+  - A page thumbnail, beside the people as a step list. The heading says "People, in signing order" or "People, all at once". Each person shows the role in plain words, the state and the time. Remind and New link appear on the person who is next.
+  - Activity in plain words, with a "Verified" shield and "Show audit details".
+- **Open the full detail (U.5):** the title in the preview opens `/sign/requests/<id>`.
 
 ### Request detail
 
@@ -212,3 +240,4 @@ Each screen task is done only when all of these hold:
 3. The app shell is a frappe-ui `Sidebar`, like CRM and Helpdesk.
 4. The company brand color appears on the guest page and in emails only. The staff app stays neutral.
 5. `/sign/envelopes` becomes `/sign/requests`, with a redirect from the old path.
+6. U.1 direction (confirmed 2026-10-25): Direction B "Guided desk" for the staff app, Direction A "Quiet list" for the guest page. See "Chosen direction".
