@@ -46,7 +46,7 @@ Conventions for every task:
 | [x] P1.2 | `pdf/sanitize.py` | Encrypted rejected; JS/OpenAction/AA/EmbeddedFiles/AcroForm stripped; caps enforced |
 | [x] P1.3 | `pdf/overlay.py` with Noto Sans + Noto Naskh Arabic, Arabic shaping, checkbox, date, image captures, auto-shrink text to box | Visual snapshot tests (rasterize page with pypdfium2 in tests only, compare to golden PNG with tolerance) |
 | [x] P1.4 | `crypto/signer.py` (`Signer`, `Pkcs12Signer`), `crypto/tsa.py`, `pdf/seal.py` PAdES-B-LT | Output validates with pyHanko; integrity and timestamp OK |
-| P1.5 | `pdf/certificate.py` + `templates/certificate.html` (branding, signers, events, hashes, QR to `/sign-verify`) | Appended pages render; seal still validates |
+| [x] P1.5 | `pdf/certificate.py` + `templates/certificate.html` (branding, signers, events, hashes, QR to `/sign-verify`) | Appended pages render; seal still validates |
 
 ### Week 2: Services and audit
 

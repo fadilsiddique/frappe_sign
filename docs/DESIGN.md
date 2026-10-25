@@ -474,7 +474,7 @@ UAE law recognises electronic signatures (Federal Decree-Law No. 46 of 2021 on e
 
 ## 6. PDF pipeline
 
-Pure stages, bytes in, bytes out, in `frappe_sign/pdf/`. Types are dataclasses in `pdf/types.py`. Only `source.py` and `certificate.py` import `frappe`.
+Pure stages, bytes in, bytes out, in `frappe_sign/pdf/`. Types are dataclasses in `pdf/types.py`. Only `source.py` and `certificate.py` may import `frappe`; today only `source.py` needs it.
 
 Stages raise `PdfError` subclasses from `pdf/types.py` (`PdfEncrypted`, `PdfTooLarge`, `PdfTooManyPages`, `AnchorNotFound`). Services translate them to the errors in 8.4.
 
@@ -484,7 +484,7 @@ Stages raise `PdfError` subclasses from `pdf/types.py` (`PdfEncrypted`, `PdfTooL
 | 2. Sanitize | `sanitize.py` | Reject encrypted; enforce size and page caps; strip JavaScript, OpenAction, AA, EmbeddedFiles, AcroForm | pypdf |
 | 3. Locate | `anchors.py` | Find `[[fs:...]]` markers; normalized rects against visible box with rotation | pypdf |
 | 4. Overlay | `overlay.py` | Per-page reportlab canvas with values and capture PNGs, merged into page content | reportlab, pypdf |
-| 5. Certificate | `certificate.py` | Jinja `templates/certificate.html` rendered to PDF via `frappe.utils.pdf.get_pdf`; appended | Frappe, pypdf |
+| 5. Certificate | `certificate.py` | `CertificateData` (branding, signers, events, hashes, QR to `/sign-verify`) drawn with reportlab platypus; appended | reportlab, qrcode, pypdf |
 | 6. Seal | `seal.py` | PAdES-B-LT with `Signer`, TSA, revocation info | pyHanko |
 
 Interfaces:
@@ -497,6 +497,7 @@ def page_metrics(pdf: bytes) -> list[PageMetric]: ...
 def find_anchors(pdf: bytes) -> list[Anchor]: ...
 def apply_fields(pdf: bytes, fields: list[PlacedField],
                  captures: dict[str, bytes], fonts: FontSet) -> bytes: ...
+def render_certificate(data: CertificateData, fonts: FontSet) -> bytes: ...
 def append_certificate(pdf: bytes, certificate_pdf: bytes) -> bytes: ...
 def seal_pdf(pdf: bytes, *, signer: Signer, tsa_urls: list[str],
              reason: str, location: str, contact: str) -> bytes: ...
@@ -511,6 +512,7 @@ def seal_pdf(pdf: bytes, *, signer: Signer, tsa_urls: list[str],
 - **Drift.** Rendering happens once, at send (D6).
 - **Generator.** In v16.0.0, `get_print` reads the Print Format's `pdf_generator` when none is passed, so `source.py` does not pass it. `get_print` writes `pdf_generator`, `letterhead` and other keys to `frappe.local.form_dict`. `source.py` saves `form_dict` and restores it after the call.
 - **Memory.** Process page by page where possible; caps from settings.
+- **Certificate renderer.** The certificate is drawn with reportlab, not rendered from HTML with `get_pdf`. wkhtmltopdf is not on every v16 server or CI runner, and reportlab reuses the overlay's fonts and Arabic shaping. Services format dates and translate the labels (`CertificateData.labels`).
 
 ---
 

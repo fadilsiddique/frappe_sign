@@ -97,5 +97,5 @@ follow_imports = "skip"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["arabic_reshaper", "arabic_reshaper.*", "bidi", "bidi.*", "asn1crypto", "asn1crypto.*"]
+module = ["arabic_reshaper", "arabic_reshaper.*", "bidi", "bidi.*", "asn1crypto", "asn1crypto.*", "qrcode", "qrcode.*"]
 ignore_missing_imports = true
