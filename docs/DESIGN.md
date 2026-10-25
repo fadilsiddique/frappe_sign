@@ -457,6 +457,7 @@ class RemoteSigner:  # Phase 3: PKCS#11 or CSC
 - `hash = sha256(prev_hash + canonical_json(event))` where canonical JSON has sorted keys, no whitespace, UTC timestamps with microseconds. First event uses `prev_hash = sha256(envelope name)`.
 - The hashed fields are `envelope`, `seq`, `recipient_row`, `event`, `at`, `actor`, `ip`, `user_agent` and `payload`. Frappe metadata (`name`, `owner`, `creation`, `modified`) and the hash fields are not hashed.
 - `seq` is assigned under the envelope row lock to avoid gaps or forks.
+- No role has create permission on Sign Event, so nobody can add events through the REST API. `services/audit.py` inserts them with `ignore_permissions=True`, after the calling service has checked access to the envelope (golden rule 6).
 - At completion `audit_head` is written to the envelope and printed on the certificate.
 - `bench --site <site> frappe-sign verify <envelope>` recomputes the chain and file hashes and reports the first mismatch.
 

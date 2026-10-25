@@ -24,7 +24,7 @@ Conventions for every task:
 | ID | Task | Done when |
 | --- | --- | --- |
 | [x] P0.1 | `bench new-app frappe_sign` (title "Frappe Sign", module "Frappe Sign"); `pyproject.toml` with `requires-python = ">=3.14,<3.15"`, `[tool.bench.frappe-dependencies] frappe = ">=16.0.0,<17.0.0"`, Python deps (pypdf, reportlab, pyhanko, arabic-reshaper, python-bidi, qrcode) | `bench install-app` works on a fresh v16.0.0 site |
-| [x] P0.2 | Pre-commit: ruff, mypy (strict on `services/`, `pdf/`, `crypto/`), semgrep with Frappe rules + custom rule flagging `ignore_permissions` outside `services/signing.py`, eslint, prettier | `pre-commit run --all-files` clean |
+| [x] P0.2 | Pre-commit: ruff, mypy (strict on `services/`, `pdf/`, `crypto/`), semgrep with Frappe rules + custom rule flagging `ignore_permissions` outside `services/signing.py` and `services/audit.py`, eslint, prettier | `pre-commit run --all-files` clean |
 | [x] P0.3 | Package skeleton per ARCHITECTURE.md (empty modules with docstrings), `compat.py`, `exceptions.py` | Import graph matches layer rules |
 | [x] P0.4 | DocType JSON for all 17 DocTypes per DESIGN.md section 2, with permissions, plus Roles fixtures (Sign Manager, Sign User) | `bench migrate` clean; controllers stubbed with integrity rules (2.6) implemented and tested |
 | [x] P0.5 | Frontend scaffold: Vite + Vue 3 + TS + frappe-ui + Tailwind, two entries (`src/staff`, `src/guest`), router bases, post-build copy to `www/`, `www/sign.py` and `www/s.py` boot context, `website_route_rules` | `/sign` and `/s/x` render a placeholder page |

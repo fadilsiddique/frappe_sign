@@ -4,13 +4,15 @@
 rules:
   - id: frappe-sign-ignore-permissions
     message: >-
-      ignore_permissions is allowed only in frappe_sign/services/signing.py, after a guest token
-      or session check, with a comment naming that check (golden rule 6).
+      ignore_permissions is allowed only in frappe_sign/services/signing.py (after a guest token
+      or session check) and frappe_sign/services/audit.py (to insert Sign Events), with a comment
+      naming that check (golden rule 6).
     languages: [python]
     severity: ERROR
     paths:
       exclude:
         - "frappe_sign/services/signing.py"
+        - "frappe_sign/services/audit.py"
     pattern-either:
       - patterns:
           - pattern: $F(..., ignore_permissions=$V, ...)

@@ -144,4 +144,5 @@ Status values: **Accepted**, **Proposed**, **Superseded**.
 ## History
 
 - 2026-10-25: Initial set D1 to D16. App renamed from working name `upscape_sign` to `frappe_sign`. Compatibility widened from 16.50+ to all of v16 (D15).
+- 2026-10-25: Golden rule 6 (CLAUDE.md) also allows `ignore_permissions` in `services/audit.py`, to insert Sign Events that no role may create.
 - 2026-10-24: Doc review before Phase 0. D2: LGPL scope stated. D3: intermediate PDF rendered in `finish` under the row lock. D17 added. DESIGN, ARCHITECTURE, PLAN and CLAUDE.md updated to match.
