@@ -78,6 +78,8 @@ Conventions for every task:
 
 **Gate 1:** Sealed PDF validates with pyHanko in CI and opens in Adobe Reader showing a valid signature (manual check, screenshot in the PR; self-signed cert trusted locally). Concurrency test passes. Coverage at least 85% on `pdf/` and `services/`.
 
+Gate 1 passed on 2026-10-25: Adobe Reader showed a valid seal on `tests/output/sample_signed.pdf` with the test root trusted; concurrency test passes; coverage `pdf/` 98%, `crypto/` 96%, `services/` 93%. The review also accepted the reportlab certificate and changed D10 (derived link tokens).
+
 ---
 
 ## Phase 2: ERPNext integration (3 weeks)

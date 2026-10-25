@@ -13,6 +13,7 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils import cint, now_datetime, validate_email_address
+from frappe.utils.password import get_encryption_key
 
 from frappe_sign.exceptions import FieldValidationError, InvalidTransition, throw
 from frappe_sign.pdf.pages import extract_pages
@@ -23,7 +24,7 @@ from frappe_sign.services.errors import pdf_message
 from frappe_sign.services.template import load_snapshot
 from frappe_sign.utils.dates import after, is_past
 from frappe_sign.utils.files import new_private_file, read_file, read_file_url
-from frappe_sign.utils.hashing import new_token, sha256_hex
+from frappe_sign.utils.hashing import derive_token, sha256_hex
 
 DRAFT, SENT, IN_PROGRESS = "Draft", "Sent", "In Progress"
 COMPLETED, DECLINED, VOIDED, EXPIRED = "Completed", "Declined", "Voided", "Expired"
@@ -334,25 +335,57 @@ def invite_next(doc: Any) -> None:
 			invite(doc, row)
 
 
-def invite(
-	doc: Any, recipient: Any, *, event: str = "Delivered", payload: dict[str, Any] | None = None
-) -> None:
-	"""Issue a new token (the old one stops working), email the link and record the event."""
-	token = new_token()
+def link_token(recipient: str, version: int) -> str:
+	return derive_token(get_encryption_key(), recipient, version)
+
+
+def issue_link(doc: Any, recipient: Any, *, rotate: bool = False) -> str:
+	"""The recipient's link token. The current one is re-derived unless `rotate` (resend) or the
+	recipient has none yet; a rotated token makes the previous link stop working (D10)."""
+	version = cint(recipient.token_version)
+	if rotate or version < 1:
+		version += 1
+	token = link_token(recipient.name, version)
 	status = "Sent" if recipient.status == "Pending" else recipient.status
 	frappe.db.set_value(
 		"Sign Envelope Recipient",
 		recipient.name,
-		{"token_hash": sha256_hex(token), "token_expires_on": doc.expires_on, "status": status},
+		{
+			"token_hash": sha256_hex(token),
+			"token_version": version,
+			"token_expires_on": doc.expires_on,
+			"status": status,
+		},
 		update_modified=False,
 	)
 	recipient.status = status
+	recipient.token_version = version
+	return token
+
+
+def invite(
+	doc: Any,
+	recipient: Any,
+	*,
+	event: str = "Delivered",
+	payload: dict[str, Any] | None = None,
+	rotate: bool = False,
+) -> None:
+	"""Email the recipient's link and record the event. Reminders resend the same link; `rotate`
+	issues a new one."""
+	token = issue_link(doc, recipient, rotate=rotate)
 	delivered = notify.try_send_invitation(doc, recipient, token, reminder=event == "Reminded")
 	audit.append(
 		doc.name,
 		event,
 		recipient_row=recipient.name,
-		payload={"email": recipient.email, "channel": "email", "queued": int(delivered), **(payload or {})},
+		payload={
+			"email": recipient.email,
+			"channel": "email",
+			"queued": int(delivered),
+			"link_version": cint(recipient.token_version),
+			**(payload or {}),
+		},
 	)
 
 
@@ -383,7 +416,7 @@ def void(name: str, reason: str) -> None:
 
 @audit.retry_on_conflict
 def remind(name: str, recipient: str | None = None) -> int:
-	"""Email a fresh link to recipients whose turn it is. Returns how many were reminded."""
+	"""Email the link again to recipients whose turn it is. Earlier emails keep working (D10)."""
 	frappe.get_doc("Sign Envelope", name).check_permission("write")
 	doc = locked(name)
 	require_open(doc)
@@ -395,7 +428,6 @@ def remind(name: str, recipient: str | None = None) -> int:
 	if recipient and not targets:
 		throw(InvalidTransition, _("This recipient is not waiting to sign."), status=doc.status)
 	for row in targets:
-		end_sessions(name, row.name)
 		invite(doc, row, event="Reminded")
 	return len(targets)
 
@@ -417,7 +449,7 @@ def resend(name: str, recipient: str, email: str | None = None) -> None:
 		frappe.db.set_value("Sign Envelope Recipient", row.name, "email", email, update_modified=False)
 		row.email = email
 	end_sessions(name, row.name)
-	invite(doc, row, payload=payload)
+	invite(doc, row, payload=payload, rotate=True)
 
 
 def expire(name: str) -> bool:
@@ -504,10 +536,8 @@ def download(name: str, kind: str) -> tuple[bytes, str]:
 
 
 def my_signing_link(name: str) -> str:
-	"""A fresh /s/<token> link for the logged-in user when it is their turn (DESIGN 5.1).
-
-	Only the token's hash is stored, so this issues a new token; earlier emailed links stop working.
-	"""
+	"""The /s/<token> link of the logged-in user when it is their turn (DESIGN 5.1). It is the
+	same link as in their email (D10)."""
 	email = frappe.db.get_value("User", frappe.session.user, "email")
 	doc = locked(name)
 	require_open(doc)
@@ -517,13 +547,7 @@ def my_signing_link(name: str) -> str:
 	)
 	if not row:
 		throw(InvalidTransition, _("This document is not waiting for your signature."), status=doc.status)
-	token = new_token()
-	frappe.db.set_value(
-		"Sign Envelope Recipient",
-		row.name,
-		{"token_hash": sha256_hex(token), "token_expires_on": doc.expires_on},
-		update_modified=False,
-	)
+	token = issue_link(doc, row)
 	audit.append(name, "Delivered", recipient_row=row.name, payload={"email": email, "channel": "desk"})
 	return notify.signing_link(token)
 

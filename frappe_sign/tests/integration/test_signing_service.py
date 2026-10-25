@@ -114,11 +114,15 @@ class TestOpen(SigningCase):
 		)
 		self.assertRaises(LinkExpired, signing.open, self.token("Customer"), CLIENT)
 
-	def test_old_token_stops_working_after_a_reminder(self):
+	def test_reminders_keep_the_link_and_resend_replaces_it(self):
 		self.sent()
-		old = self.token("Customer")
+		first = self.token("Customer")
 		envelope_service.remind(self.name)
-		self.assertRaises(LinkExpired, signing.open, old, CLIENT)
+		self.assertTrue(
+			signing.open(first, CLIENT)["session"], "the first email still works after a reminder"
+		)
+		envelope_service.resend(self.name, recipients_by_role(self.name)["Customer"].name)
+		self.assertRaises(LinkExpired, signing.open, first, CLIENT)
 		self.assertTrue(signing.open(self.token("Customer"), CLIENT)["session"])
 
 	def test_sequential_signer_waits_for_their_turn(self):

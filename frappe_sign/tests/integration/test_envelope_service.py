@@ -208,24 +208,26 @@ class TestSenderActions(SignTestCase):
 	def test_void_needs_an_open_envelope(self):
 		self.assertRaises(InvalidTransition, envelope_service.void, make_draft().name, "x")
 
-	def test_remind_rotates_the_waiting_signer_token(self):
-		name, _box = self.sent()
+	def test_remind_resends_the_same_link(self):
+		name, box = self.sent()
 		customer = recipients_by_role(name)["Customer"]
-		old = customer.token_hash
 		with capture_tokens() as reminder_box:
 			self.assertEqual(envelope_service.remind(name), 1)
-		customer = recipients_by_role(name)["Customer"]
-		self.assertNotEqual(customer.token_hash, old)
-		self.assertEqual(customer.token_hash, sha256_hex(reminder_box[customer.name]))
+		after = recipients_by_role(name)["Customer"]
+		self.assertEqual(after.token_hash, customer.token_hash)
+		self.assertEqual(reminder_box[customer.name], box[customer.name], "earlier emails keep working (D10)")
 		self.assertTrue(reminder_box.sent[0][2], "sent as a reminder")
-		self.assertEqual(events_of(name)[-1], "Reminded")
+		self.assertEqual((after.token_version, events_of(name)[-1]), (1, "Reminded"))
 
 	def test_resend_to_a_corrected_email(self):
-		name, _ = self.sent()
+		name, first = self.sent()
 		customer = recipients_by_role(name)["Customer"]
+		old_token = first[customer.name]
 		with capture_tokens() as box:
 			envelope_service.resend(name, customer.name, "ahmed.new@example.com")
 		customer = recipients_by_role(name)["Customer"]
+		self.assertNotEqual(box[customer.name], old_token, "resend rotates the link")
+		self.assertEqual(customer.token_version, 2)
 		self.assertEqual(customer.email, "ahmed.new@example.com")
 		self.assertEqual(box.sent[0][1], "ahmed.new@example.com")
 		payload = json.loads(

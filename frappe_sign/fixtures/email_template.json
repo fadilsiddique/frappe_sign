@@ -12,7 +12,7 @@
   "name": "Frappe Sign Reminder",
   "subject": "Reminder: {{ envelope_title }} is waiting for your signature",
   "use_html": 1,
-  "response_html": "<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your signature.</p><p><a href=\"{{ link }}\">Review and sign</a></p><p>This link replaces the links in earlier emails. It expires on {{ expires_on }}.</p>",
+  "response_html": "<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your signature.</p><p><a href=\"{{ link }}\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
   "response": null
  },
  {

@@ -24,7 +24,8 @@ Tick each item on a site with an outgoing Email Account and a Sign Profile with 
 
 - [ ] (auto) Recipients with role, kind, email and status.
 - [ ] (auto) Audit trail lists every event with time (system time zone), actor and IP; "Hash chain verified" is shown.
-- [ ] Remind sends a new link to the waiting signer (the old link shows "Link not valid").
+- [ ] Remind emails the same link again; the link in the first email still opens.
+- [ ] "New link" replaces the link: the old one shows "Link not valid".
 - [ ] "New link" on a recipient accepts a corrected email address.
 - [ ] Void asks for a reason; signers who were invited get the cancellation email.
 - [ ] After completion: Original PDF, Signed PDF and Certificate downloads work and are recorded as "Downloaded" events.
@@ -34,7 +35,7 @@ Tick each item on a site with an outgoing Email Account and a Sign Profile with 
 ### Home (`/sign`)
 
 - [ ] Cards: Needs my signature, Waiting for others, Completed this month, Expiring in 3 days.
-- [ ] "Sign now" opens the signing page for a company-side signer (a new link is issued; earlier emailed links stop working).
+- [ ] "Sign now" opens the signing page for a company-side signer, with the same link as their email.
 
 ## P1.14: Guest signing on a phone
 

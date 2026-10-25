@@ -241,8 +241,8 @@ FALLBACK = {
 	REMINDER: (
 		"Reminder: {{ envelope_title }} is waiting for your signature",
 		"<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your "
-		'signature.</p><p><a href="{{ link }}">Review and sign</a></p><p>This link replaces the links in '
-		"earlier emails. It expires on {{ expires_on }}.</p>",
+		'signature.</p><p><a href="{{ link }}">Review and sign</a></p><p>The link expires on '
+		"{{ expires_on }}.</p>",
 	),
 	OTP: (
 		"Your code for {{ envelope_title }}: {{ otp }}",

@@ -139,11 +139,14 @@ class TestStaffActions(PermissionCase):
 				{"role_label": "Company", "full_name": "Mona", "email": MANAGER},
 			]
 		)
-		with capture_tokens():
+		with capture_tokens() as box:
 			send_now(draft.name)
 		with self.as_user(ALICE):
 			url = staff.my_signing_link(draft.name)["url"]
-		self.assertIn("/s/", url)
+		alice_row = next(
+			r for r in frappe.get_doc("Sign Envelope", draft.name).recipients if r.email == ALICE
+		)
+		self.assertTrue(url.endswith(f"/s/{box[alice_row.name]}"), "the same link as in the email")
 		with self.as_user(MANAGER):
 			self.assertRaises(InvalidTransition, staff.my_signing_link, draft.name)
 

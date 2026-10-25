@@ -82,9 +82,10 @@ Status values: **Accepted**, **Proposed**, **Superseded**.
 ## D10. Guest access: hashed tokens, OTP, rate limits
 
 - **Status:** Accepted
-- **Decision:** Recipient token = `secrets.token_urlsafe(32)`, only SHA-256 stored, rotated on resend. Optional OTP (email or WhatsApp) per template. Guest session secret sent in an `X-Sign-Session` header, kept in memory, never a cookie. Every guest endpoint uses `frappe.rate_limiter.rate_limit`.
-- **Why:** A DB leak does not leak live links; brute force is capped; no CSRF surface for guests.
-- **Rejected:** Plain tokens in DB; link-only access; cookie sessions for guests.
+- **Decision:** Recipient token = HMAC-SHA256 of the recipient row and a token version under the site's `encryption_key` (base64url, 256 bits). Only its SHA-256 is stored. Reminders and the signer's own "Sign now" link re-derive the same token, so earlier emails keep working; resend raises the version, so the old link stops working. Optional OTP (email or WhatsApp) per template. Guest session secret sent in an `X-Sign-Session` header, kept in memory, never a cookie. Every guest endpoint uses `frappe.rate_limiter.rate_limit`.
+- **Why:** A DB leak does not leak live links (the key is in `site_config.json`, not the database); brute force is capped; no CSRF surface for guests. Signers often open an older email after a reminder, so reminders must not break it.
+- **Consequence:** Changing the site's `encryption_key` makes every open link invalid; senders then use resend.
+- **Rejected:** Plain tokens in DB; link-only access; cookie sessions for guests; random tokens that every reminder replaces (the first Phase 1 build, which broke the links in earlier emails).
 
 ## D11. All PDFs private
 
@@ -146,3 +147,4 @@ Status values: **Accepted**, **Proposed**, **Superseded**.
 - 2026-10-25: Initial set D1 to D16. App renamed from working name `upscape_sign` to `frappe_sign`. Compatibility widened from 16.50+ to all of v16 (D15).
 - 2026-10-25: Golden rule 6 (CLAUDE.md) also allows `ignore_permissions` in `services/audit.py`, to insert Sign Events that no role may create.
 - 2026-10-24: Doc review before Phase 0. D2: LGPL scope stated. D3: intermediate PDF rendered in `finish` under the row lock. D17 added. DESIGN, ARCHITECTURE, PLAN and CLAUDE.md updated to match.
+- 2026-10-25: D10 changed after Gate 1 review: link tokens are derived from the site key, so reminders keep earlier links working; resend still rotates.

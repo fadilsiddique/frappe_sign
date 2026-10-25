@@ -46,6 +46,7 @@ RECIPIENT_INITIAL_VALUES = {"status": "Pending"}
 RECIPIENT_SERVICE_FIELDS = (
 	"status",
 	"token_hash",
+	"token_version",
 	"token_expires_on",
 	"viewed_on",
 	"signed_on",

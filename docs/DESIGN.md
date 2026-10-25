@@ -222,6 +222,7 @@ Field types that need a note:
 | full_name, email, mobile | Data | |
 | status | Select | Pending, Sent, Viewed, Signed, Declined, Delegated |
 | token_hash | Data | SHA-256 hex, indexed |
+| token_version | Int | Read only. Raised on resend, which replaces the link (D10) |
 | token_expires_on | Datetime | |
 | viewed_on, signed_on | Datetime | |
 | intermediate_file | Link File | Private PDF rendered at this signer's finish (D3) |
@@ -423,7 +424,7 @@ Company-side signers (fixed users and the authorised signatory) use the same `/s
 
 ### 5.2 Guest access controls
 
-- Token: `secrets.token_urlsafe(32)`; store `sha256(token)` only; rotate on resend.
+- Token: HMAC-SHA256 of the recipient row and `token_version` under the site's `encryption_key` (D10); store `sha256(token)` only. Reminders and "Sign now" re-derive the same link; resend raises `token_version`, which ends the old link and open sessions.
 - Session: on open (OTP off) or OTP verify, issue a 32-byte session secret, store its hash, return it to the SPA. The SPA keeps it in memory and sends `X-Sign-Session` on each call. No cookie, so no CSRF surface. 30 min idle, 24 h absolute.
 - Rate limits (`@rate_limit`, IP based unless noted): `open` 30/min; `request_otp` 5/hour keyed by recipient; `verify_otp` 10/10 min; `save_*` 120/min.
 - Guest responses are recipient-scoped: no source document name, no other recipients' emails, only fields assigned to this recipient are editable.
