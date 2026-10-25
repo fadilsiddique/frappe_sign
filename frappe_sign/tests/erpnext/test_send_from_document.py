@@ -13,6 +13,7 @@ from frappe_sign.tests.doctypes import disable_doctypes, enable_doctypes
 from frappe_sign.tests.erpnext.helpers import ERPNextTestCase, make_customer, make_quotation
 from frappe_sign.tests.erpnext.quotation import default_template_for, publish_quotation_template
 from frappe_sign.tests.integration.test_sealing import no_commits
+from frappe_sign.tests.printing import make_print_format
 from frappe_sign.utils.boot import desk_boot
 
 
@@ -56,12 +57,15 @@ class TestSendFromDocument(ERPNextTestCase):
 		self.assertEqual([call["method"] for call in calls], ["frappe_sign.jobs.render.run"])
 
 	def test_print_view_choice_overrides_the_template_format(self):
+		other = make_print_format(
+			"Quotation", "<p>{{ doc.name }}</p>", "chrome", name="Frappe Sign Test Other"
+		).name
 		rows = resolve_recipients(self.template, "Quotation", self.quotation.name)
 		with self.capture_enqueue():
 			name = documents.send_from_document(
-				"Quotation", self.quotation.name, self.template, rows, print_format="Quotation Standard"
+				"Quotation", self.quotation.name, self.template, rows, print_format=other
 			)
-		self.assertEqual(frappe.db.get_value("Sign Envelope", name, "print_format"), "Quotation Standard")
+		self.assertEqual(frappe.db.get_value("Sign Envelope", name, "print_format"), other)
 
 	def test_template_for_another_doctype_is_refused(self):
 		template = frappe.get_doc("Sign Template", self.template)

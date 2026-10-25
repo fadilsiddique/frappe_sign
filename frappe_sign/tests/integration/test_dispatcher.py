@@ -49,8 +49,15 @@ class DispatcherCase(SignTestCase):
 		"""Insert a ToDo as a user without Sign roles; returns it and the jobs it queued."""
 		with self.as_user(EDITOR), self.capture_enqueue() as calls:
 			todo = frappe.get_doc(
-				# Allocated to the trigger's owner, who runs the trigger and must be able to read it.
-				{"doctype": "ToDo", "description": "Sign me", "allocated_to": OWNER, **values}
+				# Allocated to the trigger's owner, who runs the trigger and must be able to read it;
+				# assigned by the editor, which v16.0.0's ToDo permission hook needs to let them create it.
+				{
+					"doctype": "ToDo",
+					"description": "Sign me",
+					"allocated_to": OWNER,
+					"assigned_by": EDITOR,
+					**values,
+				}
 			).insert()
 		return todo, calls
 
