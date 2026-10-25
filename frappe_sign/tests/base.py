@@ -26,6 +26,9 @@ class SignTestCase(IntegrationTestCase):
 		self.addCleanup(self._clean_up)
 		if self.needs_email_account:
 			make_email_account()
+			# ERPNext's setup wizard unsubscribes admin@example.com from all email. Tests send as
+			# Administrator and check the mails it gets; the rollback restores the row.
+			frappe.db.delete("Email Unsubscribe", {"email": "admin@example.com", "global_unsubscribe": 1})
 
 	def _clean_up(self):
 		frappe.set_user("Administrator")  # nosemgrep: frappe-setuser

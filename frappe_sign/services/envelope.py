@@ -16,10 +16,11 @@ from frappe.utils import cint, now_datetime, validate_email_address
 from frappe.utils.password import get_encryption_key
 
 from frappe_sign.exceptions import FieldValidationError, InvalidTransition, throw
+from frappe_sign.pdf.anchors import find_anchors, role_token
 from frappe_sign.pdf.pages import extract_pages
 from frappe_sign.pdf.sanitize import sanitize
-from frappe_sign.pdf.source import render_print
-from frappe_sign.pdf.types import PdfError
+from frappe_sign.pdf.source import render
+from frappe_sign.pdf.types import Anchor, PdfError
 from frappe_sign.services import audit, events, notify, settings
 from frappe_sign.services.errors import pdf_message
 from frappe_sign.services.template import load_snapshot
@@ -41,6 +42,10 @@ WAITING = ("Sent", "Viewed")
 DONE = ("Signed", "Declined", "Delegated")
 PRINT_FORMAT = "Print Format"
 RECIPIENT_FIELDS = ("role_label", "full_name", "email", "mobile", "party_type", "party", "contact")
+# Fields added for an anchor that no template field names are required for these types.
+REQUIRED_ANCHOR_TYPES = ("Signature", "Initials", "Company Stamp")
+# Declared anchor sizes (mm) by marker, or None when the PDF does not come from a Print Format.
+Declared = dict[str, tuple[float, float]] | None
 
 
 class SendFailed(Exception):
@@ -220,11 +225,13 @@ def render_and_send(name: str) -> bool:
 	if doc.status != DRAFT or doc.send_state != "Queued":
 		return False
 	try:
-		clean = sanitize(
-			source_pdf(doc), max_bytes=settings.max_upload_bytes(), max_pages=settings.max_pages()
-		)
+		pdf, declared = source_pdf(doc)
+		clean = sanitize(pdf, max_bytes=settings.max_upload_bytes(), max_pages=settings.max_pages())
+		anchors = find_anchors(clean.data, declared) if declared is not None else []
 	except PdfError as error:
 		raise SendFailed(pdf_message(error)) from error
+	placed = place_anchored_fields(doc, anchors)
+	doc = frappe.get_doc("Sign Envelope", name)
 	for field in doc.fields:
 		if cint(field.page) > clean.page_count:
 			raise SendFailed(
@@ -250,7 +257,12 @@ def render_and_send(name: str) -> bool:
 	audit.append(
 		name,
 		"Sent",
-		payload={"original_sha256": clean.sha256, "pages": clean.page_count, "prefilled": prefilled},
+		payload={
+			"original_sha256": clean.sha256,
+			"pages": clean.page_count,
+			"prefilled": prefilled,
+			**placed,
+		},
 	)
 	invite_next(doc)
 	events.publish("envelope_sent", name)
@@ -274,17 +286,108 @@ def is_print_source(doc: Any) -> bool:
 	)
 
 
-def source_pdf(doc: Any) -> bytes:
+def source_pdf(doc: Any) -> tuple[bytes, Declared]:
+	"""The PDF to freeze, and the anchor sizes sign_field() declared when it is a Print Format."""
 	if is_print_source(doc):
-		return render_print(doc.reference_doctype, doc.reference_name, doc.print_format, doc.letter_head)
+		rendered = render(doc.reference_doctype, doc.reference_name, doc.print_format, doc.letter_head)
+		return rendered.pdf, rendered.declared
 	if not doc.template_version:
-		return read_file_url(doc.source_file)
+		return read_file_url(doc.source_file), None
 	snapshot = load_snapshot(doc.template_version)
 	pdf = read_file_url(snapshot["pdf_file"])
 	expected = frappe.db.get_value("Sign Template Version", doc.template_version, "source_sha256")
 	if expected and sha256_hex(pdf) != expected:
 		raise SendFailed(_("The template PDF changed after it was published. Publish the template again."))
-	return pdf
+	return pdf, None
+
+
+def place_anchored_fields(doc: Any, anchors: list[Anchor]) -> dict[str, Any]:
+	"""Fields with an anchor_tag take the anchor's page and rect. An anchor that no field names
+	becomes a field of the Signer whose role it names (DESIGN 4.2). A required field whose anchor
+	is missing fails the send; an optional one is dropped. Called by the render job, while the
+	Draft is locked for sending, so rows change directly (DESIGN 2.6)."""
+	by_tag = {anchor.tag: anchor for anchor in anchors}
+	used = set()
+	for field in doc.fields:
+		if not field.anchor_tag:
+			continue
+		anchor = by_tag.get(field.anchor_tag)
+		if anchor:
+			move_field(field.name, anchor)
+			used.add(anchor.tag)
+		elif cint(field.page) > 0:
+			continue
+		elif cint(field.required):
+			raise SendFailed(
+				_(
+					"The Print Format has no sign_field() for {0} ({1}). Add it to the Print Format or make the field optional."
+				).format(field.field_key, field.anchor_tag)
+			)
+		else:
+			frappe.db.delete("Sign Envelope Field", {"name": field.name})
+	added = add_anchor_fields(doc, [anchor for anchor in anchors if anchor.tag not in used])
+	return {
+		"anchors": len(anchors),
+		"anchor_fields_added": [anchor.tag for anchor in added],
+		"unused_anchors": [a.tag for a in anchors if a.tag not in used and a not in added],
+	}
+
+
+def move_field(row: str, anchor: Anchor) -> None:
+	frappe.db.set_value(
+		"Sign Envelope Field",
+		row,
+		{"page": anchor.page, "x": anchor.rect.x, "y": anchor.rect.y, "w": anchor.rect.w, "h": anchor.rect.h},
+		update_modified=False,
+	)
+
+
+def add_anchor_fields(doc: Any, anchors: list[Anchor]) -> list[Anchor]:
+	signers: dict[str, str] = {}
+	for row in doc.recipients:
+		if row.kind == "Signer":
+			try:
+				signers[role_token(row.role_label)] = row.role_label
+			except ValueError:
+				continue
+	keys = {field.field_key for field in doc.fields}
+	added: list[Anchor] = []
+	for anchor in anchors:
+		role_label = signers.get(anchor.role)
+		if not role_label or anchor.field_type == "Dropdown":
+			continue
+		key = unique_key(f"{anchor.role}_{anchor.field_type}_{anchor.n}".lower().replace(" ", "_"), keys)
+		keys.add(key)
+		frappe.get_doc(
+			{
+				"doctype": "Sign Envelope Field",
+				"parent": doc.name,
+				"parenttype": "Sign Envelope",
+				"parentfield": "fields",
+				"idx": len(doc.fields) + len(added) + 1,
+				"field_key": key,
+				"role_label": role_label,
+				"field_type": anchor.field_type,
+				"page": anchor.page,
+				"x": anchor.rect.x,
+				"y": anchor.rect.y,
+				"w": anchor.rect.w,
+				"h": anchor.rect.h,
+				"anchor_tag": anchor.tag,
+				"required": int(anchor.field_type in REQUIRED_ANCHOR_TYPES),
+				"font_size": 11,
+			}
+		).insert()
+		added.append(anchor)
+	return added
+
+
+def unique_key(key: str, taken: set[str]) -> str:
+	candidate, number = key, 1
+	while candidate in taken:
+		number += 1
+		candidate = f"{key}_{number}"
+	return candidate
 
 
 def expiry_days(doc: Any) -> int:

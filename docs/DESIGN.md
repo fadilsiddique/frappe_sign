@@ -345,7 +345,10 @@ Registered through the `jinja` hook (`methods`):
 - After rendering, `pdf/anchors.py` locates markers using pypdf `extract_text(visitor_text=...)`, reads their page and baseline position, and builds a normalized rect from the declared size.
 - Markers are removed from the visual output by the overlay step drawing a white rect under the field area before the field value (the marker is 1pt white text anyway).
 - Must work with both `wkhtmltopdf` and `chrome` generators; fixtures cover both.
-- `n` disambiguates multiple fields of the same type and role.
+- `n` disambiguates multiple fields of the same type and role. Without `n`, calls with the same role and field type count up from 1 in each render.
+- `<role>` is the role label with spaces replaced by `_` (Latin letters, digits, `-` and `_` only). `<field_type>` is the field type in lower case with `_` (`signature`, `initials`, `company_stamp`, `full_name`, `email`, `date_signed`, `text`, `number`, `checkbox`, `dropdown`). A wrong argument stops the print with a "Print Format error".
+- Size: `sign_field()` records each marker's declared size during the render (`pdf/source.py` keeps a per-render registry), and `find_anchors` builds the rect from it. The size is scaled by the drawn size of the 1pt marker, so a Print Format that zooms its content still gets the drawn box. A marker drawn far from 1pt (a minimum font size) keeps the declared size.
+- At send, a field whose `anchor_tag` matches a marker takes the marker's page and rect. A marker that no field names becomes a field of the Signer whose role it names (required for Signature, Initials and Company Stamp). A required field whose marker is missing fails the send with a reason; an optional one is dropped. The `Sent` event payload lists the markers found, the fields added and the markers that no recipient uses.
 
 ### 4.3 Signer resolution
 

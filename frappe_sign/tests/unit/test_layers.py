@@ -25,7 +25,9 @@ ALLOWED_IMPORTS: dict[str, set[str]] = {
 	"compat": set(),
 	"www": {"services"} | SHARED,
 	"commands": {"services"} | SHARED,
-	"jinja": SHARED,
+	# sign_field() writes the marker format that pdf/anchors.py reads, and declares sizes to
+	# pdf/source.py's per-render registry.
+	"jinja": {"pdf"} | SHARED,
 	"patches": {"services", "doctype"} | SHARED,
 	"hooks": set(),
 	"config": set(),

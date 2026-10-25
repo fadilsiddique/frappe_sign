@@ -21,6 +21,9 @@ website_route_rules = [
 	{"from_route": "/s/<path:app_path>", "to_route": "s"},
 ]
 
+# sign_field() places signature fields in Print Formats (DESIGN 4.2).
+jinja = {"methods": ["frappe_sign.jinja.sign_field"]}
+
 # Domain events (D17, DESIGN 8.5). Each handler runs in its own job as the envelope sender.
 frappe_sign_events = {
 	"envelope_sent": ["frappe_sign.services.notify.on_sent"],
@@ -46,3 +49,6 @@ has_permission = {
 }
 
 after_request = ["frappe_sign.utils.http.after_request"]
+
+# ERPNext sites get a test Company before frappe_sign's tests (tests/erpnext/).
+before_tests = "frappe_sign.tests.erpnext.bootstrap.before_tests"

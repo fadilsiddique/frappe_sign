@@ -19,8 +19,9 @@ def base_boot(user: str | None, branding: dict | None = None) -> dict:
 
 
 def profile_branding(company: str | None) -> dict:
-	"""Branding from the Sign Profile of `company`, or of the only profile when there is one."""
-	if not company:
+	"""Branding from the Sign Profile of `company`, or of the only profile when there is one
+	(also when `company`, such as the user's default Company, has no profile)."""
+	if not company or not frappe.db.exists("Sign Profile", company):
 		profiles = frappe.get_all("Sign Profile", pluck="name", limit=2)
 		company = profiles[0] if len(profiles) == 1 else None
 	if not company:
