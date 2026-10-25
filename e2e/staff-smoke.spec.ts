@@ -12,7 +12,7 @@ test.beforeAll(() => {
 })
 
 test.afterAll(() => {
-  if (started) benchExecute('purge_created', { started })
+  if (started) benchExecute('purge_created', { started }, 5)
 })
 
 test('design, publish and send a template', async ({ page }) => {

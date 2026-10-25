@@ -13,7 +13,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import frappe
-from frappe.utils import now_datetime
+from frappe.utils import get_datetime, now_datetime
 from pyhanko.sign.timestamps import TimestampRequestError
 from pyhanko_certvalidator import ValidationContext
 
@@ -94,7 +94,9 @@ def sample_fields() -> list[dict]:
 	]
 
 
-def make_sample_signed_pdf() -> dict:
+def make_sample_signed_pdf(keep: bool = False) -> dict:
+	"""`keep` leaves the envelope in place (for trying `bench frappe-sign verify`); purge it with
+	frappe_sign.tests.e2e.purge_created and the returned `started`."""
 	require_test_site()
 	started = now_datetime()
 	envelope = None
@@ -145,6 +147,8 @@ def make_sample_signed_pdf() -> dict:
 			check = verify_service.check_envelope(envelope)
 			status = validate_with_system_roots(sealed)
 			return {
+				"envelope": envelope,
+				"started": str(started),
 				"output": str(OUTPUT),
 				"bytes": len(sealed),
 				"tsa": tsa,
@@ -154,9 +158,18 @@ def make_sample_signed_pdf() -> dict:
 				"signed_sha256": doc.signed_sha256,
 			}
 	finally:
-		frappe.db.rollback()
-		for template in purge_envelope(envelope):
-			purge_template(template)
-		purge_profile(COMPANY)
-		purge_since(started)
-		frappe.db.commit()  # nosemgrep: frappe-manual-commit (removes the sample data it committed)
+		if keep:
+			frappe.db.commit()  # nosemgrep: frappe-manual-commit (keeps the sample for trying verify)
+		else:
+			purge_sample(envelope, str(started))
+
+
+def purge_sample(envelope: str | None, started: str) -> None:
+	"""Delete a sample made with keep=True (or left behind by a failed run)."""
+	require_test_site()
+	frappe.db.rollback()
+	for template in purge_envelope(envelope):
+		purge_template(template)
+	purge_profile(COMPANY)
+	purge_since(get_datetime(started))
+	frappe.db.commit()  # nosemgrep: frappe-manual-commit (removes the sample data it committed)

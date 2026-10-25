@@ -69,6 +69,16 @@ yarn lint
 # Quality
 pre-commit run --all-files
 mypy frappe_sign/services frappe_sign/pdf frappe_sign/crypto
+
+# Coverage (from the bench's sites/ folder). `run-tests --coverage` starts after the app is
+# imported and under-reports, so wrap the whole command:
+../env/bin/python -m coverage run --source=../apps/frappe_sign/frappe_sign --omit="*/tests/*" \
+    -m frappe.utils.bench_helper frappe --site sign.localhost run-tests --app frappe_sign
+../env/bin/python -m coverage report --include="*/frappe_sign/services/*"
+
+# End to end (Playwright, installed Chrome). Start a server first:
+bench --site sign.localhost serve --port 8012    # from the bench directory
+yarn e2e                                         # from frontend/
 ```
 
 ## Testing rules

@@ -33,6 +33,8 @@ frappe = ">=16.0.0,<17.0.0"
 # Test only: rasterizes pages for visual snapshot tests.
 pypdfium2 = ">=4.30.0,<6.0.0"
 mypy = ">=2.4.0,<3.0.0"
+# Coverage of services/, pdf/ and crypto/ (target 85%): bench run-tests --coverage.
+coverage = ">=7.6,<8.0"
 
 # These apt dependencies will be installed from Ubuntu repositories when you host your app on Frappe Cloud
 [deploy.dependencies.apt]

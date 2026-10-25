@@ -9,7 +9,7 @@ test.beforeAll(() => {
 })
 
 test.afterAll(() => {
-  if (fixture) benchExecute('purge', { envelope: fixture.envelope, started: fixture.started })
+  if (fixture) benchExecute('purge', { envelope: fixture.envelope, started: fixture.started }, 5)
 })
 
 async function expectNoHorizontalScroll(page: Page) {
