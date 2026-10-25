@@ -1,0 +1,22 @@
+{
+ "color": "#be123c",
+ "creation": "2026-10-25 21:42:02.985589",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Expiring In 3 Days",
+ "method": "frappe_sign.api.staff.card_expiring_soon",
+ "modified": "2026-10-25 22:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Expiring In 3 Days",
+ "owner": "Administrator",
+ "report_function": "Sum",
+ "show_full_number": 1,
+ "show_percentage_stats": 0,
+ "stats_time_interval": "Daily",
+ "type": "Custom"
+}

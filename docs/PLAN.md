@@ -95,7 +95,7 @@ Gate 1 passed on 2026-10-25: Adobe Reader showed a valid seal on `tests/output/s
 | [x] P2.7 | `services/actions.py`: Submit, Apply Workflow Action, Create Mapped Document, Set Field Value, Call Method; runs as sender | Quotation to draft Sales Order test |
 | [x] P2.8 | Sign Trigger + `*` dispatcher with cached gate, `enqueue_after_commit`, Sign Trigger Log; lifecycle sync (cancel, delete, source changed, amend) | Dispatcher costs one cache lookup for non-matching DocTypes (asserted in test) |
 | [x] P2.9 | Send wizard: Print Format source, detected anchors preview, resolved recipients, prefill | End-to-end from Quotation form |
-| P2.10 | Dashboards (`override_doctype_dashboards`) for Customer, Supplier, Employee; Workspace with number cards | Visible on ERPNext fixtures |
+| [x] P2.10 | Dashboards (`override_doctype_dashboards`) for Customer, Supplier, Employee; Workspace with number cards | Visible on ERPNext fixtures |
 | P2.11 | Pilot setup on the chosen real flow; admin guide and Print Format anchor guide in `docs/` | Pilot users trained |
 
 **Gate 2:** Playwright: user submits a Quotation, sends for signature, customer signs on mobile viewport, signed PDF attached, `sign_status = Signed`, draft Sales Order exists. Pilot live.

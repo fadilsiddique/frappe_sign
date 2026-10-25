@@ -28,6 +28,13 @@ website_route_rules = [
 # sign_field() places signature fields in Print Formats (DESIGN 4.2).
 jinja = {"methods": ["frappe_sign.jinja.sign_field"]}
 
+# Signatures group on party dashboards (DESIGN 4.8); these DocTypes exist only with ERPNext.
+override_doctype_dashboards = {
+	"Customer": "frappe_sign.erpnext.dashboards.customer",
+	"Supplier": "frappe_sign.erpnext.dashboards.supplier",
+	"Employee": "frappe_sign.erpnext.dashboards.employee",
+}
+
 # Envelopes keep their own frozen PDF and audit trail, so they do not stop the source document's
 # deletion; the dispatcher voids the open ones (DESIGN 4.7).
 ignore_links_on_delete = ["Sign Envelope", "Sign Trigger Log"]

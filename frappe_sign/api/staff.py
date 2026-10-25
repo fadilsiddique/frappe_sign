@@ -11,7 +11,7 @@ from frappe.rate_limiter import rate_limit
 from werkzeug.wrappers import Response
 
 from frappe_sign.api.errors import with_error_code
-from frappe_sign.services import audit, doctypes, documents, preview, resolvers, sealing
+from frappe_sign.services import audit, cards, doctypes, documents, preview, resolvers, sealing
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
 from frappe_sign.utils.dates import format_utc
@@ -261,3 +261,26 @@ def preview_pdf(key: str) -> Response:
 @with_error_code
 def preview_prefill(template: str, doctype: str, name: str) -> list:
 	return preview.preview_prefill(template, doctype, name)
+
+
+# Number cards of the Signatures workspace. Frappe calls them with the card's filters.
+
+
+@frappe.whitelist()
+def card_awaiting_me(filters: str | None = None) -> dict:
+	return cards.awaiting_me()
+
+
+@frappe.whitelist()
+def card_awaiting_others(filters: str | None = None) -> dict:
+	return cards.awaiting_others()
+
+
+@frappe.whitelist()
+def card_completed_this_month(filters: str | None = None) -> dict:
+	return cards.completed_this_month()
+
+
+@frappe.whitelist()
+def card_expiring_soon(filters: str | None = None) -> dict:
+	return cards.expiring_soon()

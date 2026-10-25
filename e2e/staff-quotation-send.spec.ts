@@ -67,4 +67,13 @@ test('send a Quotation for signature from Desk', async ({ page }) => {
   await page.locator('.list-row-checkbox').first().check()
   await page.getByRole('button', { name: 'Actions' }).click()
   await expect(page.getByRole('menuitem', { name: 'Send for Signature' })).toBeVisible()
+
+  // Dashboards (P2.10): the Customer's connections list its envelopes; the workspace has the cards.
+  await page.goto('/app/customer/Gulf Trading LLC')
+  await page.getByRole('tab', { name: 'Connections' }).click()
+  await expect(page.locator('.form-dashboard').getByText('Signatures', { exact: true })).toBeVisible()
+  await expect(page.locator('.form-dashboard').getByText('Sign Envelope')).toBeVisible()
+  await page.goto('/app/signatures')
+  await expect(page.getByText('Awaiting Others')).toBeVisible()
+  await page.screenshot({ path: '../e2e/test-results/desk-signatures-workspace.png' })
 })

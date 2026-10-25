@@ -1,0 +1,113 @@
+{
+ "app": "frappe_sign",
+ "creation": "2026-10-25 21:45:00.000000",
+ "docstatus": 0,
+ "doctype": "Workspace Sidebar",
+ "header_icon": "signature",
+ "idx": 0,
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "home",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Signatures",
+   "link_type": "Workspace",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Envelopes",
+   "link_to": "Sign Envelope",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "layout-template",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Templates",
+   "link_to": "Sign Template",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "zap",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Triggers",
+   "link_to": "Sign Trigger",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Trigger Log",
+   "link_to": "Sign Trigger Log",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "building-2",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Profiles",
+   "link_to": "Sign Profile",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "shield-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Certificates",
+   "link_to": "Sign Certificate",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "settings",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Settings",
+   "link_to": "Sign Settings",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-10-25 21:45:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Signatures",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Signatures"
+}
