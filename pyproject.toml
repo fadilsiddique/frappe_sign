@@ -99,3 +99,9 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["arabic_reshaper", "arabic_reshaper.*", "bidi", "bidi.*", "asn1crypto", "asn1crypto.*", "qrcode", "qrcode.*"]
 ignore_missing_imports = true
+
+# services/ wraps frappe, which is typed as Any, so nearly every lookup returns Any. Keep strict
+# mode there except for this one check; pdf/ and crypto/ keep it.
+[[tool.mypy.overrides]]
+module = ["frappe_sign.services.*"]
+warn_return_any = false

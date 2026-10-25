@@ -67,7 +67,8 @@ class TestTemplateValidation(IntegrationTestCase):
 		self.assertRaises(
 			FieldValidationError, make_template, source_type="Print Format", reference_doctype=None
 		)
-		self.assertRaises(FieldValidationError, make_template, pdf_file=None)
+		# The PDF may come later (upload after create); publish requires it (services/template.py).
+		self.assertTrue(make_template(pdf_file=None).name)
 		self.assertRaises(FieldValidationError, make_template, pdf_file="/files/public.pdf")
 
 	def test_published_version_belongs_to_template(self):

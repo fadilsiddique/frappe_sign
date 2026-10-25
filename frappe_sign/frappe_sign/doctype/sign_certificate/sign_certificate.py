@@ -9,6 +9,7 @@ from frappe.model.document import Document
 
 from frappe_sign.crypto import pkcs12
 from frappe_sign.exceptions import CertificateError
+from frappe_sign.utils.files import read_file
 from frappe_sign.utils.integrity import require_private_files
 
 
@@ -70,7 +71,7 @@ def read_private_file(file_url: str) -> bytes:
 	name = frappe.db.get_value("File", {"file_url": file_url, "is_private": 1}, "name")
 	if not name:
 		frappe.throw(_("File {0} was not found.").format(file_url), CertificateError)
-	return frappe.get_doc("File", name).get_content()
+	return read_file(name)
 
 
 def now_utc():

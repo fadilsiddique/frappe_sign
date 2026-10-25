@@ -53,7 +53,7 @@ Conventions for every task:
 | ID | Task | Done when |
 | --- | --- | --- |
 | [x] P1.6 | `services/audit.py`: append event with chain under row lock; `verify_chain(envelope)` | Tamper test detects first bad event |
-| P1.7 | `services/template.py`: create, update, upload PDF (sanitize + metrics), publish version | Version snapshot immutable |
+| [x] P1.7 | `services/template.py`: create, update, upload PDF (sanitize + metrics), publish version | Version snapshot immutable |
 | P1.8 | `services/envelope.py`: create draft from template or upload, send (`send_state`, render job freezes, hashes, issues tokens, writes events), void, remind, resend, expire; explicit transitions with `InvalidTransition` | Lifecycle integration tests |
 | P1.9 | `services/signing.py`: open, OTP (email), session, consent, save fields (server validation), capture, finish (intermediate PDF under the row lock, D3), decline, delegate; sequential and parallel routing; Approver flow | Integration tests per path |
 | P1.10 | Sealing flow: row lock, `sealing_state`, deduped job, retries, `retry_seal` | Two-thread concurrency test seals once |

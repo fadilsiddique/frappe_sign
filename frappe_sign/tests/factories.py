@@ -123,3 +123,21 @@ def make_certificate(p12_name: str = "sealing.p12", password: str = "fixture-sea
 			**overrides,
 		}
 	).insert()
+
+
+def make_user(email: str, *roles: str):
+	"""A Desk user with the given roles, created once per test transaction."""
+	if frappe.db.exists("User", email):
+		user = frappe.get_doc("User", email)
+	else:
+		user = frappe.get_doc(
+			{"doctype": "User", "email": email, "first_name": email.split("@")[0], "send_welcome_email": 0}
+		).insert()
+	user.add_roles(*roles)
+	return user
+
+
+def fixture_pdf(name: str = "a4_simple.pdf") -> bytes:
+	from pathlib import Path
+
+	return (Path(__file__).resolve().parent / "fixtures" / "pdfs" / name).read_bytes()

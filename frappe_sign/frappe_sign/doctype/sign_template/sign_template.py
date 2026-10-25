@@ -38,8 +38,6 @@ class SignTemplate(Document):
 					),
 					FieldValidationError,
 				)
-		elif self.source_type == UPLOADED_PDF and not self.pdf_file:
-			frappe.throw(_("Attach the PDF for an Uploaded PDF template."), FieldValidationError)
 
 	def validate_roles(self):
 		seen = set()

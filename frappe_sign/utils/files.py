@@ -18,8 +18,14 @@ def new_private_file(content: bytes, file_name: str, doctype: str, name: str):
 
 
 def read_file(name: str) -> bytes:
-	"""Content of a File by its name (Link File fields store the name)."""
-	return frappe.get_doc("File", name).get_content()
+	"""Raw bytes of a File by its name (Link File fields store the name).
+
+	File.get_content() returns str when the bytes happen to decode as UTF-8, so read the disk file.
+	"""
+	# get_full_path() resolves inside the site's files folder and refuses paths outside it.
+	path = frappe.get_doc("File", name).get_full_path()
+	with open(path, "rb") as handle:  # nosemgrep: frappe-security-file-traversal
+		return handle.read()
 
 
 def read_file_url(file_url: str) -> bytes:
