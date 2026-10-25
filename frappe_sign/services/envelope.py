@@ -582,6 +582,7 @@ def expire(name: str) -> bool:
 	transition(doc, EXPIRED)
 	end_sessions(name)
 	audit.append(name, "Expired", actor="System")
+	events.publish("envelope_expired", name)
 	return True
 
 

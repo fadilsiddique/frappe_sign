@@ -149,7 +149,7 @@ frappe_sign/
 | Hook in `hooks.py` | Purpose |
 | --- | --- |
 | `frappe_sign_resolvers` | Map a DocType to a resolver that returns suggested recipients |
-| `frappe_sign_events` | Subscribe handlers to domain events (`envelope_sent`, `recipient_viewed`, `recipient_signed`, `envelope_declined`, `envelope_voided`, `envelope_completed`) |
+| `frappe_sign_events` | Subscribe handlers to domain events (`envelope_sent`, `recipient_viewed`, `recipient_signed`, `envelope_declined`, `envelope_voided`, `envelope_expired`, `envelope_completed`) |
 | `frappe_sign_post_sign_actions` | Register extra post-sign action types |
 
 Other apps declare these in their own `hooks.py`; `frappe.get_hooks()` merges them.

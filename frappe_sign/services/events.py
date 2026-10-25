@@ -18,6 +18,7 @@ EVENTS = (
 	"envelope_declined",
 	"envelope_voided",
 	"envelope_completed",
+	"envelope_expired",
 )
 JOB = "frappe_sign.jobs.events.run"
 

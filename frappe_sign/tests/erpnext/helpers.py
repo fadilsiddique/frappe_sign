@@ -118,3 +118,23 @@ def make_quotation(items: int = 3, customer: str | None = None, submit: bool = F
 	if submit:
 		quotation.submit()
 	return quotation
+
+
+def make_sales_order(items: int = 2, customer: str | None = None, submit: bool = True):
+	customer = customer or make_customer().name
+	codes = [make_item(f"FS-ITEM-{index:03d}", rate=10.0 + index).name for index in range(1, items + 1)]
+	order = frappe.get_doc(
+		{
+			"doctype": "Sales Order",
+			"customer": customer,
+			"transaction_date": nowdate(),
+			"delivery_date": add_days(nowdate(), 7),
+			"items": [
+				{"item_code": code, "qty": 1, "rate": 10.0 + index, "delivery_date": add_days(nowdate(), 7)}
+				for index, code in enumerate(codes, start=1)
+			],
+		}
+	).insert()
+	if submit:
+		order.submit()
+	return order

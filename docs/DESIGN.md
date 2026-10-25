@@ -384,6 +384,8 @@ Handler `services/writeback.py` subscribed to `envelope_completed` and `recipien
 
 Generic write-back (attach, status, comment) does not need ERPNext and lives in `services/`; only party dashboards and mapped documents are ERPNext-specific.
 
+Details: `envelope_sent` sets `sign_status = Sent` and points `sign_envelope` at the envelope (the newest send wins). Later events change `sign_status` only while `sign_envelope` still points at their envelope, and `recipient_signed` never turns a Completed envelope back to Partially Signed. `envelope_declined`, `envelope_voided` and `envelope_expired` set Declined, Voided and Expired. A DocType without the custom fields still gets the PDF and the comments. The handlers can run twice (a retried job), so the attachment and each comment are added once: comments start with a marker such as `SIGN-2026-00001 (Customer):`.
+
 ### 4.6 Post-sign actions
 
 Run in a background job as the envelope `sender` (`frappe.set_user`), so the sender's permissions apply. Failures are logged as a Sign Event payload and an Error Log, and the sender is notified; the signature is never rolled back.
@@ -634,14 +636,18 @@ Standard REST covers plain reads and lists.
 ```python
 # frappe_sign/hooks.py
 frappe_sign_events = {
-    "envelope_sent": ["frappe_sign.services.notify.on_sent"],
+    "envelope_sent": ["frappe_sign.services.notify.on_sent",
+                      "frappe_sign.services.writeback.on_sent"],
     "recipient_signed": ["frappe_sign.services.notify.on_signed",
                          "frappe_sign.services.writeback.on_partial"],
     "envelope_completed": ["frappe_sign.services.notify.on_completed",
                            "frappe_sign.services.writeback.on_complete",
                            "frappe_sign.services.actions.run_post_sign"],
-    "envelope_declined": ["frappe_sign.services.notify.on_declined"],
-    "envelope_voided": ["frappe_sign.services.notify.on_voided"],
+    "envelope_declined": ["frappe_sign.services.notify.on_declined",
+                          "frappe_sign.services.writeback.on_declined"],
+    "envelope_voided": ["frappe_sign.services.notify.on_voided",
+                        "frappe_sign.services.writeback.on_voided"],
+    "envelope_expired": ["frappe_sign.services.writeback.on_expired"],
 }
 ```
 

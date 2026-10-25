@@ -91,7 +91,7 @@ Gate 1 passed on 2026-10-25: Adobe Reader showed a valid seal on `tests/output/s
 | [x] P2.3 | Enabled DocTypes in Sign Settings create custom fields; `erpnext/setup.py` switches `company` fields to Link Company | Custom fields appear, `allow_on_submit` works |
 | [x] P2.4 | Resolvers registry + resolvers for Quotation, Sales Order, Purchase Order, Contract, Job Offer (if HRMS), Employee docs, Doc Field | Tests on ERPNext fixtures; missing fields give "unresolved", not errors |
 | [x] P2.5 | `public/js/desk.js`: form button + indicator, print view button, list bulk action, send dialog | Manual QA + Playwright for Quotation |
-| P2.6 | `services/writeback.py`: attach, `sign_status`, `sign_envelope`, timeline comment, partial status | Integration tests on submitted Sales Order |
+| [x] P2.6 | `services/writeback.py`: attach, `sign_status`, `sign_envelope`, timeline comment, partial status | Integration tests on submitted Sales Order |
 | P2.7 | `services/actions.py`: Submit, Apply Workflow Action, Create Mapped Document, Set Field Value, Call Method; runs as sender | Quotation to draft Sales Order test |
 | P2.8 | Sign Trigger + `*` dispatcher with cached gate, `enqueue_after_commit`, Sign Trigger Log; lifecycle sync (cancel, delete, source changed, amend) | Dispatcher costs one cache lookup for non-matching DocTypes (asserted in test) |
 | P2.9 | Send wizard: Print Format source, detected anchors preview, resolved recipients, prefill | End-to-end from Quotation form |
