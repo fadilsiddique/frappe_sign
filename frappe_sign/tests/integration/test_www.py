@@ -112,3 +112,34 @@ class TestShellRoutes(IntegrationTestCase):
 				self.assertIn(f"/assets/frappe_sign/frontend/assets/{entry}", html)
 				self.assertIn('window["frappe_sign"]', html)
 		frappe.set_user("Administrator")
+
+
+class TestVerifyPage(IntegrationTestCase):
+	def test_verify_page_renders_for_guests_with_the_envelope_prefilled(self):
+		frappe.set_user("Guest")
+		try:
+			frappe.utils.set_request(
+				method="GET", path="sign-verify", query_string="envelope=SIGN-2026-00001"
+			)
+			response = get_response("sign-verify")
+			html = response.get_data(as_text=True)
+		finally:
+			frappe.set_user("Administrator")
+		self.assertEqual(response.status_code, 200, html[:300])
+		self.assertIn('id="sign-verify-form"', html)
+		self.assertIn('value="SIGN-2026-00001"', html)
+		self.assertIn("frappe_sign.api.public.verify", html)
+
+	def test_prefill_is_escaped(self):
+		frappe.set_user("Guest")
+		try:
+			frappe.utils.set_request(
+				method="GET",
+				path="sign-verify",
+				query_string="envelope=%22%3E%3Cscript%3Ealert(1)%3C/script%3E",
+			)
+			html = get_response("sign-verify").get_data(as_text=True)
+		finally:
+			frappe.set_user("Administrator")
+		self.assertNotIn("<script>alert(1)</script>", html)
+		self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html)

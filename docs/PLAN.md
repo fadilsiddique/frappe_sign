@@ -74,7 +74,7 @@ Conventions for every task:
 | [x] P1.15 | `shared/coords.ts`, PDF viewer component (lazy pages), `useDragResize` | Vitest against `coords.json` |
 | [x] P1.16 | Template designer: palette, placement, properties, roles, undo/redo, publish | Designer saves fields that the server overlays at identical positions (fixture round trip test) |
 | [x] P1.17 | Send wizard (upload source), envelope list and detail with audit timeline | Manual QA checklist in PR |
-| P1.18 | `bench frappe-sign verify` command, `/sign-verify` page | Command reports OK on good, first bad event on tampered |
+| [x] P1.18 | `bench frappe-sign verify` command, `/sign-verify` page | Command reports OK on good, first bad event on tampered |
 
 **Gate 1:** Sealed PDF validates with pyHanko in CI and opens in Adobe Reader showing a valid signature (manual check, screenshot in the PR; self-signed cert trusted locally). Concurrency test passes. Coverage at least 85% on `pdf/` and `services/`.
 

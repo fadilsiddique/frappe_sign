@@ -1,0 +1,91 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_content %}
+<main class="sign-verify" style="max-width: 640px; margin: 2rem auto; padding: 0 16px;">
+	<h1 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ _("Verify a signed document") }}</h1>
+	<p class="text-muted">{{ _("Upload the signed PDF to check that it is unchanged and sealed, or enter the envelope ID printed on its certificate.") }}</p>
+	<form id="sign-verify-form" style="margin-top: 1.5rem;">
+		<div class="form-group">
+			<label for="sign-verify-file">{{ _("Signed PDF") }}</label>
+			<input id="sign-verify-file" name="file" type="file" accept="application/pdf" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="sign-verify-envelope">{{ _("Envelope ID") }}</label>
+			<input id="sign-verify-envelope" name="envelope" type="text" class="form-control" maxlength="140" placeholder="SIGN-2026-00001" value="{{ envelope|e }}">
+		</div>
+		<button type="submit" class="btn btn-primary">{{ _("Verify") }}</button>
+	</form>
+	<section id="sign-verify-result" aria-live="polite" style="margin-top: 1.5rem;"></section>
+</main>
+{% endblock %}
+
+{% block script %}
+<script>
+(function () {
+	const form = document.getElementById("sign-verify-form");
+	const result = document.getElementById("sign-verify-result");
+	const t = (text) => (window.__ ? window.__(text) : text);
+
+	function line(label, value, good) {
+		const row = document.createElement("p");
+		const strong = document.createElement("strong");
+		strong.textContent = label + ": ";
+		row.appendChild(strong);
+		row.appendChild(document.createTextNode(value));
+		if (good !== undefined) row.style.color = good ? "#15803d" : "#b91c1c";
+		return row;
+	}
+
+	function show(data) {
+		result.replaceChildren();
+		if (!data.found && !data.seal) {
+			result.appendChild(line(t("Result"), t("No envelope with this ID was found."), false));
+			return;
+		}
+		if (data.seal) {
+			const seal = data.seal;
+			if (!seal.signed) result.appendChild(line(t("Seal"), t("This PDF has no digital seal."), false));
+			else {
+				result.appendChild(line(t("Seal"), seal.intact && seal.valid ? t("Intact and valid") : t("Broken: the PDF was changed after sealing"), seal.intact && seal.valid));
+				if (seal.signer) result.appendChild(line(t("Sealed by"), seal.signer));
+				if (seal.signed_at) result.appendChild(line(t("Timestamp"), seal.signed_at, seal.timestamp_valid));
+			}
+			result.appendChild(line(t("Matches a completed envelope"), data.matches ? t("Yes") : t("No"), Boolean(data.matches)));
+		}
+		if (data.found) {
+			result.appendChild(line(t("Envelope"), data.envelope));
+			result.appendChild(line(t("Status"), data.status));
+			if (data.completed_on) result.appendChild(line(t("Completed"), data.completed_on));
+			for (const signer of data.signers || []) {
+				result.appendChild(line(signer.role, `${signer.name}, ${signer.signed_on}`));
+			}
+		}
+	}
+
+	async function verify(event) {
+		if (event) event.preventDefault();
+		const body = new FormData();
+		const file = document.getElementById("sign-verify-file").files[0];
+		const envelope = document.getElementById("sign-verify-envelope").value.trim();
+		if (file) body.append("file", file);
+		if (envelope) body.append("envelope", envelope);
+		if (!file && !envelope) return;
+		result.textContent = t("Checking...");
+		const headers = { Accept: "application/json" };
+		if (window.frappe && frappe.csrf_token && frappe.csrf_token !== "None") headers["X-Frappe-CSRF-Token"] = frappe.csrf_token;
+		const response = await fetch("/api/method/frappe_sign.api.public.verify", { method: "POST", body, headers });
+		const json = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			result.replaceChildren(line(t("Error"), response.status === 429 ? t("Too many checks. Try again in a minute.") : t("The check failed."), false));
+			return;
+		}
+		show(json.message);
+	}
+
+	form.addEventListener("submit", verify);
+	if (document.getElementById("sign-verify-envelope").value) verify();
+})();
+</script>
+{% endblock %}

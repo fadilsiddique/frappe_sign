@@ -30,6 +30,7 @@ class EnvelopeCheck:
 	first_bad_seq: int | None = None
 	chain_reason: str | None = None
 	problems: list[str] = field(default_factory=list)
+	seal_trusted: bool | None = None
 
 
 def check_envelope(name: str) -> EnvelopeCheck:
@@ -61,8 +62,10 @@ def check_envelope(name: str) -> EnvelopeCheck:
 		"Sign Event", filters={"envelope": name}, pluck="hash"
 	):
 		problems.append("The audit head printed on the certificate is not in the chain")
+	seal_trusted = None
 	if doc.signed_file and not problems:
-		seal = inspect_seal(read_file(doc.signed_file))
+		seal = inspect_seal(read_file(doc.signed_file), trust_context(name))
+		seal_trusted = seal.trusted
 		if not (seal.intact and seal.valid):
 			problems.append(f"The seal does not validate: {seal.error or 'signature not intact'}")
 	return EnvelopeCheck(
@@ -73,6 +76,7 @@ def check_envelope(name: str) -> EnvelopeCheck:
 		first_bad_seq=report.first_bad_seq,
 		chain_reason=report.reason,
 		problems=problems,
+		seal_trusted=seal_trusted,
 	)
 
 
