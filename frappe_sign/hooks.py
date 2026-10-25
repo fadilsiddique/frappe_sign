@@ -11,6 +11,8 @@ required_apps = ["frappe"]
 
 fixtures = [
 	{"dt": "Role", "filters": [["role_name", "in", ["Sign Manager", "Sign User"]]]},
+	# Email texts used by services/notify.py; it falls back to the same text if one is deleted.
+	{"dt": "Email Template", "filters": [["name", "like", "Frappe Sign %"]]},
 ]
 
 # SPA shells: www/sign.html (staff) and www/s.html (guest signing), built from frontend/.

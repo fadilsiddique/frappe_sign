@@ -1,0 +1,58 @@
+[
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Invitation",
+  "subject": "{{ sender_name }} sent you {{ envelope_title }} to sign",
+  "use_html": 1,
+  "response_html": "<p>Hello {{ recipient_name }},</p><p>{{ sender_name }} asks you to review and sign <b>{{ envelope_title }}</b>.</p>{% if message %}<p>{{ message }}</p>{% endif %}<p><a href=\"{{ link }}\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Reminder",
+  "subject": "Reminder: {{ envelope_title }} is waiting for your signature",
+  "use_html": 1,
+  "response_html": "<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your signature.</p><p><a href=\"{{ link }}\">Review and sign</a></p><p>This link replaces the links in earlier emails. It expires on {{ expires_on }}.</p>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign OTP",
+  "subject": "Your code for {{ envelope_title }}: {{ otp }}",
+  "use_html": 1,
+  "response_html": "<p>Hello {{ recipient_name }},</p><p>Your verification code is <b>{{ otp }}</b>. It is valid for {{ minutes }} minutes. Do not share it.</p>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Completed",
+  "subject": "Completed: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<p><b>{{ envelope_title }}</b> has been signed by everyone. The sealed PDF is attached.</p>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Declined",
+  "subject": "Declined: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<p>{{ declined_by }} declined <b>{{ envelope_title }}</b>.</p><p>Reason: {{ reason }}</p>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Voided",
+  "subject": "Cancelled: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<p>{{ sender_name }} cancelled <b>{{ envelope_title }}</b>. You do not need to sign it.</p>{% if reason %}<p>Reason: {{ reason }}</p>{% endif %}",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Failed",
+  "subject": "Action needed: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<p>Frappe Sign could not finish <b>{{ envelope_title }}</b> ({{ envelope }}).</p><p>{{ reason }}</p>",
+  "response": null
+ }
+]

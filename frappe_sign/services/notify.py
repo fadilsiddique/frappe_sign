@@ -12,6 +12,7 @@ from typing import Any
 
 import frappe
 from frappe import _
+from frappe.desk.doctype.notification_log.notification_log import make_notification_logs
 from frappe.email.doctype.email_account.email_account import EmailAccount
 from frappe.utils import escape_html, get_url
 
@@ -80,7 +81,7 @@ def send_failed(envelope: str, reason: str) -> None:
 	"""Tell the sender that sending (render) or sealing failed."""
 	doc = frappe.get_doc("Sign Envelope", envelope)
 	context = base_context(doc) | {"reason": escape_html(reason)}
-	send(doc, [doc.sender], FAILED, context)
+	send(doc, [sender_email(doc)], FAILED, context)
 	notify_sender(doc, _("Frappe Sign could not finish {0}: {1}").format(doc.name, reason))
 
 
@@ -98,7 +99,7 @@ def on_signed(envelope: str) -> None:
 def on_completed(envelope: str) -> None:
 	doc = frappe.get_doc("Sign Envelope", envelope)
 	recipients = sorted(
-		{row.email for row in doc.recipients if row.email and row.status != "Delegated"} | {doc.sender}
+		{row.email for row in doc.recipients if row.email and row.status != "Delegated"} | {sender_email(doc)}
 	)
 	attachments = [{"fid": doc.signed_file}] if doc.signed_file else None
 	send(doc, recipients, COMPLETED, base_context(doc), attachments=attachments)
@@ -113,7 +114,7 @@ def on_declined(envelope: str) -> None:
 		"declined_by": escape_html(declined.full_name if declined else ""),
 		"reason": escape_html(declined.decline_reason if declined else ""),
 	}
-	send(doc, [doc.sender], DECLINED, context)
+	send(doc, [sender_email(doc)], DECLINED, context)
 	notify_sender(doc, _("{0} was declined").format(doc.title))
 	publish_realtime(envelope)
 
@@ -127,6 +128,10 @@ def on_voided(envelope: str) -> None:
 		context = base_context(doc) | {"reason": escape_html(doc.void_reason or "")}
 		send(doc, invited, VOIDED, context)
 	publish_realtime(envelope)
+
+
+def sender_email(envelope: Any) -> str:
+	return frappe.db.get_value("User", envelope.sender, "email") or envelope.sender
 
 
 def base_context(envelope: Any) -> dict[str, Any]:
@@ -201,18 +206,18 @@ def single_profile() -> str | None:
 
 
 def notify_sender(envelope: Any, subject: str) -> None:
-	if not envelope.sender or envelope.sender in ("Guest", "Administrator"):
+	"""A Desk alert for the sender. Frappe's helper inserts it for the user, whoever runs the job."""
+	if not envelope.sender or envelope.sender == "Guest":
 		return
-	frappe.get_doc(
+	make_notification_logs(
 		{
-			"doctype": "Notification Log",
-			"for_user": envelope.sender,
 			"type": "Alert",
 			"subject": subject,
 			"document_type": "Sign Envelope",
 			"document_name": envelope.name,
-		}
-	).insert()
+		},
+		[sender_email(envelope)],
+	)
 
 
 def publish_realtime(envelope: str) -> None:
