@@ -412,15 +412,20 @@ def apply_prefill(doc: Any) -> dict[str, str]:
 	for field in doc.fields:
 		if not field.prefill_path:
 			continue
-		if "{{" in field.prefill_path:
-			# Written by a Sign Manager on the template; frappe renders it in its sandboxed Jinja.
-			value = frappe.render_template(field.prefill_path, {"doc": source})  # nosemgrep: frappe-ssti
-		else:
-			value = source.get(field.prefill_path)
-		value = "" if value is None else str(value)
+		value = prefill_value(field.prefill_path, source)
 		frappe.db.set_value("Sign Envelope Field", field.name, "value", value, update_modified=False)
 		prefilled[field.field_key] = value
 	return prefilled
+
+
+def prefill_value(path: str, source: Any) -> str:
+	"""A field path (`customer_name`) or a Jinja expression (`{{ doc.items | length }}`)."""
+	if "{{" in path:
+		# Written by a Sign Manager on the template; frappe renders it in its sandboxed Jinja.
+		value = frappe.render_template(path, {"doc": source})  # nosemgrep: frappe-ssti
+	else:
+		value = source.get(path)
+	return "" if value is None else str(value)
 
 
 def assign_fields(doc: Any) -> None:

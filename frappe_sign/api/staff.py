@@ -11,7 +11,7 @@ from frappe.rate_limiter import rate_limit
 from werkzeug.wrappers import Response
 
 from frappe_sign.api.errors import with_error_code
-from frappe_sign.services import audit, doctypes, documents, resolvers, sealing
+from frappe_sign.services import audit, doctypes, documents, preview, resolvers, sealing
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
 from frappe_sign.utils.dates import format_utc
@@ -236,3 +236,28 @@ def send_from_document(
 def bulk_send(doctype: str, names: list | str, template: str) -> dict:
 	"""List view: one envelope per selected document, queued (jobs.bulk.run)."""
 	return {"queued": documents.queue_bulk_send(doctype, frappe.parse_json(names) or [], template)}
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def preview_source(
+	doctype: str, name: str, print_format: str | None = None, letter_head: str | None = None
+) -> dict:
+	"""Send wizard: render the Print Format and return the anchors found (cached 5 minutes)."""
+	return preview.preview_source(doctype, name, print_format, letter_head)
+
+
+@frappe.whitelist()
+@with_error_code
+def preview_pdf(key: str) -> Response:
+	return Response(
+		preview.preview_pdf(key),
+		mimetype="application/pdf",
+		headers={"Content-Disposition": "inline", "Cache-Control": "no-store"},
+	)
+
+
+@frappe.whitelist()
+@with_error_code
+def preview_prefill(template: str, doctype: str, name: str) -> list:
+	return preview.preview_prefill(template, doctype, name)

@@ -1,29 +1,62 @@
 <script setup lang="ts">
-// Send wizard (P1.17): source (published template or an uploaded PDF), recipients, fields (for an
-// uploaded PDF, placed with the designer canvas), review and send.
+// Send wizard (P1.17, P2.9): source (published template, uploaded PDF, or a document rendered with
+// its Print Format), recipients, fields (for an uploaded PDF, placed with the designer canvas),
+// preview (for a document: the anchors sign_field() placed and the prefilled values), review, send.
+// Desk's "Customize" opens it with ?doctype=&name=&template=&print_format=&letter_head=.
 import { Button, call, createListResource, FormControl, toast } from 'frappe-ui'
-import { computed, reactive, ref, shallowRef, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, reactive, ref, shallowRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import type { PageMetric } from '@/shared/coords'
 import { __ } from '@/shared/translate'
-import { errorMessage, fileToBase64, staff } from '../api'
+import { errorMessage, fetchPdf, fileToBase64, STAFF_API, staff } from '../api'
+import AnchorPreview, { type PreviewAnchor } from '../components/AnchorPreview.vue'
 import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
 import { FIELD_TYPES, useDesigner, type FieldType } from '../designer/store'
 
-type Step = 'source' | 'recipients' | 'fields' | 'review'
+type Step = 'source' | 'recipients' | 'fields' | 'preview' | 'review'
 interface Recipient {
   role_label: string
   kind: string
   routing_order: number
   full_name: string
   email: string
+  mobile?: string | null
+  party_type?: string | null
+  party?: string | null
+  contact?: string | null
+  resolved?: boolean
+}
+interface DocumentTemplate {
+  name: string
+  title: string
+  print_format: string | null
+  letter_head: string | null
+}
+interface Preview {
+  key: string
+  generator: string
+  generator_tested: boolean
+  metrics: PageMetric[]
+  anchors: PreviewAnchor[]
+}
+interface Prefill {
+  field_key: string
+  role_label: string
+  field_type: string
+  read_only: number
+  value: string
 }
 
+const route = useRoute()
 const router = useRouter()
 const store = useDesigner()
 const step = ref<Step>('source')
-const mode = ref<'template' | 'upload'>('template')
+const mode = ref<'template' | 'upload' | 'document'>('template')
+const doc = reactive({ doctype: '', name: '', template: '', printFormat: '', letterHead: '' })
+const documentTemplates = ref<DocumentTemplate[]>([])
+const preview = shallowRef<Preview | null>(null)
+const prefill = ref<Prefill[]>([])
 const templateVersion = ref('')
 const sourceFile = ref('')
 const pdf = shallowRef<ArrayBuffer | null>(null)
@@ -34,18 +67,38 @@ const recipients = ref<Recipient[]>([])
 
 const templates = createListResource({
   doctype: 'Sign Template',
-  fields: ['name', 'title', 'published_version'],
+  fields: ['name', 'title', 'published_version', 'source_type', 'reference_doctype'],
   filters: { published_version: ['is', 'set'], is_active: 1 },
   orderBy: 'title asc',
   pageLength: 200,
   auto: true,
 })
 
-const steps = computed<Step[]>(() =>
-  mode.value === 'upload' ? ['source', 'recipients', 'fields', 'review'] : ['source', 'recipients', 'review'],
+const steps = computed<Step[]>(() => {
+  if (mode.value === 'upload') return ['source', 'recipients', 'fields', 'review']
+  if (mode.value === 'document') return ['source', 'recipients', 'preview', 'review']
+  return ['source', 'recipients', 'review']
+})
+
+// Anchor roles are role labels with spaces as underscores (pdf/anchors.py role_token).
+const signerTokens = computed(() =>
+  recipients.value.filter((r) => r.kind === 'Signer').map((r) => r.role_label.trim().split(/\s+/).join('_')),
 )
 
-async function chooseTemplate(name: string, version: string, title: string) {
+async function chooseTemplate(
+  name: string,
+  version: string,
+  title: string,
+  sourceType?: string,
+  doctype?: string,
+) {
+  if (sourceType === 'Print Format' && doctype) {
+    // A Print Format template needs the document to render.
+    doc.doctype = doctype
+    doc.template = name
+    toast.info(__('Choose the {0} to send.', [__(doctype)]))
+    return
+  }
   busy.value = true
   try {
     const snapshot = await call<{ snapshot: string }>('frappe.client.get_value', {
@@ -69,6 +122,68 @@ async function chooseTemplate(name: string, version: string, title: string) {
     busy.value = false
   }
 }
+
+async function loadDocument() {
+  if (!doc.doctype || !doc.name) return
+  busy.value = true
+  try {
+    documentTemplates.value = await staff<DocumentTemplate[]>('document_templates', { doctype: doc.doctype })
+    if (!documentTemplates.value.length) {
+      toast.error(__('Publish a template for {0} first.', [__(doc.doctype)]))
+      return
+    }
+    if (!documentTemplates.value.some((t) => t.name === doc.template))
+      doc.template = documentTemplates.value[0].name
+    await loadTemplate()
+    form.title = form.title || `${__(doc.doctype)} ${doc.name}`
+    mode.value = 'document'
+    step.value = 'recipients'
+  } catch (error) {
+    toast.error(errorMessage(error))
+  } finally {
+    busy.value = false
+  }
+}
+
+async function loadTemplate() {
+  const chosen = documentTemplates.value.find((t) => t.name === doc.template)
+  const target = { doctype: doc.doctype, name: doc.name }
+  const [rows, rendered, values] = await Promise.all([
+    staff<Recipient[]>('resolve_recipients', { template: doc.template, ...target }),
+    staff<Preview>('preview_source', {
+      ...target,
+      print_format: doc.printFormat || chosen?.print_format || null,
+      letter_head: doc.letterHead || chosen?.letter_head || null,
+    }),
+    staff<Prefill[]>('preview_prefill', { template: doc.template, ...target }),
+  ])
+  recipients.value = rows.map((row) => ({ ...row, full_name: row.full_name ?? '', email: row.email ?? '' }))
+  preview.value = rendered
+  prefill.value = values
+  pdf.value = await fetchPdf(`/api/method/${STAFF_API}preview_pdf?key=${encodeURIComponent(rendered.key)}`)
+}
+
+async function changeTemplate() {
+  busy.value = true
+  try {
+    await loadTemplate()
+  } catch (error) {
+    toast.error(errorMessage(error))
+  } finally {
+    busy.value = false
+  }
+}
+
+onMounted(() => {
+  const query = route.query
+  const text = (key: string) => (typeof query[key] === 'string' ? (query[key] as string) : '')
+  doc.doctype = text('doctype')
+  doc.name = text('name')
+  doc.template = text('template')
+  doc.printFormat = text('print_format')
+  doc.letterHead = text('letter_head')
+  if (doc.doctype && doc.name) void loadDocument()
+})
 
 async function uploadSource(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -125,6 +240,7 @@ const recipientsValid = computed(
 )
 
 async function send() {
+  if (mode.value === 'document') return sendDocument()
   busy.value = true
   try {
     const payload: Record<string, unknown> = {
@@ -149,6 +265,27 @@ async function send() {
       // The draft exists; open it so the sender can fix the problem and send from there.
       toast.error(errorMessage(error))
     }
+    await router.push(`/envelopes/${name}`)
+  } catch (error) {
+    toast.error(errorMessage(error))
+  } finally {
+    busy.value = false
+  }
+}
+
+async function sendDocument() {
+  busy.value = true
+  try {
+    const { name } = await staff<{ name: string }>('send_from_document', {
+      doctype: doc.doctype,
+      name: doc.name,
+      template: doc.template,
+      recipients: recipients.value,
+      message: form.message,
+      print_format: doc.printFormat || null,
+      letter_head: doc.letterHead || null,
+    })
+    toast.success(__('Sending {0}', [name]))
     await router.push(`/envelopes/${name}`)
   } catch (error) {
     toast.error(errorMessage(error))
@@ -182,13 +319,15 @@ function next() {
                 ? 'Recipients'
                 : name === 'fields'
                   ? 'Fields'
-                  : 'Review',
+                  : name === 'preview'
+                    ? 'Preview'
+                    : 'Review',
           )
         }}
       </li>
     </ol>
 
-    <section v-if="step === 'source'" class="mt-6 grid gap-6 md:grid-cols-2">
+    <section v-if="step === 'source'" class="mt-6 grid gap-6 md:grid-cols-3">
       <div class="rounded-lg border border-outline-gray-1 bg-surface-base p-4">
         <h2 class="mb-3 text-base font-semibold text-ink-gray-8">{{ __('From a template') }}</h2>
         <button
@@ -197,13 +336,37 @@ function next() {
           type="button"
           class="block w-full rounded px-3 py-2 text-start hover:bg-surface-gray-2"
           :disabled="busy"
-          @click="chooseTemplate(template.name, template.published_version, template.title)"
+          @click="
+            chooseTemplate(
+              template.name,
+              template.published_version,
+              template.title,
+              template.source_type,
+              template.reference_doctype,
+            )
+          "
         >
           {{ template.title }}
         </button>
         <p v-if="templates.data && !templates.data.length" class="text-sm text-ink-gray-5">
           {{ __('No published templates.') }}
         </p>
+      </div>
+      <div
+        class="space-y-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4"
+        data-testid="document-source"
+      >
+        <h2 class="text-base font-semibold text-ink-gray-8">{{ __('From a document') }}</h2>
+        <p class="text-sm text-ink-gray-5">{{ __('Rendered with its Print Format.') }}</p>
+        <FormControl v-model="doc.doctype" :label="__('DocType')" placeholder="Quotation" />
+        <FormControl v-model="doc.name" :label="__('Document')" />
+        <Button
+          :label="__('Load')"
+          :loading="busy"
+          :disabled="!doc.doctype || !doc.name"
+          data-testid="load-document"
+          @click="loadDocument"
+        />
       </div>
       <label
         class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-outline-gray-2 bg-surface-base p-8 text-center hover:bg-surface-gray-1"
@@ -224,6 +387,16 @@ function next() {
       <div v-if="mode === 'upload'" class="rounded-lg border border-outline-gray-1 bg-surface-base p-4">
         <RolesPanel />
       </div>
+      <div v-if="mode === 'document'" class="rounded-lg border border-outline-gray-1 bg-surface-base p-4">
+        <p class="mb-2 text-sm text-ink-gray-7">{{ __(doc.doctype) }} {{ doc.name }}</p>
+        <FormControl
+          v-model="doc.template"
+          type="select"
+          :label="__('Template')"
+          :options="documentTemplates.map((t) => ({ label: t.title, value: t.name }))"
+          @change="changeTemplate"
+        />
+      </div>
       <div class="space-y-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4">
         <div v-for="row in recipients" :key="row.role_label" class="grid gap-2 sm:grid-cols-[8rem_1fr_1fr]">
           <span class="self-center text-sm font-medium text-ink-gray-7"
@@ -231,6 +404,12 @@ function next() {
           >
           <FormControl v-model="row.full_name" :placeholder="__('Full name')" />
           <FormControl v-model="row.email" type="email" :placeholder="__('Email')" />
+          <p
+            v-if="mode === 'document' && row.resolved === false"
+            class="text-xs text-ink-gray-5 sm:col-start-2"
+          >
+            {{ __('Not found on the document. Enter it here.') }}
+          </p>
         </div>
       </div>
       <Button variant="solid" :label="__('Next')" @click="next" />
@@ -267,6 +446,54 @@ function next() {
       <div class="rounded-lg bg-surface-gray-2 p-3">
         <DesignerCanvas :source="pdf" :placing="placing" @placed="placing = null" />
       </div>
+    </section>
+
+    <section v-else-if="step === 'preview'" class="mt-6 grid gap-4 lg:grid-cols-[1fr_18rem]">
+      <div class="rounded-lg bg-surface-gray-2 p-3" data-testid="anchor-preview">
+        <AnchorPreview
+          :source="pdf"
+          :pages="preview?.metrics ?? []"
+          :anchors="preview?.anchors ?? []"
+          :roles="signerTokens"
+        />
+      </div>
+      <aside class="space-y-4">
+        <p
+          v-if="preview && !preview.generator_tested"
+          class="rounded bg-surface-amber-2 p-2 text-sm text-ink-amber-3"
+        >
+          {{
+            __(
+              'This Print Format uses the {0} generator. Fields from sign_field() are tested only with wkhtmltopdf and chrome; check their places.',
+              [preview.generator],
+            )
+          }}
+        </p>
+        <div>
+          <h2 class="mb-2 text-sm font-semibold text-ink-gray-8">{{ __('Fields from the Print Format') }}</h2>
+          <ul class="space-y-1 text-sm text-ink-gray-7">
+            <li v-for="anchor in preview?.anchors ?? []" :key="anchor.tag">
+              {{ anchor.role }} · {{ __(anchor.field_type) }} · {{ __('page {0}', [anchor.page]) }}
+              <span v-if="!signerTokens.includes(anchor.role)" class="block text-xs text-ink-red-4">
+                {{ __('No signer has this role; the field stays empty.') }}
+              </span>
+            </li>
+          </ul>
+          <p v-if="preview && !preview.anchors.length" class="text-sm text-ink-gray-5">
+            {{ __("No sign_field() found. The template's own fields are used.") }}
+          </p>
+        </div>
+        <div v-if="prefill.length">
+          <h2 class="mb-2 text-sm font-semibold text-ink-gray-8">{{ __('Filled from the document') }}</h2>
+          <dl class="space-y-1 text-sm">
+            <div v-for="row in prefill" :key="row.field_key" class="flex justify-between gap-2">
+              <dt class="text-ink-gray-5">{{ row.field_key }}</dt>
+              <dd class="text-ink-gray-8">{{ row.value }}</dd>
+            </div>
+          </dl>
+        </div>
+        <Button variant="solid" :label="__('Next')" data-testid="preview-next" @click="next" />
+      </aside>
     </section>
 
     <section

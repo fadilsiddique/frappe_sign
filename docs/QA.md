@@ -2,6 +2,17 @@
 
 Tick each item on a site with an outgoing Email Account and a Sign Profile with a sealing certificate. Items marked (auto) are also covered by the Playwright tests in `e2e/` (`yarn e2e` in `frontend/`, see `frontend/playwright.config.ts`).
 
+## P2.9: Send wizard with a Print Format source
+
+- [ ] (auto) Quotation form, Send for Signature, Customize: `/sign/new` opens with the Quotation, the template and the Customer's contact filled in.
+- [ ] (auto) Preview shows the rendered Print Format with a box per `sign_field()`, coloured by role; a role without a signer is flagged.
+- [ ] Changing the template reloads the recipients, the preview and the prefilled values.
+- [ ] A recipient not found on the document says "Not found on the document"; Send stays disabled until it is filled.
+- [ ] A Print Format with a generator other than wkhtmltopdf or chrome shows the untested-generator warning.
+- [ ] "From a document" on the first step works for a DocType typed by hand; choosing a Print Format template from the template list asks for the document.
+- [ ] Prefilled values (template fields with a prefill path) are listed under "Filled from the document".
+- [ ] (auto) Send opens the envelope detail.
+
 ## P2.5: Desk (Quotation)
 
 Enable Quotation in Sign Settings (System Manager) and publish a Print Format template for it.
