@@ -24,6 +24,24 @@ website_route_rules = [
 # sign_field() places signature fields in Print Formats (DESIGN 4.2).
 jinja = {"methods": ["frappe_sign.jinja.sign_field"]}
 
+# Suggested recipients per DocType (DESIGN 4.3). "*" is the fallback for other DocTypes. The
+# ERPNext resolvers only run for ERPNext DocTypes, which exist only when ERPNext is installed.
+frappe_sign_resolvers = {
+	"Contact": "frappe_sign.services.resolvers.contact",
+	"User": "frappe_sign.services.resolvers.user",
+	"Quotation": "frappe_sign.erpnext.resolvers.quotation",
+	"Sales Order": "frappe_sign.erpnext.resolvers.sales_order",
+	"Purchase Order": "frappe_sign.erpnext.resolvers.purchase_order",
+	"Contract": "frappe_sign.erpnext.resolvers.contract",
+	"Customer": "frappe_sign.erpnext.resolvers.customer",
+	"Supplier": "frappe_sign.erpnext.resolvers.supplier",
+	"Lead": "frappe_sign.erpnext.resolvers.lead",
+	"Employee": "frappe_sign.erpnext.resolvers.employee",
+	"Job Offer": "frappe_sign.erpnext.resolvers.job_offer",
+	"Job Applicant": "frappe_sign.erpnext.resolvers.job_applicant",
+	"*": "frappe_sign.erpnext.resolvers.employee_linked",
+}
+
 # Domain events (D17, DESIGN 8.5). Each handler runs in its own job as the envelope sender.
 frappe_sign_events = {
 	"envelope_sent": ["frappe_sign.services.notify.on_sent"],

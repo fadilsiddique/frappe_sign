@@ -35,8 +35,8 @@ class TestTemplateValidation(IntegrationTestCase):
 	def test_roles_are_unique_and_complete(self):
 		role = {"role_label": "Customer", "kind": "Signer", "signer_source": "Ask at Send"}
 		self.assertRaises(FieldValidationError, make_template, roles=[role, role])
-		fixed = {**role, "signer_source": "Fixed User"}
-		self.assertRaises(FieldValidationError, make_template, roles=[fixed])
+		# A Fixed User role without a user is the Sign Profile's authorised signatory (DESIGN 4.3).
+		make_template(roles=[{**role, "signer_source": "Fixed User"}])
 		doc_field = {**role, "signer_source": "Doc Field"}
 		self.assertRaises(FieldValidationError, make_template, roles=[doc_field])
 

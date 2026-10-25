@@ -89,7 +89,7 @@ Gate 1 passed on 2026-10-25: Adobe Reader showed a valid seal on `tests/output/s
 | [x] P2.1 | `pdf/source.py` Print Format rendering via `frappe.get_print(..., as_pdf=True)`; respects Print Format `pdf_generator` | Works with wkhtmltopdf and chrome generators |
 | [x] P2.2 | `jinja/` `sign_field()` helper + `pdf/anchors.py` | Anchors found in both generators for a Quotation Print Format with 3 and 40 items |
 | [x] P2.3 | Enabled DocTypes in Sign Settings create custom fields; `erpnext/setup.py` switches `company` fields to Link Company | Custom fields appear, `allow_on_submit` works |
-| P2.4 | Resolvers registry + resolvers for Quotation, Sales Order, Purchase Order, Contract, Job Offer (if HRMS), Employee docs, Doc Field | Tests on ERPNext fixtures; missing fields give "unresolved", not errors |
+| [x] P2.4 | Resolvers registry + resolvers for Quotation, Sales Order, Purchase Order, Contract, Job Offer (if HRMS), Employee docs, Doc Field | Tests on ERPNext fixtures; missing fields give "unresolved", not errors |
 | P2.5 | `public/js/desk.js`: form button + indicator, print view button, list bulk action, send dialog | Manual QA + Playwright for Quotation |
 | P2.6 | `services/writeback.py`: attach, `sign_status`, `sign_envelope`, timeline comment, partial status | Integration tests on submitted Sales Order |
 | P2.7 | `services/actions.py`: Submit, Apply Workflow Action, Create Mapped Document, Set Field Value, Call Method; runs as sender | Quotation to draft Sales Order test |

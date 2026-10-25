@@ -365,6 +365,8 @@ Resolvers are registered per DocType through `frappe_sign_resolvers` and return 
 | Any DocType | Template role with `signer_source = Doc Field` | Value at `source_field` |
 | Company side | Template `fixed_user` or Sign Profile `authorised_signatory` | User email |
 
+The hook maps a DocType to a dotted path; `"*"` is the fallback for DocTypes without their own resolver (ERPNext registers the Employee-linked one there). Party DocTypes (Customer, Supplier, Lead, Employee, Job Applicant) and Frappe's Contact and User have resolvers too, so a template role with `signer_source = Doc Field` that points at a link field resolves through the linked record. A `Fixed User` role with no user means the Sign Profile's `authorised_signatory`. `api.staff.resolve_recipients` returns one row per template role with `resolved` set when an email was found; `primary_party` gives the envelope's `party_type` and `party`.
+
 Field names must be verified against the ERPNext v16.0.0 DocType JSON in tests; resolvers read fields with `doc.get()` so a missing field yields "unresolved", never an exception. The send dialog always lets the user correct recipients.
 
 ### 4.4 Prefill

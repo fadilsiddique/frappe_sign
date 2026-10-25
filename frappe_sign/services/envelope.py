@@ -23,6 +23,7 @@ from frappe_sign.pdf.source import render
 from frappe_sign.pdf.types import Anchor, PdfError
 from frappe_sign.services import audit, events, notify, settings
 from frappe_sign.services.errors import pdf_message
+from frappe_sign.services.resolvers import authorised_signatory
 from frappe_sign.services.template import load_snapshot
 from frappe_sign.utils.dates import after, is_past
 from frappe_sign.utils.files import new_private_file, read_file, read_file_url
@@ -129,9 +130,11 @@ def from_template(snapshot: dict[str, Any], given: list[dict[str, Any]]) -> dict
 			"kind": role["kind"],
 			"routing_order": role.get("routing_order") or 1,
 		}
-		if role.get("signer_source") == "Fixed User" and role.get("fixed_user") and not row.get("email"):
-			row["email"] = frappe.db.get_value("User", role["fixed_user"], "email")
-			row["full_name"] = row.get("full_name") or frappe.utils.get_fullname(role["fixed_user"])
+		# Without a fixed user, the role is the company's authorised signatory (DESIGN 4.3).
+		person = role.get("fixed_user") or authorised_signatory(snapshot.get("company"))
+		if role.get("signer_source") == "Fixed User" and person and not row.get("email"):
+			row["email"] = frappe.db.get_value("User", person, "email")
+			row["full_name"] = row.get("full_name") or frappe.utils.get_fullname(person)
 		recipients.append(row)
 	from_print = snapshot.get("source_type") == PRINT_FORMAT
 	return {

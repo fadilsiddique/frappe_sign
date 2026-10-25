@@ -45,8 +45,6 @@ class SignTemplate(Document):
 			if role.role_label in seen:
 				frappe.throw(_("Role {0} is listed twice.").format(role.role_label), FieldValidationError)
 			seen.add(role.role_label)
-			if role.signer_source == "Fixed User" and not role.fixed_user:
-				frappe.throw(_("Role {0}: set the fixed user.").format(role.role_label), FieldValidationError)
 			if role.signer_source == "Doc Field" and not role.source_field:
 				frappe.throw(
 					_("Role {0}: set the source field.").format(role.role_label), FieldValidationError

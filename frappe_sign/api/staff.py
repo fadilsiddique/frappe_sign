@@ -11,7 +11,7 @@ from frappe.rate_limiter import rate_limit
 from werkzeug.wrappers import Response
 
 from frappe_sign.api.errors import with_error_code
-from frappe_sign.services import audit, doctypes, sealing
+from frappe_sign.services import audit, doctypes, resolvers, sealing
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
 from frappe_sign.utils.dates import format_utc
@@ -191,3 +191,10 @@ def uploaded_pdf(file_name: str, content: str | None) -> tuple[str, bytes]:
 def remove_sign_fields(doctype: str) -> dict:
 	"""System Manager: delete sign_status and sign_envelope from a DocType no longer enabled."""
 	return {"removed": doctypes.remove_custom_fields(doctype)}
+
+
+@frappe.whitelist()
+@with_error_code
+def resolve_recipients(template: str, doctype: str | None = None, name: str | None = None) -> list:
+	"""The template's roles with the recipients found on the document (DESIGN 4.3)."""
+	return resolvers.resolve_recipients(template, doctype, name)
