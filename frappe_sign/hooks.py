@@ -44,3 +44,5 @@ permission_query_conditions = {
 has_permission = {
 	"Sign Envelope": "frappe_sign.utils.permissions.envelope_has_permission",
 }
+
+after_request = ["frappe_sign.utils.http.after_request"]

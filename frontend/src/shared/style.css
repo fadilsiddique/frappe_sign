@@ -5,3 +5,9 @@ body,
 #app {
   height: 100%;
 }
+
+/* Brand colour from the Sign Profile (boot.ts sets --sign-brand). */
+:root {
+  --sign-brand: #0f766e;
+  --sign-brand-soft: rgb(15 118 110 / 0.08);
+}

@@ -9,17 +9,17 @@ deleted again in tearDown.
 """
 
 import io
-import os
 import threading
 from unittest.mock import patch
 
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import get_files_path, now_datetime
+from frappe.utils import now_datetime
 from pypdf import PdfReader
 
 from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import audit, sealing, signing
+from frappe_sign.tests.cleanup import purge_envelope, purge_profile, purge_since, purge_template
 from frappe_sign.tests.factories import make_email_account, make_profile
 from frappe_sign.tests.integration.test_sealing import COMPANY, offline_seal
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, publish_template, send_now
@@ -144,43 +144,8 @@ class TestConcurrency(IntegrationTestCase):
 	def purge(self):
 		"""Delete everything setUp and the threads committed."""
 		frappe.db.rollback()
-		envelope = self.envelope
-		templates = []
-		if envelope:
-			version = frappe.db.get_value("Sign Envelope", envelope, "template_version")
-			templates = [frappe.db.get_value("Sign Template Version", version, "template")] if version else []
-			for doctype in ("Sign Event", "Sign Session", "Sign Capture"):
-				frappe.db.delete(doctype, {"envelope": envelope})
-			for doctype in ("Sign Envelope Recipient", "Sign Envelope Field"):
-				frappe.db.delete(doctype, {"parent": envelope})
-			frappe.db.delete("Sign Envelope", {"name": envelope})
-			queued = frappe.get_all("Email Queue", filters={"reference_name": envelope}, pluck="name")
-			if queued:
-				frappe.db.delete("Email Queue Recipient", {"parent": ["in", queued]})
-				frappe.db.delete("Email Queue", {"name": ["in", queued]})
-			frappe.db.delete("Notification Log", {"document_name": envelope})
-			frappe.db.delete("Error Log", {"reference_name": envelope})
-		for template in templates:
-			frappe.db.delete("Sign Template Version", {"template": template})
-			for doctype in ("Sign Template Role", "Sign Template Field"):
-				frappe.db.delete(doctype, {"parent": template})
-			frappe.db.delete("Sign Template", {"name": template})
-		certificate = frappe.db.get_value("Sign Profile", COMPANY, "sealing_certificate")
-		frappe.db.delete("Sign Profile", {"name": COMPANY})
-		if certificate:
-			frappe.db.delete("Sign Certificate", {"name": certificate})
-			frappe.db.delete("__Auth", {"doctype": "Sign Certificate", "name": certificate})
-		frappe.db.delete("Email Account", {"email_id": "sign-test@example.com"})
-		frappe.db.delete("Version", {"creation": [">=", self.started], "ref_doctype": ["like", "Sign %"]})
-		for file in frappe.get_all(
-			"File", filters={"creation": [">=", self.started]}, fields=["name", "file_url", "is_private"]
-		):
-			path = (
-				get_files_path(file.file_url.rsplit("/", 1)[-1], is_private=file.is_private)
-				if file.file_url
-				else None
-			)
-			if path and os.path.exists(path):
-				os.remove(path)
-			frappe.db.delete("File", {"name": file.name})
+		for template in purge_envelope(self.envelope):
+			purge_template(template)
+		purge_profile(COMPANY)
+		purge_since(self.started)
 		frappe.db.commit()  # nosemgrep: frappe-manual-commit (threads need committed rows)

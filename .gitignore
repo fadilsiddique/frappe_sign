@@ -60,3 +60,6 @@ frappe_sign/www/sign.html
 frappe_sign/www/s.html
 # bench build links node_modules into public/; "node_modules/" does not match a symlink
 frappe_sign/public/node_modules
+
+# Playwright output
+e2e/test-results/

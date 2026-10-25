@@ -143,11 +143,12 @@ def fixture_pdf(name: str = "a4_simple.pdf") -> bytes:
 	return (Path(__file__).resolve().parent / "fixtures" / "pdfs" / name).read_bytes()
 
 
-def make_email_account(email_id: str = "sign-test@example.com"):
-	"""A default outgoing Email Account; tests never connect to it (frappe skips SMTP in tests)."""
+def make_email_account(email_id: str = "sign-test@example.com", *, skip_smtp_check: bool = False):
+	"""A default outgoing Email Account. Tests never connect to it: frappe skips the SMTP check in
+	tests, and the e2e fixtures (outside tests) pass skip_smtp_check."""
 	if frappe.db.exists("Email Account", {"email_id": email_id}):
 		return frappe.get_doc("Email Account", {"email_id": email_id})
-	return frappe.get_doc(
+	account = frappe.get_doc(
 		{
 			"doctype": "Email Account",
 			"email_account_name": "Frappe Sign Test",
@@ -157,7 +158,9 @@ def make_email_account(email_id: str = "sign-test@example.com"):
 			"smtp_server": "localhost",
 			"no_smtp_authentication": 1,
 		}
-	).insert()
+	)
+	account.flags.ignore_validate = skip_smtp_check
+	return account.insert()
 
 
 def make_profile(company: str = "Frappe Sign Test Co", **overrides):

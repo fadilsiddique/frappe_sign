@@ -64,6 +64,26 @@ class TestShellContext(IntegrationTestCase):
 		self.assertNotIn("csrf_token", context.boot)
 		self.assertIsNone(context.boot["frappe_sign"]["user"])
 
+	def test_logged_in_signer_gets_a_csrf_token(self):
+		context = frappe._dict()
+		guest_page.get_context(context)
+		self.assertTrue(context.boot["csrf_token"])
+		self.assertEqual(context.boot["frappe_sign"]["user"], "Administrator")
+
+	def test_guest_headers(self):
+		from werkzeug.wrappers import Response
+
+		from frappe_sign.utils.http import after_request
+
+		for path, expected in (
+			("/s/abc", "no-referrer"),
+			("/api/method/frappe_sign.api.guest.open", "no-referrer"),
+			("/app", None),
+		):
+			response = Response("x")
+			after_request(response=response, request=frappe._dict(path=path))
+			self.assertEqual(response.headers.get("Referrer-Policy"), expected, path)
+
 	def test_arabic_is_right_to_left(self):
 		frappe.local.lang = "ar"
 		context = frappe._dict()
