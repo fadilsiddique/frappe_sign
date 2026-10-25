@@ -514,6 +514,7 @@ def clean_attachment(content: bytes, file_name: str) -> tuple[bytes, str]:
 	return clean_image(content), "png"
 
 
+@audit.retry_on_conflict
 def finish(secret: str, client: Client | None = None) -> dict[str, Any]:
 	"""Complete this recipient: check, render the intermediate PDF under the row lock (D3)."""
 	client = client or current_client()
@@ -600,6 +601,7 @@ def is_filled(field: Any) -> bool:
 	return bool((field.value or "").strip())
 
 
+@audit.retry_on_conflict
 def decline(secret: str, reason: str, client: Client | None = None) -> None:
 	reason = (reason or "").strip()
 	if not reason:
@@ -635,6 +637,7 @@ def can_delegate(access: Access) -> bool:
 	)
 
 
+@audit.retry_on_conflict
 def delegate(secret: str, full_name: str, email: str, client: Client | None = None) -> None:
 	full_name, email = (full_name or "").strip(), (email or "").strip().lower()
 	access = locked(by_session(secret))

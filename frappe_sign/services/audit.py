@@ -8,8 +8,10 @@ microseconds. Only HASHED_FIELDS are hashed; Frappe metadata and the hash fields
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from functools import wraps
 from typing import Any
 
 import frappe
@@ -28,6 +30,33 @@ class ChainReport:
 	head: str | None
 	first_bad_seq: int | None = None
 	reason: str | None = None
+
+
+LOCK_ATTEMPTS = 3
+
+
+def retry_on_conflict[**P, R](fn: Callable[P, R]) -> Callable[P, R]:
+	"""Retry a service entry point whose envelope row lock hit a snapshot conflict.
+
+	MariaDB 11.8 (innodb_snapshot_isolation) refuses SELECT ... FOR UPDATE on a row that another
+	transaction changed after this one's first read, and Frappe raises QueryDeadlockError. When two
+	signers finish together, the second must wait and then see the first one's work, so the call is
+	rolled back and run again with a fresh read view. Use it only on functions that start the
+	transaction's work (an API call or job step), never on helpers called inside one.
+	"""
+
+	@wraps(fn)
+	def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+		for attempt in range(1, LOCK_ATTEMPTS + 1):
+			try:
+				return fn(*args, **kwargs)
+			except frappe.QueryDeadlockError:
+				if attempt == LOCK_ATTEMPTS:
+					raise
+				frappe.db.rollback()
+		raise AssertionError("unreachable")
+
+	return wrapper
 
 
 def lock_envelope(envelope: str) -> None:

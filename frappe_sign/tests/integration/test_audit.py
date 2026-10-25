@@ -171,3 +171,27 @@ class TestAuditChain(SignTestCase):
 			}
 		)
 		self.assertRaises(frappe.UniqueValidationError, duplicate.insert)
+
+
+class TestRetryOnConflict(SignTestCase):
+	def test_retries_after_a_snapshot_conflict(self):
+		calls = []
+
+		@audit.retry_on_conflict
+		def flaky():
+			calls.append(1)
+			if len(calls) == 1:
+				raise frappe.QueryDeadlockError("1020")
+			return "done"
+
+		with patch.object(frappe.db, "rollback") as rollback:
+			self.assertEqual(flaky(), "done")
+		self.assertEqual((len(calls), rollback.call_count), (2, 1))
+
+	def test_gives_up_after_three_attempts(self):
+		@audit.retry_on_conflict
+		def always():
+			raise frappe.QueryDeadlockError("1020")
+
+		with patch.object(frappe.db, "rollback"), self.assertRaises(frappe.QueryDeadlockError):
+			always()

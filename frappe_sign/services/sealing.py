@@ -66,6 +66,7 @@ def queue_seal(envelope: Any) -> bool:
 	return True
 
 
+@audit.retry_on_conflict
 def retry_seal(name: str) -> None:
 	"""A Sign Manager starts a new seal after sealing_state Failed."""
 	if not MANAGER_ROLES & set(frappe.get_roles()):
@@ -77,6 +78,7 @@ def retry_seal(name: str) -> None:
 	enqueue_seal(name)
 
 
+@audit.retry_on_conflict
 def begin(name: str) -> bool:
 	"""Queued -> Sealing under the row lock. False when another job already took it."""
 	doc = envelope_service.locked(name)
@@ -138,6 +140,7 @@ def complete(name: str, sealed: bytes, head: str | None) -> None:
 	events.publish("envelope_completed", name)
 
 
+@audit.retry_on_conflict
 def fail(name: str, reason: str) -> None:
 	"""Record a failed attempt after the job rolled back, and schedule the next retry."""
 	doc = envelope_service.locked(name)

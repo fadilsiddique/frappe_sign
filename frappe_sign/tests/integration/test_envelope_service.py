@@ -39,6 +39,11 @@ class TestDraft(SignTestCase):
 		self.assertEqual(len(draft.fields), 4)
 		self.assertEqual(events_of(draft.name), ["Created"])
 
+	def test_sender_values_win_over_template_defaults(self):
+		draft = make_draft(title="Quotation Q-1", company="Acme")
+		self.assertEqual((draft.title, draft.company), ("Quotation Q-1", "Acme"))
+		self.assertEqual(make_draft().title, "Service Agreement")
+
 	def test_fixed_user_role_fills_itself(self):
 		roles = [
 			{"role_label": "Customer", "kind": "Signer", "signer_source": "Ask at Send", "routing_order": 1},

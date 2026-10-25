@@ -90,7 +90,9 @@ def create_draft(payload: dict[str, Any]) -> Any:
 	}
 	if version:
 		frappe.has_permission("Sign Template Version", "read", doc=version, throw=True)
-		values |= from_template(load_snapshot(version), payload.get("recipients") or [])
+		template = from_template(load_snapshot(version), payload.get("recipients") or [])
+		# What the sender typed wins over the template's defaults.
+		values |= {key: value for key, value in template.items() if not values.get(key)}
 		values["template_version"] = version
 	else:
 		values |= {
@@ -140,6 +142,7 @@ def recipient_row(row: dict[str, Any]) -> dict[str, Any]:
 # Send
 
 
+@audit.retry_on_conflict
 def send(name: str) -> None:
 	"""Check the Draft, set send_state Queued and enqueue the render job (DESIGN 3)."""
 	doc = frappe.get_doc("Sign Envelope", name)
@@ -198,6 +201,7 @@ def check_sendable(doc: Any) -> None:
 		throw(FieldValidationError, _("Set up an outgoing Email Account before sending."))
 
 
+@audit.retry_on_conflict
 def render_and_send(name: str) -> bool:
 	"""Body of jobs.render.run: freeze the PDF, issue tokens, set Sent. False when nothing to do."""
 	doc = locked(name)
@@ -360,6 +364,7 @@ def end_sessions(envelope: str, recipient: str | None = None) -> None:
 # Sender actions
 
 
+@audit.retry_on_conflict
 def void(name: str, reason: str) -> None:
 	frappe.get_doc("Sign Envelope", name).check_permission("write")
 	if not (reason or "").strip():
@@ -374,6 +379,7 @@ def void(name: str, reason: str) -> None:
 	events.publish("envelope_voided", name)
 
 
+@audit.retry_on_conflict
 def remind(name: str, recipient: str | None = None) -> int:
 	"""Email a fresh link to recipients whose turn it is. Returns how many were reminded."""
 	frappe.get_doc("Sign Envelope", name).check_permission("write")
@@ -392,6 +398,7 @@ def remind(name: str, recipient: str | None = None) -> int:
 	return len(targets)
 
 
+@audit.retry_on_conflict
 def resend(name: str, recipient: str, email: str | None = None) -> None:
 	"""A new link for one waiting recipient, optionally to a corrected email address."""
 	frappe.get_doc("Sign Envelope", name).check_permission("write")

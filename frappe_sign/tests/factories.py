@@ -158,3 +158,19 @@ def make_email_account(email_id: str = "sign-test@example.com"):
 			"no_smtp_authentication": 1,
 		}
 	).insert()
+
+
+def make_profile(company: str = "Frappe Sign Test Co", **overrides):
+	"""A Sign Profile with the test sealing certificate."""
+	if frappe.db.exists("Sign Profile", company):
+		return frappe.get_doc("Sign Profile", company)
+	return frappe.get_doc(
+		{
+			"doctype": "Sign Profile",
+			"company": company,
+			"sealing_certificate": make_certificate().name,
+			"brand_color": "#0f766e",
+			"legal_footer": "Frappe Sign test company",
+			**overrides,
+		}
+	).insert()

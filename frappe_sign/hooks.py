@@ -27,3 +27,10 @@ frappe_sign_events = {
 	"envelope_declined": ["frappe_sign.services.notify.on_declined"],
 	"envelope_voided": ["frappe_sign.services.notify.on_voided"],
 }
+
+scheduler_events = {
+	"cron": {
+		# Failed seals retry after 1, 5 and 30 minutes (DESIGN 5.4).
+		"* * * * *": ["frappe_sign.jobs.seal.retry_due"],
+	},
+}

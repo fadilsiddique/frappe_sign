@@ -455,6 +455,8 @@ class RemoteSigner:  # Phase 3: PKCS#11 or CSC
 - Triggered when the last signer finishes. `services/signing.finish` holds the envelope row lock (5.1), re-checks that all Signers and Approvers are done and `sealing_state = Not Started`, sets `Queued`, and enqueues `jobs.seal.run` with `job_id=f"frappe_sign::seal::{envelope}"`, `deduplicate=True`, `enqueue_after_commit=True`.
 - The job sets `Sealing`, runs overlay, certificate, seal; on success stores the file, sets `Sealed`, writes events `Sealed` and `Completed`. On failure sets `Failed`, retries with backoff (1, 5, 30 min), alerts the sender after the last retry.
 - `retry_seal` (Sign Manager) accepts only `sealing_state = Failed`. It sets `Queued` under the row lock and enqueues the same deduplicated job.
+- Retries: the job records each failure in `seal_attempts` and the next try in `seal_retry_on`. The RQ scheduler is off in Frappe workers, so `jobs.seal.retry_due` (scheduler, every minute) queues due retries.
+- Snapshot conflicts: MariaDB 11.8 (`innodb_snapshot_isolation`) refuses `SELECT ... FOR UPDATE` on a row that another transaction changed after this transaction's first read, and Frappe raises `QueryDeadlockError`. Service entry points that take the envelope lock (`finish`, `decline`, `delegate`, `send`, `void`, `remind`, `resend`, `begin`, `retry_seal`, `fail`) use `audit.retry_on_conflict`: roll back and run again, up to three times, so the second of two parallel finishes waits for the first and sees its work.
 
 ### 5.5 Audit chain
 
