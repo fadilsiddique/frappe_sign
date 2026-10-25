@@ -56,6 +56,7 @@ frappe_sign_events = {
 	"envelope_completed": [
 		"frappe_sign.services.notify.on_completed",
 		"frappe_sign.services.writeback.on_complete",
+		"frappe_sign.services.actions.queue_post_sign",
 	],
 	"envelope_declined": [
 		"frappe_sign.services.notify.on_declined",

@@ -244,7 +244,7 @@ Field types that need a note:
 | envelope | Link Sign Envelope | Indexed |
 | seq | Int | 1-based per envelope |
 | recipient_row | Data | |
-| event | Select | Created, Sent, Delivered, Viewed, OTP Sent, OTP Verified, Consented, Field Filled, Signed, Declined, Delegated, Reminded, Voided, Expired, Source Changed, Sealed, Completed, Downloaded |
+| event | Select | Created, Sent, Delivered, Viewed, OTP Sent, OTP Verified, Consented, Field Filled, Signed, Declined, Delegated, Reminded, Voided, Expired, Source Changed, Sealed, Completed, Downloaded, Post-Sign Action |
 | at | Datetime(6) | UTC, stored naive. Only Sign Event uses UTC; the UI converts it for display |
 | actor | Data | User or recipient email |
 | ip | Data | |
@@ -399,7 +399,9 @@ Run in a background job as the envelope `sender` (`frappe.set_user`), so the sen
 | Set Field Value | `fieldname`, `value` | `custom_signed_on = now` |
 | Call Method | `method` | Any whitelisted dotted path, called with `(envelope, doc)` |
 
-Extra action types can be registered via `frappe_sign_post_sign_actions`.
+Extra action types can be registered via `frappe_sign_post_sign_actions` (`{"Action name": "dotted.path"}`, called with `(envelope, doc, config)`). The Select on Sign Template lists the built-in types; an app that registers another adds it to the Select with a Property Setter.
+
+How it runs: the `envelope_completed` handler `services.actions.queue_post_sign` queues `jobs.actions.run` when the template version has an action. The job runs the action as the sender and commits. Each run writes a `Post-Sign Action` Sign Event with `{action, status: ok | failed, ...}`; on failure the job rolls back the action only, then writes the Error Log ("Frappe Sign: post-sign action"), that event and a notification to the sender. `Create Mapped Document` and `Call Method` accept only whitelisted functions; the mapper is called with `source_name`, its result gets `values` from the config and is inserted as a draft unless `save` is 0. Config values may be relative: `now`, `today`, `today+N`. ERPNext's `make_sales_order` leaves the Delivery Date empty, so the pilot config sets `"values": {"delivery_date": "today+7"}`.
 
 ### 4.7 Lifecycle sync
 
@@ -642,7 +644,7 @@ frappe_sign_events = {
                          "frappe_sign.services.writeback.on_partial"],
     "envelope_completed": ["frappe_sign.services.notify.on_completed",
                            "frappe_sign.services.writeback.on_complete",
-                           "frappe_sign.services.actions.run_post_sign"],
+                           "frappe_sign.services.actions.queue_post_sign"],
     "envelope_declined": ["frappe_sign.services.notify.on_declined",
                           "frappe_sign.services.writeback.on_declined"],
     "envelope_voided": ["frappe_sign.services.notify.on_voided",
@@ -660,7 +662,7 @@ frappe_sign_events = {
 | `jobs.render.run` | default | On send |
 | `jobs.seal.run` | long | Last signature; job_id dedupe |
 | `jobs.events.run` | default | One per event handler, after commit |
-| `jobs.actions.run` | default | After seal (calls `services.actions.run_post_sign`) |
+| `jobs.actions.run` | default | After seal, queued by the `envelope_completed` handler `services.actions.queue_post_sign` |
 | `jobs.bulk.run` | long | List action |
 | `jobs.triggers.run` | default | After source doc commit |
 | `jobs.reminders.run` | scheduler `*/15 * * * *` | Reminders and expiry |

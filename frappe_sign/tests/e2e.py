@@ -119,7 +119,11 @@ def prepare_quotation(submit: bool = True, items: int = 3, post_sign_action: str
 
 
 SALES_ORDER_ACTION = frappe.as_json(
-	{"method": "erpnext.selling.doctype.quotation.quotation.make_sales_order", "save": 1}
+	{
+		"method": "erpnext.selling.doctype.quotation.quotation.make_sales_order",
+		"save": 1,
+		"values": {"delivery_date": "today+7"},
+	}
 )
 
 

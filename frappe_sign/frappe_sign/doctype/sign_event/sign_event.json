@@ -45,7 +45,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Event",
-   "options": "Created\nSent\nDelivered\nViewed\nOTP Sent\nOTP Verified\nConsented\nField Filled\nSigned\nDeclined\nDelegated\nReminded\nVoided\nExpired\nSource Changed\nSealed\nCompleted\nDownloaded",
+   "options": "Created\nSent\nDelivered\nViewed\nOTP Sent\nOTP Verified\nConsented\nField Filled\nSigned\nDeclined\nDelegated\nReminded\nVoided\nExpired\nSource Changed\nSealed\nCompleted\nDownloaded\nPost-Sign Action",
    "read_only": 1,
    "reqd": 1
   },
@@ -120,7 +120,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-24 12:00:00.000000",
+ "modified": "2026-10-25 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Sign",
  "name": "Sign Event",
