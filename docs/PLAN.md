@@ -100,6 +100,8 @@ Gate 1 passed on 2026-10-25: Adobe Reader showed a valid seal on `tests/output/s
 
 **Gate 2:** Playwright: user submits a Quotation, sends for signature, customer signs on mobile viewport, signed PDF attached, `sign_status = Signed`, draft Sales Order exists. Pilot live.
 
+Gate 2 status on 2026-10-25: the Playwright test passes (`e2e/staff-gate2-quotation.spec.ts`), with the bench worker rendering, sealing through the public TSA, writing back and creating the Sales Order. P2.11 has its guides (`docs/ADMIN_GUIDE.md`, `docs/ANCHOR_GUIDE.md`); the pilot setup on the real site and the user training are open. The wkhtmltopdf anchor tests run only in CI (no wkhtmltopdf on the development Mac).
+
 ---
 
 ## Phase 3: Hardening (3 weeks)

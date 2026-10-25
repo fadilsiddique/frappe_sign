@@ -23,9 +23,15 @@ frappe.provide("frappe.ui.form");
 	$(document).on("form-refresh", (event, frm) => {
 		if (!frm || !frm.doc || frm.is_new() || !is_enabled(frm.doctype)) return;
 		const status = frm.doc.sign_status;
+		// The form message sits above the tabs; the dashboard is inside "Connections" in v16.
 		if (status && status !== "Not Sent") {
-			frm.dashboard.add_indicator(
-				__("Signature: {0}", [__(status)]),
+			const envelope = frm.doc.sign_envelope
+				? ` · <a href="/sign/envelopes/${encodeURIComponent(
+						frm.doc.sign_envelope
+				  )}">${frappe.utils.escape_html(frm.doc.sign_envelope)}</a>`
+				: "";
+			frm.dashboard.set_headline_alert(
+				`${__("Signature: {0}", [__(status)])}${envelope}`,
 				STATUS_COLORS[status] || "gray"
 			);
 		}

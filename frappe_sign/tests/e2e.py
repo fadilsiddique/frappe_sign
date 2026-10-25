@@ -169,8 +169,12 @@ def render_if_queued(envelope: str) -> dict:
 	)
 
 
-def signing_token(envelope: str, email: str) -> str | None:
-	"""The /s/<token> link from the newest invitation email to `email` for this envelope."""
+def signing_token(envelope: str, email: str) -> dict:
+	"""{"token": the /s/<token> from the newest invitation email to `email` for this envelope}."""
+	return {"token": invitation_token(envelope, email)}
+
+
+def invitation_token(envelope: str, email: str) -> str | None:
 	require_test_site()
 	import email as email_parser
 	import re
@@ -219,3 +223,38 @@ def purge_quotation(started: str) -> dict:
 	frappe.db.commit()  # nosemgrep: frappe-manual-commit (e2e fixtures commit for the browser)
 	disable_doctypes("Quotation")
 	return result
+
+
+def complete_pending(envelope: str) -> dict:
+	"""Gate 2: when no worker has sealed the envelope, seal it here with the offline test PKI,
+	then run the jobs that sealing queues (event handlers, post-sign action), each committing."""
+	require_test_site()
+	from unittest.mock import patch
+
+	from frappe_sign.jobs import seal as seal_job
+	from frappe_sign.tests.integration.test_sealing import offline_seal
+
+	state = frappe.db.get_value("Sign Envelope", envelope, "sealing_state")
+	if state not in ("Queued", "Failed"):
+		return {"sealing_state": state, "ran": 0}
+	if state == "Failed":
+		frappe.db.set_value("Sign Envelope", envelope, {"sealing_state": "Queued", "seal_retry_on": None})
+		frappe.db.commit()  # nosemgrep: frappe-manual-commit (e2e fixtures commit for the browser)
+	queued: list[tuple[str, dict]] = []
+
+	def record(method, **kwargs):
+		queued.append((method, kwargs))
+
+	sender = frappe.db.get_value("Sign Envelope", envelope, "sender")
+	with patch("frappe.enqueue", side_effect=record), offline_seal(), run_as(sender):
+		seal_job.run(envelope)
+		ran = 0
+		while queued:
+			method, kwargs = queued.pop(0)
+			params = {k: v for k, v in kwargs.items() if k not in JOB_OPTIONS}
+			frappe.get_attr(method)(**params)
+			ran += 1
+	return {"sealing_state": frappe.db.get_value("Sign Envelope", envelope, "sealing_state"), "ran": ran}
+
+
+JOB_OPTIONS = {"queue", "timeout", "job_id", "deduplicate", "enqueue_after_commit", "now", "at_front"}
