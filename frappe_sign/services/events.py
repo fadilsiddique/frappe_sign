@@ -36,7 +36,8 @@ def publish(event: str, envelope: str) -> None:
 			queue="default",
 			enqueue_after_commit=True,
 			handler=handler,
-			event=event,
+			# Not `event`: frappe.enqueue has its own `event` parameter and would keep it.
+			domain_event=event,
 			envelope=envelope,
 		)
 
