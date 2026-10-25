@@ -409,7 +409,7 @@ class TestFinish(SigningCase):
 		)
 		self.assertEqual(payload, {"intermediate_sha256": customer.intermediate_sha256, "kind": "Signer"})
 		self.assertEqual(
-			[c.get("event") for c in self.enqueued if c["method"].endswith("events.run")][-1],
+			[c.get("domain_event") for c in self.enqueued if c["method"].endswith("events.run")][-1],
 			"recipient_signed",
 		)
 
@@ -504,7 +504,7 @@ class TestDeclineAndDelegate(SigningCase):
 		self.assertEqual(
 			(doc.status, customer.status, customer.decline_reason), ("Declined", "Declined", "Price is wrong")
 		)
-		self.assertIn("envelope_declined", [c.get("event") for c in calls])
+		self.assertIn("envelope_declined", [c.get("domain_event") for c in calls])
 		self.assertRaises(SessionInvalid, signing.state, secret)
 		self.assertRaises(EnvelopeNotOpen, signing.open, self.token("Customer"), CLIENT)
 

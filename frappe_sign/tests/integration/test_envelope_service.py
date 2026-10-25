@@ -202,7 +202,7 @@ class TestSenderActions(SignTestCase):
 		doc = frappe.get_doc("Sign Envelope", name)
 		self.assertEqual((doc.status, doc.void_reason), ("Voided", "Wrong price"))
 		self.assertEqual(events_of(name)[-1], "Voided")
-		self.assertIn("envelope_voided", [call.get("event") for call in calls])
+		self.assertIn("envelope_voided", [call.get("domain_event") for call in calls])
 		self.assertRaises(InvalidTransition, envelope_service.void, name, "again")
 
 	def test_void_needs_an_open_envelope(self):

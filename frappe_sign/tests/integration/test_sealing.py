@@ -64,7 +64,7 @@ class TestSealing(SigningCase):
 		report = audit.verify_chain(name)
 		self.assertTrue(report.ok)
 		self.assertIn(doc.audit_head, frappe.get_all("Sign Event", filters={"envelope": name}, pluck="hash"))
-		self.assertIn("envelope_completed", [c.get("event") for c in calls])
+		self.assertIn("envelope_completed", [c.get("domain_event") for c in calls])
 
 	def test_second_job_does_nothing(self):
 		make_profile(test_company())
