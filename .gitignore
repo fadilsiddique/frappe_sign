@@ -63,3 +63,6 @@ frappe_sign/public/node_modules
 
 # Playwright output
 e2e/test-results/
+
+# Generated sample for the Gate 1 Adobe check (frappe_sign/tests/sample.py)
+frappe_sign/tests/output/
