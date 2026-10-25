@@ -8,13 +8,19 @@ from frappe.model.document import Document
 from frappe_sign.exceptions import ImmutableRecord, InvalidTransition
 from frappe_sign.utils.integrity import (
 	changed_fields,
+	require_private_files,
 	require_sha256,
 	validate_placed_field,
 )
 
 DRAFT = "Draft"
 # Initial values of the service-owned fields. Any other service-owned field starts empty.
-INITIAL_VALUES = {"status": DRAFT, "send_state": "Not Started", "sealing_state": "Not Started"}
+INITIAL_VALUES = {
+	"status": DRAFT,
+	"send_state": "Not Started",
+	"sealing_state": "Not Started",
+	"seal_attempts": 0,
+}
 
 # Set only by services, through db_set (DESIGN 2.6). save() may not change them.
 SERVICE_FIELDS = (
@@ -22,9 +28,12 @@ SERVICE_FIELDS = (
 	"send_state",
 	"send_error",
 	"sealing_state",
+	"seal_attempts",
+	"seal_retry_on",
 	"source_changed",
 	"original_file",
 	"original_sha256",
+	"page_metrics",
 	"signed_file",
 	"signed_sha256",
 	"audit_head",
@@ -67,6 +76,7 @@ class SignEnvelope(Document):
 		for row in self.fields:
 			reject_non_initial(row, FIELD_SERVICE_FIELDS, {})
 		require_sha256(self, "original_sha256", "signed_sha256", "audit_head")
+		require_private_files(self, "source_file")
 
 	def validate(self):
 		for row in self.fields:

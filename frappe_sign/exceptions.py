@@ -10,6 +10,8 @@ import frappe
 class FrappeSignError(frappe.ValidationError):
 	http_status_code = 417
 	code = "frappe_sign_error"
+	# Extra values for the frontend, such as the name of the signer whose turn it is.
+	data: dict | None = None
 
 
 class EnvelopeNotOpen(FrappeSignError):
@@ -57,3 +59,30 @@ class ImmutableRecord(FrappeSignError):
 
 	http_status_code = 409
 	code = "immutable_record"
+
+
+class SessionInvalid(FrappeSignError):
+	"""The X-Sign-Session secret is missing, unknown, idle for too long or past its absolute expiry."""
+
+	http_status_code = 401
+	code = "session_invalid"
+
+
+class OtpCooldown(FrappeSignError):
+	http_status_code = 429
+	code = "otp_cooldown"
+
+
+class RecipientDone(FrappeSignError):
+	"""This recipient already signed, declined or delegated (`data.status`)."""
+
+	http_status_code = 409
+	code = "recipient_done"
+
+
+def throw(exc_class: type[FrappeSignError], message: str, **data) -> None:
+	"""frappe.throw that also carries `data` for the frontend (shown as `code` and `data` by api/)."""
+	frappe.msgprint(message, title=frappe._("Error"), indicator="red")
+	error = exc_class(message)
+	error.data = data or None
+	raise error

@@ -14,6 +14,8 @@
   "send_state",
   "send_error",
   "sealing_state",
+  "seal_attempts",
+  "seal_retry_on",
   "source_changed",
   "source_section",
   "reference_doctype",
@@ -31,8 +33,10 @@
   "fields_section",
   "fields",
   "files_section",
+  "source_file",
   "original_file",
   "original_sha256",
+  "page_metrics",
   "audit_head",
   "column_break_files",
   "signed_file",
@@ -300,11 +304,40 @@
    "label": "Void reason",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "source_file",
+   "fieldtype": "Attach",
+   "label": "Source PDF",
+   "description": "Uploaded PDF to send, for envelopes without a template. Private."
+  },
+  {
+   "fieldname": "page_metrics",
+   "fieldtype": "JSON",
+   "label": "Page metrics",
+   "no_copy": 1,
+   "read_only": 1,
+   "description": "Page sizes and rotation of the frozen PDF"
+  },
+  {
+   "fieldname": "seal_attempts",
+   "fieldtype": "Int",
+   "label": "Seal attempts",
+   "no_copy": 1,
+   "read_only": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "seal_retry_on",
+   "fieldtype": "Datetime",
+   "label": "Next seal retry",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-24 12:00:00.000000",
+ "modified": "2026-10-25 02:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Sign",
  "name": "Sign Envelope",

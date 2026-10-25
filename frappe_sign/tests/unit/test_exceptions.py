@@ -15,6 +15,9 @@ EXPECTED_STATUS = {
 	"FieldValidationError": 422,
 	"CertificateError": 500,
 	"ImmutableRecord": 409,
+	"SessionInvalid": 401,
+	"OtpCooldown": 429,
+	"RecipientDone": 409,
 }
 
 
@@ -44,3 +47,9 @@ class TestExceptions(UnitTestCase):
 		with self.assertRaises(exceptions.OtpInvalid) as raised:
 			frappe.throw(frappe._("Wrong code"), exc=exceptions.OtpInvalid)
 		self.assertEqual(raised.exception.code, "otp_invalid")
+
+	def test_sign_throw_carries_data(self):
+		with self.assertRaises(exceptions.NotYourTurn) as raised:
+			exceptions.throw(exceptions.NotYourTurn, "Wait", waiting_for="Ahmed Khan")
+		self.assertEqual(raised.exception.data, {"waiting_for": "Ahmed Khan"})
+		frappe.local.message_log = []

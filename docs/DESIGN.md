@@ -126,7 +126,7 @@ Customize Form does not allow a Data to Link change, so `erpnext/setup.py` write
 | print_format | Link Print Format | Filtered by reference_doctype |
 | letter_head | Link Letter Head | |
 | pdf_file | Attach | Private; Uploaded PDF source |
-| page_metrics | JSON | `[{page, width, height, rotation}]` in points |
+| page_metrics | JSON | `[{page, width, height, rotation, left, bottom}]`: CropBox size and origin in points, clockwise `/Rotate` |
 | signing_order | Select | Sequential, Parallel |
 | otp_mode | Select | Off, Email, WhatsApp |
 | expiry_days | Int | Overrides settings |
@@ -192,9 +192,12 @@ Field types that need a note:
 | send_state | Select | Not Started, Queued, Failed. The envelope stays Draft until the render job sets Sent |
 | send_error | Small Text | Read only; reason of the last failed send |
 | sealing_state | Select | Not Started, Queued, Sealing, Sealed, Failed |
+| seal_attempts, seal_retry_on | Int, Datetime | Read only. Failed seal attempts and when the scheduler retries (5.4) |
 | signing_order | Select | Copied from template |
 | otp_mode | Select | Copied from template |
+| source_file | Attach | Private. Uploaded PDF of an envelope without a template; editable in Draft |
 | original_file | Link File | Frozen PDF |
+| page_metrics | JSON | Read only. `[{page, width, height, rotation, left, bottom}]` of the frozen PDF |
 | original_sha256 | Data | |
 | signed_file | Link File | Final sealed PDF |
 | signed_sha256 | Data | |
@@ -615,7 +618,7 @@ Standard REST covers plain reads and lists.
 
 ### 8.4 Errors
 
-`frappe_sign/exceptions.py`: `EnvelopeNotOpen` (409), `NotYourTurn` (409), `OtpRequired` (401), `OtpInvalid` (401), `LinkExpired` (410), `InvalidTransition` (409), `FieldValidationError` (422), `CertificateError` (500), `ImmutableRecord` (409, an insert-only record or an envelope past Draft changed outside a service, 2.6). Each subclasses `frappe.ValidationError`, sets `http_status_code`, and carries a stable `code` string returned in the response for the frontend.
+`frappe_sign/exceptions.py`: `EnvelopeNotOpen` (409), `NotYourTurn` (409), `OtpRequired` (401), `OtpInvalid` (401), `LinkExpired` (410), `InvalidTransition` (409), `FieldValidationError` (422), `CertificateError` (500), `ImmutableRecord` (409, an insert-only record or an envelope past Draft changed outside a service, 2.6). Guest flows add `SessionInvalid` (401, the `X-Sign-Session` secret is unknown, idle over 30 min or past 24 h), `OtpCooldown` (429, a new code within 60 s) and `RecipientDone` (409, this recipient already signed, declined or delegated). An error can carry `data` (for example `waiting_for` on `NotYourTurn`), which `api/` returns next to `code`. Each subclasses `frappe.ValidationError`, sets `http_status_code`, and carries a stable `code` string returned in the response for the frontend.
 
 ### 8.5 Domain events
 
