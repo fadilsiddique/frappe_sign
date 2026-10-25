@@ -36,3 +36,11 @@ scheduler_events = {
 		"* * * * *": ["frappe_sign.jobs.seal.retry_due"],
 	},
 }
+
+# Sign Users see envelopes they sent, receive or were shared (DESIGN 1).
+permission_query_conditions = {
+	"Sign Envelope": "frappe_sign.utils.permissions.envelope_query_conditions",
+}
+has_permission = {
+	"Sign Envelope": "frappe_sign.utils.permissions.envelope_has_permission",
+}

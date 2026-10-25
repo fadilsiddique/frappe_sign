@@ -64,7 +64,7 @@ Conventions for every task:
 | ID | Task | Done when |
 | --- | --- | --- |
 | [x] P1.12 | `api/guest.py` with `@rate_limit`, `X-Sign-Session` handling, PDF streaming | Security tests: rate limit, cross-envelope denial, token rotation |
-| P1.13 | `api/staff.py` (Phase 1 subset), `api/public.py` verify | Permission tests for Sign User vs Sign Manager |
+| [x] P1.13 | `api/staff.py` (Phase 1 subset), `api/public.py` verify | Permission tests for Sign User vs Sign Manager |
 | P1.14 | Guest SPA: verify, consent, guided "Next field", signature bottom sheet (draw, type, upload), finish, decline, delegate, terminal screens | Playwright at 390 px width signs a fixture envelope |
 
 ### Week 4: Staff app basics

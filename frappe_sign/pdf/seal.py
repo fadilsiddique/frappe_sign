@@ -9,12 +9,17 @@ from __future__ import annotations
 
 import asyncio
 import io
+from dataclasses import dataclass
 
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.pdf_utils.misc import PdfError as PyhankoPdfError
+from pyhanko.pdf_utils.reader import PdfFileReader
 from pyhanko.sign import fields, signers
 from pyhanko.sign.general import SigningError
 from pyhanko.sign.timestamps import TimeStamper, TimestampRequestError
+from pyhanko.sign.validation import validate_pdf_signature
+from pyhanko.sign.validation.errors import SignatureValidationError
+from pyhanko.sign.validation.status import SignatureCoverageLevel
 from pyhanko_certvalidator import ValidationContext
 from pyhanko_certvalidator.errors import PathBuildingError, PathValidationError
 
@@ -89,4 +94,47 @@ def online_validation_context(pyhanko_signer: signers.Signer) -> ValidationConte
 		other_certs=chain,
 		allow_fetching=True,
 		revocation_mode="soft-fail",
+	)
+
+
+@dataclass(frozen=True)
+class SealReport:
+	"""What pyHanko says about the first signature in a PDF."""
+
+	signed: bool
+	intact: bool = False
+	valid: bool = False
+	trusted: bool = False
+	signer: str | None = None
+	signed_at: str | None = None
+	timestamp_valid: bool = False
+	covers_whole_file: bool = False
+	error: str | None = None
+
+
+def inspect_seal(pdf: bytes, validation_context: ValidationContext | None = None) -> SealReport:
+	"""Validate the seal offline. `trusted` depends on the trust roots in `validation_context`."""
+	try:
+		reader = PdfFileReader(io.BytesIO(pdf), strict=False)
+		signatures = reader.embedded_signatures
+	except (PyhankoPdfError, OSError, ValueError) as error:
+		return SealReport(signed=False, error=f"Not a readable PDF: {error}")
+	if not signatures:
+		return SealReport(signed=False)
+	context = validation_context or ValidationContext(allow_fetching=False, revocation_mode="soft-fail")
+	try:
+		status = validate_pdf_signature(signatures[0], context)
+	except (SignatureValidationError, PyhankoPdfError, ValueError) as error:
+		return SealReport(signed=True, error=str(error))
+	timestamp = status.timestamp_validity
+	return SealReport(
+		signed=True,
+		intact=bool(status.intact),
+		valid=bool(status.valid),
+		trusted=bool(status.trusted),
+		signer=status.signing_cert.subject.human_friendly if status.signing_cert else None,
+		signed_at=(timestamp.timestamp.isoformat() if timestamp else None),
+		timestamp_valid=bool(timestamp and timestamp.intact and timestamp.valid),
+		covers_whole_file=status.coverage == SignatureCoverageLevel.ENTIRE_FILE
+		or status.coverage == SignatureCoverageLevel.ENTIRE_REVISION,
 	)

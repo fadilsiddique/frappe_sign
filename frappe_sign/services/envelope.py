@@ -15,6 +15,7 @@ from frappe import _
 from frappe.utils import cint, now_datetime, validate_email_address
 
 from frappe_sign.exceptions import FieldValidationError, InvalidTransition, throw
+from frappe_sign.pdf.pages import extract_pages
 from frappe_sign.pdf.sanitize import sanitize
 from frappe_sign.pdf.types import PdfError
 from frappe_sign.services import audit, events, notify, settings
@@ -104,6 +105,7 @@ def create_draft(payload: dict[str, Any]) -> Any:
 		}
 	values["title"] = values["title"] or _("Document for signature")
 	doc = frappe.get_doc(values).insert()
+	attach_source(doc)
 	audit.append(doc.name, "Created", payload={"template_version": version} if version else None)
 	return doc
 
@@ -446,3 +448,110 @@ def record_send_crash(name: str) -> None:
 	"""The render job failed unexpectedly: log the traceback and tell the sender."""
 	frappe.log_error(title="Frappe Sign: send", reference_doctype="Sign Envelope", reference_name=name)
 	mark_send_failed(name, _("Sending failed unexpectedly. The details are in the Error Log."))
+
+
+# Staff helpers
+
+
+def stage_source(file_name: str, content: bytes) -> dict[str, Any]:
+	"""Sanitize an uploaded PDF for a new envelope; create_draft attaches it (source_file)."""
+	frappe.has_permission("Sign Envelope", "create", throw=True)
+	try:
+		clean = sanitize(content, max_bytes=settings.max_upload_bytes(), max_pages=settings.max_pages())
+	except PdfError as error:
+		throw(FieldValidationError, pdf_message(error))
+	file = frappe.get_doc(
+		{"doctype": "File", "file_name": file_name or "document.pdf", "content": clean.data, "is_private": 1}
+	).insert()
+	return {"file_url": file.file_url, "metrics": [metric.to_dict() for metric in clean.metrics]}
+
+
+def attach_source(envelope: Any) -> None:
+	"""Attach a staged source PDF to its new envelope. Only the uploader's own unattached file."""
+	if not envelope.source_file:
+		return
+	file = frappe.db.get_value(
+		"File",
+		{"file_url": envelope.source_file, "is_private": 1},
+		["name", "owner", "attached_to_name"],
+		as_dict=True,
+		order_by="creation desc",
+	)
+	if not file or (file.attached_to_name and file.attached_to_name != envelope.name):
+		throw(FieldValidationError, _("Upload the PDF again."))
+	if file.owner != frappe.session.user and frappe.session.user != "Administrator":
+		raise frappe.PermissionError(_("You cannot use a file uploaded by someone else."))
+	frappe.db.set_value(
+		"File", file.name, {"attached_to_doctype": "Sign Envelope", "attached_to_name": envelope.name}
+	)
+
+
+def download(name: str, kind: str) -> tuple[bytes, str]:
+	"""original, signed or certificate (the certificate pages of the signed PDF)."""
+	doc = frappe.get_doc("Sign Envelope", name)
+	doc.check_permission("read")
+	if kind == "original" and doc.original_file:
+		data = read_file(doc.original_file)
+	elif kind in ("signed", "certificate") and doc.signed_file:
+		data = read_file(doc.signed_file)
+		if kind == "certificate":
+			pages = len(json.loads(doc.page_metrics or "[]"))
+			data = extract_pages(data, pages + 1)
+	else:
+		throw(InvalidTransition, _("There is no {0} PDF for {1} yet.").format(kind, name), status=doc.status)
+	audit.append(name, "Downloaded", payload={"kind": kind})
+	return data, f"{name}-{kind}.pdf"
+
+
+def my_signing_link(name: str) -> str:
+	"""A fresh /s/<token> link for the logged-in user when it is their turn (DESIGN 5.1).
+
+	Only the token's hash is stored, so this issues a new token; earlier emailed links stop working.
+	"""
+	email = frappe.db.get_value("User", frappe.session.user, "email")
+	doc = locked(name)
+	require_open(doc)
+	row = next(
+		(r for r in signing_recipients(doc) if r.email == email and r.status in WAITING and is_turn(doc, r)),
+		None,
+	)
+	if not row:
+		throw(InvalidTransition, _("This document is not waiting for your signature."), status=doc.status)
+	token = new_token()
+	frappe.db.set_value(
+		"Sign Envelope Recipient",
+		row.name,
+		{"token_hash": sha256_hex(token), "token_expires_on": doc.expires_on},
+		update_modified=False,
+	)
+	audit.append(name, "Delivered", recipient_row=row.name, payload={"email": email, "channel": "desk"})
+	return notify.signing_link(token)
+
+
+def dashboard() -> dict[str, Any]:
+	"""Home cards: needs my signature, waiting for others, completed this month, expiring soon."""
+	user = frappe.session.user
+	email = frappe.db.get_value("User", user, "email")
+	waiting_rows = frappe.get_all(
+		"Sign Envelope Recipient",
+		filters={"parenttype": "Sign Envelope", "email": email, "status": ["in", WAITING]},
+		pluck="parent",
+	)
+	open_filter = {"status": ["in", OPEN]}
+	month_start = frappe.utils.get_first_day(frappe.utils.today())
+	soon = after(days=3)
+	return {
+		"needs_my_signature": frappe.get_list(
+			"Sign Envelope",
+			filters={**open_filter, "name": ["in", waiting_rows or [""]]},
+			fields=["name", "title", "sender", "expires_on"],
+			order_by="sent_on desc",
+		),
+		"waiting_for_others": frappe.db.count("Sign Envelope", {**open_filter, "sender": user}),
+		"completed_this_month": frappe.db.count(
+			"Sign Envelope", {"status": COMPLETED, "sender": user, "completed_on": [">=", month_start]}
+		),
+		"expiring_soon": frappe.db.count(
+			"Sign Envelope", {**open_filter, "sender": user, "expires_on": ["<=", soon]}
+		),
+	}
