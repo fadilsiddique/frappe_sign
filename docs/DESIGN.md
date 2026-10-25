@@ -444,7 +444,8 @@ class RemoteSigner:  # Phase 3: PKCS#11 or CSC
     def __init__(self, config: dict) -> None: ...
 ```
 
-- `crypto/tsa.py`: tries each URL in `Sign Settings.tsa_urls` in order with a 10 s timeout.
+- `crypto/tsa.py`: tries each URL in `Sign Settings.tsa_urls` in order with a 10 s timeout, and uses the first granted response. When the list is empty it uses the public DigiCert and Sectigo TSAs (`DEFAULT_TSA_URLS`).
+- `crypto/pkcs12.py` parses the certificate for the Sign Certificate controller. `Pkcs12Signer` checks again before each seal that the key is present and the certificate is valid now, and raises `SignerError` otherwise.
 
 ### 5.4 Sealing
 

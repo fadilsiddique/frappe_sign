@@ -100,3 +100,26 @@ def make_capture(envelope, **overrides):
 			**overrides,
 		}
 	).insert()
+
+
+def make_private_file(file_name: str, content: bytes, **overrides):
+	return frappe.get_doc(
+		{"doctype": "File", "file_name": file_name, "content": content, "is_private": 1, **overrides}
+	).insert(ignore_if_duplicate=True)
+
+
+def make_certificate(p12_name: str = "sealing.p12", password: str = "fixture-seal", **overrides):
+	"""A Sign Certificate holding one of the test PKI's PKCS#12 files (tests/fixtures/certs/)."""
+	from frappe_sign.tests.pki import CERTS
+
+	p12 = make_private_file(p12_name, (CERTS / p12_name).read_bytes())
+	return frappe.get_doc(
+		{
+			"doctype": "Sign Certificate",
+			"title": "Test Seal",
+			"storage": "PKCS#12 File",
+			"p12_file": p12.file_url,
+			"p12_password": password,
+			**overrides,
+		}
+	).insert()
