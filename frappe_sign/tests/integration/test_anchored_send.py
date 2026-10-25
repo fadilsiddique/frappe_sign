@@ -48,7 +48,10 @@ class TestAnchoredSend(SignTestCase):
 		template = self.publish(fields)
 		with self.as_user(sender):
 			if sender != "Administrator":
-				self.todo = frappe.get_doc({"doctype": "ToDo", "description": "Mine"}).insert()
+				# v16.0.0's ToDo permission hook wants the ToDo allocated to the user.
+				self.todo = frappe.get_doc(
+					{"doctype": "ToDo", "description": "Mine", "allocated_to": sender}
+				).insert()
 			draft = envelope_service.create_draft(
 				{
 					"template_version": template,

@@ -23,7 +23,7 @@ from frappe_sign.services import verify as verify_service
 from frappe_sign.tests import pki
 from frappe_sign.tests.cleanup import purge_envelope, purge_profile, purge_since, purge_template
 from frappe_sign.tests.e2e import require_test_site
-from frappe_sign.tests.factories import make_email_account, make_profile, signature_field
+from frappe_sign.tests.factories import make_email_account, make_profile, signature_field, test_company
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, publish_template, send_now
 from frappe_sign.tests.unit.test_overlay import signature_png
 from frappe_sign.utils.files import read_file
@@ -31,7 +31,7 @@ from frappe_sign.utils.request import Client
 from frappe_sign.utils.users import run_as
 
 OUTPUT = Path(__file__).resolve().parent / "output" / "sample_signed.pdf"
-COMPANY = "Upscape Sample Co"
+MADE_UP_COMPANY = "Upscape Sample Co"
 
 
 def public_timestamper():
@@ -103,7 +103,10 @@ def make_sample_signed_pdf(keep: bool = False) -> dict:
 	try:
 		with run_as("Administrator"):
 			make_email_account(skip_smtp_check=True)
-			make_profile(COMPANY, legal_footer="Sample only. Sealed with the Frappe Sign test certificate.")
+			make_profile(
+				test_company(MADE_UP_COMPANY),
+				legal_footer="Sample only. Sealed with the Frappe Sign test certificate.",
+			)
 			version = publish_template(fields=sample_fields(), pdf="arabic_text.pdf")
 			draft = make_draft(
 				version,
@@ -112,7 +115,7 @@ def make_sample_signed_pdf(keep: bool = False) -> dict:
 					{"role_label": "Company", "full_name": "Fatima Ali", "email": "fatima@example.com"},
 				],
 				title="Sample Service Agreement",
-				company=COMPANY,
+				company=test_company(MADE_UP_COMPANY),
 			)
 			envelope = draft.name
 			with capture_tokens() as box, patch("frappe.enqueue"):
@@ -170,6 +173,6 @@ def purge_sample(envelope: str | None, started: str) -> None:
 	frappe.db.rollback()
 	for template in purge_envelope(envelope):
 		purge_template(template)
-	purge_profile(COMPANY)
+	purge_profile(test_company(MADE_UP_COMPANY))
 	purge_since(get_datetime(started))
 	frappe.db.commit()  # nosemgrep: frappe-manual-commit (removes the sample data it committed)

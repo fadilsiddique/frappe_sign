@@ -7,6 +7,7 @@ from frappe.tests import IntegrationTestCase
 from frappe.website.path_resolver import resolve_path
 from frappe.website.serve import get_response
 
+from frappe_sign.tests.factories import test_company
 from frappe_sign.www import s as guest_page
 from frappe_sign.www import sign as staff_page
 
@@ -52,7 +53,9 @@ class TestShellContext(IntegrationTestCase):
 		self.assertEqual(context.boot["frappe_sign"]["dir"], "ltr")
 
 	def test_staff_boot_uses_the_only_profile_branding(self):
-		frappe.get_doc({"doctype": "Sign Profile", "company": "Boot Co", "brand_color": "#0f766e"}).insert()
+		frappe.get_doc(
+			{"doctype": "Sign Profile", "company": test_company("Boot Co"), "brand_color": "#0f766e"}
+		).insert()
 		context = frappe._dict()
 		staff_page.get_context(context)
 		self.assertEqual(context.boot["frappe_sign"]["branding"]["brand_color"], "#0f766e")

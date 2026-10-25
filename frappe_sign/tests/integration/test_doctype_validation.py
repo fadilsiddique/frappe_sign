@@ -1,5 +1,7 @@
 """Validation in the DocType controllers other than the 2.6 integrity rules."""
 
+from unittest.mock import patch
+
 import frappe
 from frappe.tests import IntegrationTestCase
 
@@ -10,6 +12,7 @@ from frappe_sign.tests.factories import (
 	make_template,
 	make_template_version,
 	signature_field,
+	test_company,
 )
 
 
@@ -82,6 +85,11 @@ class TestSettingsValidation(IntegrationTestCase):
 	def setUp(self):
 		self.settings = frappe.get_single("Sign Settings")
 
+	def tearDown(self):
+		# A later save must not see an earlier test's enabled DocTypes: that would add custom
+		# fields, and their DDL commits.
+		frappe.db.rollback()
+
 	def test_consent_version_goes_up_when_text_changes(self):
 		start = self.settings.consent_version or 0
 		self.settings.consent_text = "<p>I agree to sign electronically.</p>"
@@ -106,14 +114,16 @@ class TestSettingsValidation(IntegrationTestCase):
 		self.assertRaises(FieldValidationError, self.settings.save)
 
 	def test_enabled_doctypes(self):
-		self.settings.append("enabled_doctypes", {"reference_doctype": "ToDo"})
-		self.settings.save()
-		self.settings.append("enabled_doctypes", {"reference_doctype": "ToDo"})
-		self.assertRaises(FieldValidationError, self.settings.save)
+		# Only the rules here; adding the fields is DDL, which commits (see test_enabled_doctypes.py).
+		with patch("frappe_sign.services.doctypes.add_custom_fields"):
+			self.settings.append("enabled_doctypes", {"reference_doctype": "ToDo"})
+			self.settings.save()
+			self.settings.append("enabled_doctypes", {"reference_doctype": "ToDo"})
+			self.assertRaises(FieldValidationError, self.settings.save)
 
-		self.settings.reload()
-		self.settings.append("enabled_doctypes", {"reference_doctype": "Sign Envelope"})
-		self.assertRaises(FieldValidationError, self.settings.save)
+			self.settings.reload()
+			self.settings.append("enabled_doctypes", {"reference_doctype": "Sign Envelope"})
+			self.assertRaises(FieldValidationError, self.settings.save)
 
 
 class TestTriggerValidation(IntegrationTestCase):
@@ -156,7 +166,7 @@ class TestOtherValidation(IntegrationTestCase):
 
 	def test_profile_stamp_must_be_private(self):
 		profile = frappe.get_doc(
-			{"doctype": "Sign Profile", "company": "Test Company", "stamp_image": "/files/stamp.png"}
+			{"doctype": "Sign Profile", "company": test_company(), "stamp_image": "/files/stamp.png"}
 		)
 		self.assertRaises(FieldValidationError, profile.insert)
 

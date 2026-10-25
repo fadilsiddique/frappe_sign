@@ -50,5 +50,17 @@ has_permission = {
 
 after_request = ["frappe_sign.utils.http.after_request"]
 
+# ERPNext (D4): company fields become Link Company when ERPNext is installed (DESIGN 2.1). Each hook
+# returns at once on a site without ERPNext.
+after_install = "frappe_sign.erpnext.setup.after_install"
+after_app_install = ["frappe_sign.erpnext.setup.after_app_install"]
+before_app_uninstall = ["frappe_sign.erpnext.setup.before_app_uninstall"]
+after_migrate = ["frappe_sign.erpnext.setup.after_migrate"]
+
+# Sign Settings adds custom fields to the DocTypes it enables (DESIGN 2.5).
+doc_events = {
+	"Sign Settings": {"on_update": "frappe_sign.services.doctypes.on_settings_update"},
+}
+
 # ERPNext sites get a test Company before frappe_sign's tests (tests/erpnext/).
 before_tests = "frappe_sign.tests.erpnext.bootstrap.before_tests"

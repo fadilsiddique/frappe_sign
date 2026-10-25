@@ -7,16 +7,16 @@ from click.testing import CliRunner
 
 from frappe_sign import commands
 from frappe_sign.jobs import seal as seal_job
-from frappe_sign.tests.factories import make_profile
-from frappe_sign.tests.integration.test_sealing import COMPANY, no_commits, offline_seal
+from frappe_sign.tests.factories import make_profile, test_company
+from frappe_sign.tests.integration.test_sealing import no_commits, offline_seal
 from frappe_sign.tests.integration.test_signing_service import SigningCase
 
 
 class TestVerifyCommand(SigningCase):
 	def completed(self) -> str:
-		make_profile(COMPANY)
-		self.sent(company=COMPANY)
-		frappe.db.set_value("Sign Envelope", self.name, "company", COMPANY)
+		make_profile(test_company())
+		self.sent(company=test_company())
+		frappe.db.set_value("Sign Envelope", self.name, "company", test_company())
 		self.sign("Customer")
 		self.sign("Company")
 		with offline_seal(), no_commits(), self.capture_enqueue():

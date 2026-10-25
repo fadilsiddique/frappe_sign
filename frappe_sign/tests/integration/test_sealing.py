@@ -12,12 +12,10 @@ from frappe_sign.exceptions import InvalidTransition
 from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import audit, sealing
 from frappe_sign.tests import pki
-from frappe_sign.tests.factories import make_profile, make_user
+from frappe_sign.tests.factories import make_profile, make_user, test_company
 from frappe_sign.tests.integration.test_signing_service import SigningCase
 from frappe_sign.utils.files import read_file
 from frappe_sign.utils.hashing import sha256_hex
-
-COMPANY = "Frappe Sign Test Co"
 
 
 def offline_seal():
@@ -38,14 +36,14 @@ def no_commits():
 
 class TestSealing(SigningCase):
 	def fully_signed(self) -> str:
-		self.sent(company=COMPANY)
-		frappe.db.set_value("Sign Envelope", self.name, "company", COMPANY)
+		self.sent(company=test_company())
+		frappe.db.set_value("Sign Envelope", self.name, "company", test_company())
 		self.sign("Customer")
 		self.sign("Company")
 		return self.name
 
 	def test_seal_job_completes_the_envelope(self):
-		make_profile(COMPANY)
+		make_profile(test_company())
 		name = self.fully_signed()
 		with offline_seal(), no_commits(), self.capture_enqueue() as calls:
 			seal_job.run(name)
@@ -69,7 +67,7 @@ class TestSealing(SigningCase):
 		self.assertIn("envelope_completed", [c.get("event") for c in calls])
 
 	def test_second_job_does_nothing(self):
-		make_profile(COMPANY)
+		make_profile(test_company())
 		name = self.fully_signed()
 		with offline_seal(), no_commits(), self.capture_enqueue():
 			seal_job.run(name)

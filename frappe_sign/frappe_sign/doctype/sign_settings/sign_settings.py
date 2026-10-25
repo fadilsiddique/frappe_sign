@@ -41,6 +41,7 @@ class SignSettings(Document):
 		return [line.strip() for line in (self.tsa_urls or "").splitlines() if line.strip()]
 
 	def validate_enabled_doctypes(self):
+		self.check_can_enable()
 		seen = set()
 		for row in self.enabled_doctypes:
 			if row.reference_doctype in seen:
@@ -54,6 +55,19 @@ class SignSettings(Document):
 					_("DocType {0} cannot be enabled for signing.").format(row.reference_doctype),
 					FieldValidationError,
 				)
+
+	def check_can_enable(self):
+		"""Enabling a DocType adds custom fields to it, which only a System Manager may do."""
+		before = self.get_doc_before_save()
+		previous = {row.reference_doctype for row in before.enabled_doctypes} if before else set()
+		added = {row.reference_doctype for row in self.enabled_doctypes} - previous
+		if added and "System Manager" not in frappe.get_roles():
+			frappe.throw(
+				_("Only a System Manager can enable DocTypes for signing: {0}.").format(
+					", ".join(sorted(added))
+				),
+				frappe.PermissionError,
+			)
 
 	def set_consent_version(self):
 		"""consent_version goes up by one each time the consent text changes (read only)."""

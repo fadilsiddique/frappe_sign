@@ -20,8 +20,8 @@ from pypdf import PdfReader
 from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import audit, sealing, signing
 from frappe_sign.tests.cleanup import purge_envelope, purge_profile, purge_since, purge_template
-from frappe_sign.tests.factories import make_email_account, make_profile
-from frappe_sign.tests.integration.test_sealing import COMPANY, offline_seal
+from frappe_sign.tests.factories import make_email_account, make_profile, test_company
+from frappe_sign.tests.integration.test_sealing import offline_seal
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, publish_template, send_now
 from frappe_sign.tests.unit.test_overlay import signature_png
 from frappe_sign.utils.files import read_file
@@ -67,9 +67,9 @@ class TestConcurrency(IntegrationTestCase):
 		self.addCleanup(self.purge)
 		with run_as("Administrator"):
 			make_email_account()
-			make_profile(COMPANY)
+			make_profile(test_company())
 			version = publish_template(signing_order="Parallel")
-			draft = make_draft(version, company=COMPANY)
+			draft = make_draft(version, company=test_company())
 			with capture_tokens() as box:
 				send_now(draft.name)
 			self.envelope = draft.name
@@ -146,6 +146,6 @@ class TestConcurrency(IntegrationTestCase):
 		frappe.db.rollback()
 		for template in purge_envelope(self.envelope):
 			purge_template(template)
-		purge_profile(COMPANY)
+		purge_profile(test_company())
 		purge_since(self.started)
 		frappe.db.commit()  # nosemgrep: frappe-manual-commit (threads need committed rows)

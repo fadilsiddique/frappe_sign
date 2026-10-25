@@ -13,8 +13,8 @@ from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import events, notify, signing
 from frappe_sign.tests.base import SignTestCase
-from frappe_sign.tests.factories import make_envelope, make_profile, make_user
-from frappe_sign.tests.integration.test_sealing import COMPANY, no_commits, offline_seal
+from frappe_sign.tests.factories import make_envelope, make_profile, make_user, test_company
+from frappe_sign.tests.integration.test_sealing import no_commits, offline_seal
 from frappe_sign.tests.integration.test_signing_service import SigningCase
 
 MARK = "frappe_sign event test"
@@ -182,9 +182,9 @@ class TestNotifyHandlers(SigningCase):
 		return set(frappe.get_all("Email Queue Recipient", filters={"parent": queue}, pluck="recipient"))
 
 	def test_completed_mails_everyone_the_sealed_pdf(self):
-		make_profile(COMPANY)
-		self.sent(company=COMPANY)
-		frappe.db.set_value("Sign Envelope", self.name, "company", COMPANY)
+		make_profile(test_company())
+		self.sent(company=test_company())
+		frappe.db.set_value("Sign Envelope", self.name, "company", test_company())
 		self.sign("Customer")
 		self.sign("Company")
 		with offline_seal(), no_commits(), self.capture_enqueue():

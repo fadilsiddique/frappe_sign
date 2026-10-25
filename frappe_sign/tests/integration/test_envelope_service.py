@@ -11,7 +11,7 @@ from frappe_sign.jobs import render as render_job
 from frappe_sign.services import audit
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.tests.base import SignTestCase
-from frappe_sign.tests.factories import fixture_pdf, make_private_file
+from frappe_sign.tests.factories import fixture_pdf, make_private_file, test_company
 from frappe_sign.tests.signing_helpers import (
 	COMPANY,
 	CUSTOMER,
@@ -40,8 +40,8 @@ class TestDraft(SignTestCase):
 		self.assertEqual(events_of(draft.name), ["Created"])
 
 	def test_sender_values_win_over_template_defaults(self):
-		draft = make_draft(title="Quotation Q-1", company="Acme")
-		self.assertEqual((draft.title, draft.company), ("Quotation Q-1", "Acme"))
+		draft = make_draft(title="Quotation Q-1", company=test_company())
+		self.assertEqual((draft.title, draft.company), ("Quotation Q-1", test_company()))
 		self.assertEqual(make_draft().title, "Service Agreement")
 
 	def test_fixed_user_role_fills_itself(self):

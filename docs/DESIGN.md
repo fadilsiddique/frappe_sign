@@ -262,7 +262,7 @@ Field types that need a note:
 
 ### 2.5 Custom fields on enabled DocTypes
 
-Created with `frappe.custom.doctype.custom_field.custom_field.create_custom_fields` when a DocType is added to `Sign Settings.enabled_doctypes`; removed only on explicit admin action.
+Created (`services/doctypes.py`) when Sign Settings is saved with a DocType in `enabled_doctypes`. Adding a DocType needs System Manager, since it adds fields. Taking a DocType off the list keeps the fields and their values; a System Manager removes them explicitly with `api.staff.remove_sign_fields(doctype)`. The fields are created as the current user, so a System Manager can delete them later (Frappe lets only the Administrator delete fields the Administrator owns).
 
 | Field | Type | Notes |
 | --- | --- | --- |

@@ -10,8 +10,8 @@ from frappe_sign.api import public, staff
 from frappe_sign.exceptions import InvalidTransition
 from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import envelope as envelope_service
-from frappe_sign.tests.factories import fixture_pdf, make_profile, make_user
-from frappe_sign.tests.integration.test_sealing import COMPANY, no_commits, offline_seal
+from frappe_sign.tests.factories import fixture_pdf, make_profile, make_user, test_company
+from frappe_sign.tests.integration.test_sealing import no_commits, offline_seal
 from frappe_sign.tests.integration.test_signing_service import SigningCase
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, send_now
 from frappe_sign.utils.files import read_file
@@ -162,9 +162,11 @@ class TestStaffActions(PermissionCase):
 
 class TestDownloadsAndVerify(PermissionCase):
 	def completed(self) -> str:
-		make_profile(COMPANY)
-		self.sent(company=COMPANY)
-		frappe.db.set_value("Sign Envelope", self.name, {"company": COMPANY, "sender": ALICE, "owner": ALICE})
+		make_profile(test_company())
+		self.sent(company=test_company())
+		frappe.db.set_value(
+			"Sign Envelope", self.name, {"company": test_company(), "sender": ALICE, "owner": ALICE}
+		)
 		self.sign("Customer")
 		self.sign("Company")
 		with offline_seal(), no_commits(), self.capture_enqueue():

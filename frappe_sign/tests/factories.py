@@ -163,8 +163,17 @@ def make_email_account(email_id: str = "sign-test@example.com", *, skip_smtp_che
 	return account.insert()
 
 
-def make_profile(company: str = "Frappe Sign Test Co", **overrides):
+def test_company(made_up: str = "Frappe Sign Test Co") -> str:
+	"""A company name the company fields accept. With ERPNext they link to Company
+	(erpnext/setup.py), so this is the test Company from tests/erpnext/bootstrap.py."""
+	if frappe.get_meta("Sign Profile").get_field("company").fieldtype == "Link":
+		return frappe.db.get_value("Company", {}, "name", order_by="creation asc")
+	return made_up
+
+
+def make_profile(company: str | None = None, **overrides):
 	"""A Sign Profile with the test sealing certificate."""
+	company = company or test_company()
 	if frappe.db.exists("Sign Profile", company):
 		return frappe.get_doc("Sign Profile", company)
 	return frappe.get_doc(
