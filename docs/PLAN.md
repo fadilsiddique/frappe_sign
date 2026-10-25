@@ -104,6 +104,30 @@ Gate 2 status on 2026-10-25: the Playwright test passes (`e2e/staff-gate2-quotat
 
 ---
 
+## Phase 2.5: UX (2 weeks)
+
+Make the app easy to understand and pleasant to use before Phase 3. The screen audit, the design direction, the screen designs and the open decisions are in [UX_PLAN.md](UX_PLAN.md). Read it first. Load the `ui-design`, `frontend-design` and `frappe-app-dev` skills before any screen work.
+
+| ID | Task | Done when |
+| --- | --- | --- |
+| U.1 | Two tangibly different directions for Home, Sent and the guest signing screen, as a clickable prototype with a Tweak panel (density, list or cards, sidebar or top bar). Not shipped | User picks a direction and confirms the open decisions in UX_PLAN.md |
+| U.2 | Foundation: frappe-ui `Sidebar` shell and mobile nav, page header, empty, loading and error states, avatar stack, status badge colors, UI words from UX_PLAN.md through `__()` | Every existing staff page uses the shell and states; Vitest for the shared components |
+| U.3 | Home with "Get started" checklist (`setup_status` API: email account, seal, profile, enabled DocTypes, template, test send), "Needs your signature" and "Waiting on others" | On an empty site the checklist leads through setup; Playwright |
+| U.4 | Sent list `/sign/requests` (redirect from `/sign/envelopes`): table, avatars, progress, tabs with counts, search, filters, row menu | Playwright; lanes align at 1440 px and 390 px |
+| U.5 | Request detail: PDF beside a recipient step list, state-based primary action, plain activity timeline, audit details behind a toggle | Playwright for waiting and completed requests |
+| U.6 | Send wizard: DocType and document pickers (Combobox with party, date, total), template cards with thumbnails, people step with autocomplete, check step, sticky footer | Send a Quotation without typing a DocType or a document number; Playwright |
+| U.7 | Templates grid with thumbnails; "New template" asks the kind; Print Format template editor in the staff app (DocType, Print Format with sign field check, people, after-sign choices that build the JSON, preview, publish); Desk form intro links to it | Create and publish a Quotation template without Desk; Playwright |
+| U.8 | Designer polish: drop zone, palette with icons and groups, compact people panel, save state, icon undo and redo | Visual review at 1440 px; existing designer tests pass |
+| U.9 | Settings `/sign/settings`: Company (profiles, sender status, seal status with Create test seal and Upload), Documents (enabled DocTypes, default template), Signing, Advanced | A Sign Manager sees it, a System Manager changes it; integration tests for the new APIs |
+| U.10 | Guest page: company branding, clear consent checkbox, progress bar, floating "Next" field button, More menu, review before finish, done and terminal screens | Playwright at 390 px; guest bundle under 250 KB gzipped |
+| U.11 | Verify page drop zone and result card; branded invitation, reminder, completed and declined emails | Emails render in Gmail web and Outlook web (manual) |
+| U.12 | Desk: cleaner send dialog, Signatures workspace shortcuts, internal DocTypes off the sidebar, headline shows who it waits for | Playwright for the send dialog; Desk script stays a bundle |
+| U.13 | QA pass: after screenshots in `docs/ux/after/`, RTL check, keyboard and contrast check, stale-browser check, ADMIN_GUIDE and DESIGN 7 updated | Checklist in UX_PLAN.md "Quality bar" holds for every screen |
+
+**Gate 2.5:** On a fresh site, someone who has not seen the app sets up a company seal, a profile, Quotation and a template, and sends a Quotation for signature, without the docs and without help, in under 15 minutes. The user approves the after screenshots.
+
+---
+
 ## Phase 3: Hardening (3 weeks)
 
 | ID | Task | Done when |
