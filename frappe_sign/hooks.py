@@ -28,6 +28,10 @@ website_route_rules = [
 # sign_field() places signature fields in Print Formats (DESIGN 4.2).
 jinja = {"methods": ["frappe_sign.jinja.sign_field"]}
 
+# Envelopes keep their own frozen PDF and audit trail, so they do not stop the source document's
+# deletion; the dispatcher voids the open ones (DESIGN 4.7).
+ignore_links_on_delete = ["Sign Envelope", "Sign Trigger Log"]
+
 # Suggested recipients per DocType (DESIGN 4.3). "*" is the fallback for other DocTypes. The
 # ERPNext resolvers only run for ERPNext DocTypes, which exist only when ERPNext is installed.
 frappe_sign_resolvers = {
@@ -90,9 +94,29 @@ after_app_install = ["frappe_sign.erpnext.setup.after_app_install"]
 before_app_uninstall = ["frappe_sign.erpnext.setup.before_app_uninstall"]
 after_migrate = ["frappe_sign.erpnext.setup.after_migrate"]
 
-# Sign Settings adds custom fields to the DocTypes it enables (DESIGN 2.5).
+# One dispatcher for Sign Triggers and lifecycle sync on every DocType (D8); it returns after one
+# cache lookup unless the DocType is in services/gate.py's set. Sign Settings adds custom fields to
+# the DocTypes it enables (DESIGN 2.5); it and Sign Trigger refresh the gate.
+DISPATCH = "frappe_sign.services.trigger.dispatch"
 doc_events = {
-	"Sign Settings": {"on_update": "frappe_sign.services.doctypes.on_settings_update"},
+	"*": {
+		"after_insert": DISPATCH,
+		"on_update": DISPATCH,
+		"on_update_after_submit": DISPATCH,
+		"on_submit": DISPATCH,
+		"on_cancel": DISPATCH,
+		"on_trash": DISPATCH,
+	},
+	"Sign Settings": {
+		"on_update": [
+			"frappe_sign.services.doctypes.on_settings_update",
+			"frappe_sign.services.gate.clear",
+		],
+	},
+	"Sign Trigger": {
+		"on_update": "frappe_sign.services.gate.clear",
+		"on_trash": "frappe_sign.services.gate.clear",
+	},
 }
 
 # ERPNext sites get a test Company before frappe_sign's tests (tests/erpnext/).

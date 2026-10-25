@@ -258,6 +258,8 @@ Field types that need a note:
 
 **Sign Trigger Log**: `trigger`, `reference_doctype`, `reference_name`, `status` (Queued, Created, Sent, Skipped, Failed), `envelope`, `error` (Code).
 
+A trigger runs in `jobs.triggers.run` as the trigger's owner (a Sign Manager or System Manager), not as the user who saved the document: that user may have no Sign role, and only the managers may create Sign Trigger Logs. So the owner must be able to read and print the documents the trigger covers. The run writes a Queued log and commits, then sets Created, Sent or Skipped (with the reason: disabled, condition false, document gone, an envelope from the same template still open). In `Send` mode the envelope is sent only when every Signer and Approver has a name and email; otherwise it stays a Draft and the owner is notified. A failure sets the log to Failed with the traceback, writes the Error Log and comments on the source document. Triggers cannot target child, single or Frappe Sign DocTypes.
+
 **Sign Saved Signature** (owner only): `user`, `kind` (Signature, Initials), `image`.
 
 ### 2.5 Custom fields on enabled DocTypes
@@ -410,6 +412,8 @@ How it runs: the `envelope_completed` handler `services.actions.queue_post_sign`
 - Source amended: user can create a new envelope from the amendment; the old one is voided with a reference.
 
 These run through the same `*` dispatcher as triggers (D8), gated by a cached set of DocTypes with open envelopes or triggers.
+
+The dispatcher (`services/trigger.dispatch`) handles `after_insert`, `on_update`, `on_update_after_submit`, `on_submit`, `on_cancel` and `on_trash`. It skips installs, migrations and patches. The gate (`services/gate.py`, cache key `frappe_sign::gated_doctypes`) holds DocTypes with an enabled trigger, enabled in Sign Settings, or with an open envelope; it is rebuilt on a miss and cleared when a trigger or Sign Settings is saved or an envelope opens for a DocType outside it. A non-matching DocType costs one cache lookup and no query (tested). For a matching one, the dispatcher only queries and enqueues jobs with `enqueue_after_commit=True`; `jobs.triggers.lifecycle` voids or flags as the envelope's sender. "Source saved" means a content change: `modified`, `_comments`, `_assign` and similar fields are ignored, so a save without edits flags nothing; the flag and its `Source Changed` event are set once. Envelopes do not block the deletion of their source (`ignore_links_on_delete`).
 
 ### 4.8 Dashboards and portal
 

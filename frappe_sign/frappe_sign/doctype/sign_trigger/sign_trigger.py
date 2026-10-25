@@ -20,6 +20,11 @@ class SignTrigger(Document):
 
 	def validate_event_details(self):
 		meta = frappe.get_meta(self.reference_doctype)
+		if meta.istable or meta.issingle or meta.module == "Frappe Sign":
+			frappe.throw(
+				_("DocType {0} cannot have Sign Triggers.").format(self.reference_doctype),
+				FieldValidationError,
+			)
 		if self.event == "Submit" and not meta.is_submittable:
 			frappe.throw(
 				_("DocType {0} is not submittable.").format(self.reference_doctype), FieldValidationError

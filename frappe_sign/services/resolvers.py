@@ -137,7 +137,8 @@ def resolve_recipients(template: str, doctype: str | None, name: str | None) -> 
 				"routing_order": role.get("routing_order") or 1,
 				"signer_source": role.get("signer_source"),
 				**clean(found),
-				"resolved": bool(found.get("email")),
+				# Sending needs both (envelope.check_sendable).
+				"resolved": bool(found.get("email") and found.get("full_name")),
 			}
 		)
 	return rows
@@ -166,23 +167,22 @@ def field_suggestion(doc: Any, fieldname: str | None) -> Suggestion | None:
 	value = doc.get(fieldname)
 	if not value or not isinstance(value, str):
 		return None
-	if validate_email_address(value):
-		return {"email": value}
 	df = doc.meta.get_field(fieldname)
-	if not df:
-		return None
-	target = (
-		df.options
-		if df.fieldtype == "Link"
-		else doc.get(df.options)
-		if df.fieldtype == "Dynamic Link"
-		else None
-	)
+	target = None
+	if df and df.fieldtype == "Link":
+		target = df.options
+	elif df and df.fieldtype == "Dynamic Link":
+		target = doc.get(df.options)
+	# A link first: User IDs are email addresses too, and the link also gives the name.
 	if target == "User":
-		return user_suggestion(value) if frappe.db.exists("User", value) else None
-	if target == "Contact":
-		return contact_details(value)
-	return linked(target, value) if target else None
+		found = user_suggestion(value) if frappe.db.exists("User", value) else None
+	elif target == "Contact":
+		found = contact_details(value)
+	else:
+		found = linked(target, value) if target else None
+	if not found and validate_email_address(value):
+		found = {"email": value}
+	return found
 
 
 def authorised_signatory(company: str | None) -> str | None:

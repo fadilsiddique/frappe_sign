@@ -21,7 +21,7 @@ from frappe_sign.pdf.pages import extract_pages
 from frappe_sign.pdf.sanitize import sanitize
 from frappe_sign.pdf.source import render
 from frappe_sign.pdf.types import Anchor, PdfError
-from frappe_sign.services import audit, events, notify, settings
+from frappe_sign.services import audit, events, gate, notify, settings
 from frappe_sign.services.errors import pdf_message
 from frappe_sign.services.resolvers import authorised_signatory
 from frappe_sign.services.template import load_snapshot
@@ -257,6 +257,7 @@ def render_and_send(name: str) -> bool:
 		}
 	)
 	transition(doc, SENT, sent_on=now_datetime())
+	gate.include(doc.reference_doctype)
 	audit.append(
 		name,
 		"Sent",
