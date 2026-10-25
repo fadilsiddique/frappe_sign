@@ -21,7 +21,13 @@ export default defineConfig({
   projects: [
     {
       name: 'phone-390',
+      testMatch: /guest-.*\.spec\.ts/,
       use: { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 3 },
+    },
+    {
+      name: 'desktop',
+      testMatch: /staff-.*\.spec\.ts/,
+      use: { viewport: { width: 1440, height: 900 } },
     },
   ],
 })

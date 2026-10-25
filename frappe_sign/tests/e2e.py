@@ -50,3 +50,25 @@ def purge(envelope: str, started: str) -> None:
 	for template in purge_envelope(envelope):
 		purge_template(template)
 	purge_since(get_datetime(started))
+
+
+def purge_created(started: str) -> dict:
+	"""Delete envelopes and templates created since `started` (a staff e2e run), with their files."""
+	require_test_site()
+	since = get_datetime(started)
+	envelopes = frappe.get_all("Sign Envelope", filters={"creation": [">=", since]}, pluck="name")
+	templates = set(frappe.get_all("Sign Template", filters={"creation": [">=", since]}, pluck="name"))
+	for envelope in envelopes:
+		templates.update(purge_envelope(envelope))
+	for template in templates:
+		purge_template(template)
+	purge_since(since)
+	return {"envelopes": len(envelopes), "templates": len(templates)}
+
+
+def prepare_staff() -> dict:
+	"""An outgoing Email Account for sending, and the start time for purge_created."""
+	require_test_site()
+	started = now_datetime()
+	make_email_account(skip_smtp_check=True)
+	return {"now": str(started)}
