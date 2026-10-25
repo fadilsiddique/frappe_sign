@@ -4,7 +4,13 @@ import { __, setMessages } from '@/shared/translate'
 
 describe('boot', () => {
   it('falls back to defaults without a boot block', () => {
-    expect(readBoot(undefined)).toMatchObject({ lang: 'en', dir: 'ltr', user: null })
+    expect(readBoot(undefined)).toMatchObject({
+      lang: 'en',
+      dir: 'ltr',
+      user: null,
+      full_name: null,
+      user_image: null,
+    })
   })
 
   it('keeps branding defaults for missing keys', () => {

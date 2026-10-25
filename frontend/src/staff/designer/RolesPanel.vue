@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button, FormControl } from 'frappe-ui'
 import { __ } from '@/shared/translate'
+import { roleKindLabel, signerSourceLabel } from '../labels'
 import { useDesigner } from './store'
 
 const store = useDesigner()
@@ -11,8 +12,8 @@ const SOURCES = ['Ask at Send', 'Fixed User', 'Doc Field', 'Party Contact', 'Emp
 <template>
   <div class="space-y-3" data-testid="roles">
     <div class="flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-ink-gray-8">{{ __('Roles') }}</h3>
-      <Button size="sm" :label="__('Add role')" @click="store.addRole('Signer')" />
+      <h3 class="text-sm font-semibold text-ink-gray-8">{{ __('People') }}</h3>
+      <Button size="sm" :label="__('Add person')" @click="store.addRole('Signer')" />
     </div>
     <div
       v-for="role in store.roles"
@@ -42,21 +43,21 @@ const SOURCES = ['Ask at Send', 'Fixed User', 'Doc Field', 'Party Contact', 'Emp
           size="sm"
           variant="ghost"
           :label="'×'"
-          :aria-label="__('Remove role')"
+          :aria-label="__('Remove person')"
           @click.stop="store.removeRole(role.role_label)"
         />
       </div>
       <div class="grid grid-cols-2 gap-2">
         <FormControl
           type="select"
-          :label="__('Kind')"
+          :label="__('What they do')"
           :model-value="role.kind"
-          :options="KINDS.map((k) => ({ label: __(k), value: k }))"
+          :options="KINDS.map((k) => ({ label: roleKindLabel(k), value: k }))"
           @update:model-value="store.updateRole(role.role_label, { kind: $event })"
         />
         <FormControl
           type="number"
-          :label="__('Order')"
+          :label="__('Signs as number')"
           :model-value="role.routing_order"
           @change="
             store.updateRole(role.role_label, {
@@ -69,7 +70,7 @@ const SOURCES = ['Ask at Send', 'Fixed User', 'Doc Field', 'Party Contact', 'Emp
         type="select"
         :label="__('Who signs')"
         :model-value="role.signer_source"
-        :options="SOURCES.map((s) => ({ label: __(s), value: s }))"
+        :options="SOURCES.map((s) => ({ label: signerSourceLabel(s), value: s }))"
         @update:model-value="store.updateRole(role.role_label, { signer_source: $event })"
       />
       <FormControl

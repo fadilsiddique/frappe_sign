@@ -22,7 +22,8 @@ def get_context(context):
 		raise frappe.PermissionError(_("You need the Sign User or Sign Manager role to open Frappe Sign."))
 
 	company = frappe.defaults.get_user_default("company")
-	context.boot = {
-		"csrf_token": frappe.sessions.get_csrf_token(),
-		"frappe_sign": base_boot(frappe.session.user, profile_branding(company)),
-	}
+	boot = base_boot(frappe.session.user, profile_branding(company))
+	# The sidebar's user menu shows who is signed in; the guest page never gets these.
+	boot["full_name"] = frappe.utils.get_fullname(frappe.session.user)
+	boot["user_image"] = frappe.db.get_value("User", frappe.session.user, "user_image")
+	context.boot = {"csrf_token": frappe.sessions.get_csrf_token(), "frappe_sign": boot}

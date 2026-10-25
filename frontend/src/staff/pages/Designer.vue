@@ -10,6 +10,7 @@ import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import FieldProperties from '../designer/FieldProperties.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
 import { FIELD_TYPES, useDesigner, type FieldType } from '../designer/store'
+import { otpModeLabel, signingOrderLabel } from '../labels'
 import { call } from 'frappe-ui'
 
 const props = defineProps<{ id: string }>()
@@ -171,19 +172,13 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
             v-model="store.signingOrder"
             type="select"
             :label="__('Signing order')"
-            :options="[
-              { label: __('Sequential'), value: 'Sequential' },
-              { label: __('Parallel'), value: 'Parallel' },
-            ]"
+            :options="['Sequential', 'Parallel'].map((value) => ({ label: signingOrderLabel(value), value }))"
           />
           <FormControl
             v-model="store.otpMode"
             type="select"
-            :label="__('Verification')"
-            :options="[
-              { label: __('Off'), value: 'Off' },
-              { label: __('Email code'), value: 'Email' },
-            ]"
+            :label="__('Verify with an emailed code')"
+            :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
           />
         </div>
         <FieldProperties />

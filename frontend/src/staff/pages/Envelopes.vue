@@ -3,15 +3,19 @@ import { createListResource } from 'frappe-ui'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { __ } from '@/shared/translate'
+import AppPageHeader from '../components/AppPageHeader.vue'
+import EmptyState from '../components/EmptyState.vue'
+import HeaderAction from '../components/HeaderAction.vue'
+import ResourceState from '../components/ResourceState.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 
 const route = useRoute()
 const FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'open', label: 'Waiting' },
-  { value: 'Draft', label: 'Draft' },
+  { value: 'Draft', label: 'Drafts' },
   { value: 'Completed', label: 'Completed' },
-  { value: 'closed', label: 'Declined, voided or expired' },
+  { value: 'closed', label: 'Closed' },
 ]
 const status = ref(String(route.query.status ?? 'all'))
 const filters = computed(() => {
@@ -45,14 +49,19 @@ watch(filters, (next) => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl p-6" data-testid="envelopes">
-    <h1 class="mb-4 text-xl font-semibold text-ink-gray-9">{{ __('Envelopes') }}</h1>
-    <div class="mb-3 flex flex-wrap gap-1">
+  <AppPageHeader :title="__('Sent')">
+    <template #primary>
+      <HeaderAction icon="lucide-plus" :label="__('New request')" route="/new" />
+    </template>
+  </AppPageHeader>
+  <div class="max-w-5xl p-4 sm:p-5" data-testid="envelopes">
+    <div class="mb-3 flex flex-wrap gap-1" role="group" :aria-label="__('Show')">
       <button
         v-for="filter in FILTERS"
         :key="filter.value"
         type="button"
-        class="rounded px-3 py-1 text-sm"
+        class="rounded px-3 py-1 text-base"
+        :aria-pressed="status === filter.value"
         :class="
           status === filter.value
             ? 'bg-surface-gray-4 text-ink-gray-9'
@@ -63,27 +72,42 @@ watch(filters, (next) => {
         {{ __(filter.label) }}
       </button>
     </div>
-    <div class="divide-y divide-outline-gray-1 rounded-lg border border-outline-gray-1 bg-surface-base">
-      <RouterLink
-        v-for="row in envelopes.data ?? []"
-        :key="row.name"
-        :to="`/envelopes/${row.name}`"
-        class="grid grid-cols-[1fr_auto] items-center gap-2 px-4 py-3 hover:bg-surface-gray-1"
-      >
-        <span class="min-w-0">
-          <span class="block truncate text-base text-ink-gray-9">{{ row.title }}</span>
-          <span class="block text-sm text-ink-gray-5">
-            {{ row.name
-            }}<template v-if="row.reference_name">
-              · {{ row.reference_doctype }} {{ row.reference_name }}</template
-            >
-          </span>
-        </span>
-        <StatusBadge :status="row.status" :sealing="row.sealing_state" :sending="row.send_state" />
-      </RouterLink>
-      <p v-if="envelopes.data && !envelopes.data.length" class="p-6 text-center text-ink-gray-5">
-        {{ __('Nothing here.') }}
-      </p>
+    <div class="rounded-lg border border-outline-gray-1 bg-surface-base">
+      <ResourceState :resource="envelopes">
+        <template #empty>
+          <EmptyState
+            v-if="status === 'all'"
+            icon="lucide-send"
+            :title="__('No requests yet')"
+            :text="__('Send one from a Quotation in Desk, or upload a PDF here.')"
+          />
+          <EmptyState
+            v-else
+            icon="lucide-inbox"
+            :title="__('Nothing here')"
+            :text="__('Look in All for every request.')"
+          />
+        </template>
+        <div class="divide-y divide-outline-gray-1">
+          <RouterLink
+            v-for="row in envelopes.data ?? []"
+            :key="row.name"
+            :to="`/envelopes/${row.name}`"
+            class="grid grid-cols-[1fr_auto] items-center gap-2 px-4 py-3 hover:bg-surface-gray-1"
+          >
+            <span class="min-w-0">
+              <span class="block truncate text-base text-ink-gray-9">{{ row.title }}</span>
+              <span class="block text-sm text-ink-gray-6">
+                <template v-if="row.reference_name"
+                  >{{ row.reference_doctype }} {{ row.reference_name }}</template
+                >
+                <template v-else>{{ row.name }}</template>
+              </span>
+            </span>
+            <StatusBadge :status="row.status" :sealing="row.sealing_state" :sending="row.send_state" />
+          </RouterLink>
+        </div>
+      </ResourceState>
     </div>
   </div>
 </template>

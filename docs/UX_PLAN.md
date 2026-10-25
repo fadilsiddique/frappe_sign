@@ -60,7 +60,7 @@ The U.1 prototype showed two directions on a Design canvas (https://claude.ai/ar
 
 - **Staff app: Direction B, "Guided desk".**
   - The page area is gray-50 with white panels. The sidebar is white, and the active item has a gray-200 background.
-  - Each page has a 56 px header bar with the title and the primary action.
+  - Each page has a 48 px header bar, level with the sidebar header, with the title and the primary action. On phones, the primary action is an icon button in the header, and other actions sit in a row under it.
   - Home puts the work queue beside a setup panel. Sent puts a grouped list beside a preview pane.
   - Defaults: comfortable density, list layout, full row detail. The board view (Sent by stage, as columns) is not in scope.
 - **Guest page: Direction A, "Quiet list".**
@@ -200,7 +200,7 @@ A split view: the list on the left (about 400 px) and a preview of the selected 
   - A floating "Next: Signature" button that jumps to and highlights the next field.
   - Fields in the brand color, with clear states: to do, done, optional.
   - Delegate and Decline go into a "More" menu.
-- **Signature sheet:** Type is prefilled with the signer's name. A baseline on the Draw canvas. A large Save button.
+- **Signature sheet:** Type is prefilled with the signer's name. A baseline on the Draw canvas. A large Save button. A press that starts while the sheet slides in must not close it (today a stroke started mid-slide lands on the backdrop and closes the sheet; found in U.2).
 - **Finish:** a review list of what was filled, then **Finish and sign**.
 - **Done screen:** a tick, "You signed E2E Service Agreement", "Everyone will get the signed PDF by email", and a Download button once it is sealed.
 - **Terminal screens** (Declined, Expired, Voided, Waiting): the same layout with an icon and one sentence.

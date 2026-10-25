@@ -8,6 +8,9 @@ export interface Branding {
 
 export interface Boot {
   user: string | null
+  // Staff app only: the sidebar's user menu.
+  full_name: string | null
+  user_image: string | null
   lang: string
   dir: 'ltr' | 'rtl'
   branding: Branding
@@ -23,6 +26,8 @@ declare global {
 
 const DEFAULT_BOOT: Boot = {
   user: null,
+  full_name: null,
+  user_image: null,
   lang: 'en',
   dir: 'ltr',
   branding: { company: null, logo: null, brand_color: null },

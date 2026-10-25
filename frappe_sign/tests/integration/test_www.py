@@ -44,13 +44,18 @@ class TestShellContext(IntegrationTestCase):
 		context = frappe._dict()
 		staff_page.get_context(context)
 		self.assertEqual(context.boot["frappe_sign"]["user"], "sign-user@example.com")
+		self.assertEqual(context.boot["frappe_sign"]["full_name"], "Sign Test")
 
 	def test_staff_boot(self):
 		context = frappe._dict()
 		staff_page.get_context(context)
 		self.assertTrue(context.boot["csrf_token"])
-		self.assertEqual(set(context.boot["frappe_sign"]), {"user", "lang", "dir", "branding", "messages"})
+		self.assertEqual(
+			set(context.boot["frappe_sign"]),
+			{"user", "full_name", "user_image", "lang", "dir", "branding", "messages"},
+		)
 		self.assertEqual(context.boot["frappe_sign"]["dir"], "ltr")
+		self.assertEqual(context.boot["frappe_sign"]["full_name"], "Administrator")
 
 	def test_staff_boot_uses_the_only_profile_branding(self):
 		frappe.get_doc(
@@ -66,6 +71,7 @@ class TestShellContext(IntegrationTestCase):
 		guest_page.get_context(context)
 		self.assertNotIn("csrf_token", context.boot)
 		self.assertIsNone(context.boot["frappe_sign"]["user"])
+		self.assertNotIn("full_name", context.boot["frappe_sign"])
 
 	def test_logged_in_signer_gets_a_csrf_token(self):
 		context = frappe._dict()

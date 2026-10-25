@@ -1,6 +1,7 @@
 // P1.14: a signer completes a fixture envelope on a 390 px wide phone screen.
 import { expect, test, type Page } from '@playwright/test'
 import { benchExecute, type EnvelopeState, type GuestEnvelope } from './bench'
+import { drawSignature } from './signature-pad'
 
 let fixture: GuestEnvelope
 
@@ -15,20 +16,6 @@ test.afterAll(() => {
 async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
   expect(overflow).toBeLessThanOrEqual(0)
-}
-
-async function drawSignature(page: Page) {
-  const pad = page.getByTestId('pad')
-  await expect(pad).toBeVisible()
-  const box = (await pad.boundingBox())!
-  const points = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9].map((x, i) => ({
-    x: box.x + box.width * x,
-    y: box.y + box.height * (i % 2 ? 0.35 : 0.7),
-  }))
-  await page.mouse.move(points[0].x, points[0].y)
-  await page.mouse.down()
-  for (const point of points.slice(1)) await page.mouse.move(point.x, point.y, { steps: 6 })
-  await page.mouse.up()
 }
 
 test('signs a fixture envelope at 390 px width', async ({ page }) => {

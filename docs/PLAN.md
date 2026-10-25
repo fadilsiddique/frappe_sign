@@ -111,7 +111,7 @@ Make the app easy to understand and pleasant to use before Phase 3. The screen a
 | ID | Task | Done when |
 | --- | --- | --- |
 | [x] U.1 | Two tangibly different directions for Home, Sent and the guest signing screen, inside the sidebar shell (D18), as a clickable prototype with a Tweak panel (density, list or cards, row detail). Not shipped | User picks a direction |
-| U.2 | Foundation: frappe-ui `Sidebar` shell and mobile nav, page header, empty, loading and error states, avatar stack, status badge colors, UI words from UX_PLAN.md through `__()` | Every existing staff page uses the shell and states; Vitest for the shared components |
+| [x] U.2 | Foundation: frappe-ui `Sidebar` shell and mobile nav, page header, empty, loading and error states, avatar stack, status badge colors, UI words from UX_PLAN.md through `__()` | Every existing staff page uses the shell and states; Vitest for the shared components |
 | U.3 | Home with "Get started" checklist (`setup_status` API: email account, seal, profile, enabled DocTypes, template, test send), "Needs your signature" and "Waiting on others" | On an empty site the checklist leads through setup; Playwright |
 | U.4 | Sent list `/sign/requests` (redirect from `/sign/envelopes`): table, avatars, progress, tabs with counts, search, filters, row menu | Playwright; lanes align at 1440 px and 390 px |
 | U.5 | Request detail: PDF beside a recipient step list, state-based primary action, plain activity timeline, audit details behind a toggle | Playwright for waiting and completed requests |

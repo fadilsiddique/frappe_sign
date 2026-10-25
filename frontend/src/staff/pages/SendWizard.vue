@@ -10,6 +10,8 @@ import type { PageMetric } from '@/shared/coords'
 import { __ } from '@/shared/translate'
 import { errorMessage, fetchPdf, fileToBase64, STAFF_API, staff } from '../api'
 import AnchorPreview, { type PreviewAnchor } from '../components/AnchorPreview.vue'
+import AppPageHeader from '../components/AppPageHeader.vue'
+import { otpModeLabel, roleKindLabel, signingOrderLabel } from '../labels'
 import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
 import { FIELD_TYPES, useDesigner, type FieldType } from '../designer/store'
@@ -301,9 +303,9 @@ function next() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl p-6" data-testid="send-wizard">
-    <h1 class="text-xl font-semibold text-ink-gray-9">{{ __('Send a document') }}</h1>
-    <ol class="mt-3 flex gap-2 text-sm">
+  <AppPageHeader :title="__('New request')" />
+  <div class="max-w-6xl p-4 sm:p-5" data-testid="send-wizard">
+    <ol class="flex gap-2 text-sm">
       <li
         v-for="(name, index) in steps"
         :key="name"
@@ -316,7 +318,7 @@ function next() {
             name === 'source'
               ? 'Document'
               : name === 'recipients'
-                ? 'Recipients'
+                ? 'People'
                 : name === 'fields'
                   ? 'Fields'
                   : name === 'preview'
@@ -400,7 +402,7 @@ function next() {
       <div class="space-y-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4">
         <div v-for="row in recipients" :key="row.role_label" class="grid gap-2 sm:grid-cols-[8rem_1fr_1fr]">
           <span class="self-center text-sm font-medium text-ink-gray-7"
-            >{{ row.role_label }} <span class="text-ink-gray-5">({{ __(row.kind) }})</span></span
+            >{{ row.role_label }} <span class="text-ink-gray-5">({{ roleKindLabel(row.kind) }})</span></span
           >
           <FormControl v-model="row.full_name" :placeholder="__('Full name')" />
           <FormControl v-model="row.email" type="email" :placeholder="__('Email')" />
@@ -501,25 +503,19 @@ function next() {
       class="mt-6 max-w-2xl space-y-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4"
     >
       <FormControl v-model="form.title" :label="__('Title')" />
-      <FormControl v-model="form.message" type="textarea" :label="__('Message to signers')" />
+      <FormControl v-model="form.message" type="textarea" :label="__('Message (optional)')" />
       <template v-if="mode === 'upload'">
         <FormControl
           v-model="form.signingOrder"
           type="select"
           :label="__('Signing order')"
-          :options="[
-            { label: __('Sequential'), value: 'Sequential' },
-            { label: __('Parallel'), value: 'Parallel' },
-          ]"
+          :options="['Sequential', 'Parallel'].map((value) => ({ label: signingOrderLabel(value), value }))"
         />
         <FormControl
           v-model="form.otpMode"
           type="select"
-          :label="__('Verification')"
-          :options="[
-            { label: __('Off'), value: 'Off' },
-            { label: __('Email code'), value: 'Email' },
-          ]"
+          :label="__('Verify with an emailed code')"
+          :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
         />
       </template>
       <ul class="text-sm text-ink-gray-7">
@@ -528,7 +524,7 @@ function next() {
         </li>
       </ul>
       <p v-if="!recipientsValid" class="text-sm text-ink-red-4">
-        {{ __('Every recipient needs a name and an email address.') }}
+        {{ __('Every person needs a name and an email address.') }}
       </p>
       <Button
         variant="solid"

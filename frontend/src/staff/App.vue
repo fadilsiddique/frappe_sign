@@ -1,42 +1,32 @@
 <script setup lang="ts">
-import { FrappeUIProvider } from 'frappe-ui'
+// The app shell (D18): a frappe-ui sidebar on desktop, a tab bar on phones. The designer needs the
+// full width, so it has neither.
+import { DesktopShell, FrappeUIProvider, MobileShell } from 'frappe-ui'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { __ } from '@/shared/translate'
+import AppMobileNav from './shell/AppMobileNav.vue'
+import AppSidebar from './shell/AppSidebar.vue'
+import { useIsMobile } from './shell/useIsMobile'
 
 const route = useRoute()
-const links = [
-  { to: '/', label: 'Home' },
-  { to: '/envelopes', label: 'Envelopes' },
-  { to: '/new', label: 'Send' },
-  { to: '/templates', label: 'Templates' },
-]
+const isMobile = useIsMobile()
+// The designer has no nav, and its panes scroll on their own.
+const fullWidth = computed(() => route.name === 'Designer')
 </script>
 
 <template>
   <FrappeUIProvider>
-    <div class="flex h-full flex-col bg-surface-gray-1">
-      <nav
-        v-if="route.name !== 'Designer'"
-        class="flex items-center gap-1 border-b border-outline-gray-1 bg-surface-base px-4 py-2"
-      >
-        <span class="me-4 font-semibold text-ink-gray-9">{{ __('Frappe Sign') }}</span>
-        <RouterLink
-          v-for="link in links"
-          :key="link.to"
-          :to="link.to"
-          class="rounded px-3 py-1.5 text-sm text-ink-gray-7 hover:bg-surface-gray-2"
-          active-class="bg-surface-gray-2 text-ink-gray-9"
-          :exact-active-class="link.to === '/' ? 'bg-surface-gray-2 text-ink-gray-9' : undefined"
-        >
-          {{ __(link.label) }}
-        </RouterLink>
-        <a href="/app/sign-envelope" class="ms-auto text-sm text-ink-gray-5 hover:text-ink-gray-8">{{
-          __('Desk')
-        }}</a>
-      </nav>
-      <div class="min-h-0 flex-1 overflow-auto">
-        <RouterView />
-      </div>
-    </div>
+    <MobileShell v-if="isMobile">
+      <RouterView />
+      <template v-if="!fullWidth" #nav>
+        <AppMobileNav />
+      </template>
+    </MobileShell>
+    <DesktopShell v-else :scroll="!fullWidth" class="bg-surface-gray-1">
+      <template v-if="!fullWidth" #sidebar>
+        <AppSidebar />
+      </template>
+      <RouterView />
+    </DesktopShell>
   </FrappeUIProvider>
 </template>

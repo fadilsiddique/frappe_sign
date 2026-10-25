@@ -1,7 +1,8 @@
 // Gate 2: a user submits a Quotation and sends it for signature; the customer signs on a phone;
 // the signed PDF is attached, sign_status is Signed and a draft Sales Order exists.
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { benchExecute } from './bench'
+import { drawSignature } from './signature-pad'
 
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'admin'
 
@@ -33,16 +34,6 @@ test.afterAll(() => {
 
 const state = () => benchExecute<DocumentState>('document_state', { doctype: 'Quotation', name: prepared!.quotation })
 
-async function drawSignature(page: Page) {
-  const pad = page.getByTestId('pad')
-  await expect(pad).toBeVisible()
-  const box = (await pad.boundingBox())!
-  await page.mouse.move(box.x + box.width * 0.15, box.y + box.height * 0.7)
-  await page.mouse.down()
-  for (const [x, y] of [[0.3, 0.35], [0.45, 0.7], [0.6, 0.35], [0.75, 0.7], [0.9, 0.35]])
-    await page.mouse.move(box.x + box.width * x, box.y + box.height * y, { steps: 6 })
-  await page.mouse.up()
-}
 
 test('Gate 2: Quotation signed on a phone becomes a draft Sales Order', async ({ page, browser }) => {
   test.setTimeout(240_000)
