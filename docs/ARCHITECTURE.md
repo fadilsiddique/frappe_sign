@@ -68,7 +68,7 @@ flowchart TB
 sequenceDiagram
     autonumber
     actor S as Sales user
-    participant D as Desk (desk.js)
+    participant D as Desk (frappe_sign_desk.bundle.js)
     participant API as api.staff / api.guest
     participant SV as Services
     participant J as Jobs
@@ -124,7 +124,7 @@ frappe_sign/
     ├── utils/                    small shared helpers (hashing, dates, paths)
     ├── jinja/                    sign_field() anchor helper
     ├── exceptions.py             domain errors with HTTP codes and stable codes
-    ├── public/js/desk.js         form, print view and list view integration
+    ├── public/js/frappe_sign_desk.bundle.js  form, print view and list view integration
     ├── public/frontend/          build output (gitignored)
     ├── templates/                certificate.html, emails/
     ├── www/                      sign.html/.py, s.html/.py, sign-verify.html/.py

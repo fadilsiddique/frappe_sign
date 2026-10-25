@@ -16,7 +16,8 @@ fixtures = [
 ]
 
 # Desk: Send for Signature on enabled DocTypes' forms, print view and list view (DESIGN 4.1).
-app_include_js = "/assets/frappe_sign/js/desk.js"
+# A bundle, so `bench build` gives it a hashed URL and browsers never keep a stale copy.
+app_include_js = "frappe_sign_desk.bundle.js"
 boot_session = "frappe_sign.utils.boot.desk_boot"
 
 # SPA shells: www/sign.html (staff) and www/s.html (guest signing), built from frontend/.

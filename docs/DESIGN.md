@@ -328,7 +328,7 @@ Lives in `frappe_sign/erpnext/`, registered through hooks, active only when ERPN
 
 ### 4.1 Entry points
 
-- **Form view:** "Send for Signature" button and a status indicator, added by `public/js/desk.js` (loaded via `app_include_js`) on the `form-refresh` event, only for DocTypes listed in `frappe.boot.frappe_sign.enabled_doctypes`.
+- **Form view:** "Send for Signature" button and a status indicator, added by `public/js/frappe_sign_desk.bundle.js` (an `app_include_js` bundle: `bench build` hashes its URL, so browsers load each new version) on the `form-refresh` event, only for DocTypes listed in `frappe.boot.frappe_sign.enabled_doctypes`.
 - **Print view:** "Send this print for signature" uses the selected Print Format and Letter Head.
 - **List view:** bulk "Send for Signature" for selected documents (queued, one envelope each).
 - **Workspace:** "Signatures" with number cards: awaiting me, awaiting others, completed this month, expiring in 3 days. The cards are Custom number cards (`api.staff.card_*`) that open the Sign Envelope list with their filters. The workspace is shown to Sign Manager, Sign User and System Manager. Navigation differs inside v16: v16.0.0 reads the app-level `workspace_sidebar/` and `desktop_icon/` files that the app ships; later v16 releases no longer import that folder and build the module's sidebar from its contents.
