@@ -55,7 +55,7 @@ Conventions for every task:
 | [x] P1.6 | `services/audit.py`: append event with chain under row lock; `verify_chain(envelope)` | Tamper test detects first bad event |
 | [x] P1.7 | `services/template.py`: create, update, upload PDF (sanitize + metrics), publish version | Version snapshot immutable |
 | [x] P1.8 | `services/envelope.py`: create draft from template or upload, send (`send_state`, render job freezes, hashes, issues tokens, writes events), void, remind, resend, expire; explicit transitions with `InvalidTransition` | Lifecycle integration tests |
-| P1.9 | `services/signing.py`: open, OTP (email), session, consent, save fields (server validation), capture, finish (intermediate PDF under the row lock, D3), decline, delegate; sequential and parallel routing; Approver flow | Integration tests per path |
+| [x] P1.9 | `services/signing.py`: open, OTP (email), session, consent, save fields (server validation), capture, finish (intermediate PDF under the row lock, D3), decline, delegate; sequential and parallel routing; Approver flow | Integration tests per path |
 | P1.10 | Sealing flow: row lock, `sealing_state`, deduped job, retries, `retry_seal` | Two-thread concurrency test seals once |
 | P1.11 | `services/events.py` + `jobs/events.py` (D17) + `services/notify.py` (email only), Email Templates fixtures | Handlers run in jobs after commit and their writes persist; failing handler does not roll back |
 
