@@ -3,8 +3,11 @@
 import frappe
 
 
-def new_private_file(content: bytes, file_name: str, doctype: str, name: str):
-	"""A File document, not yet inserted. Callers insert it, so the permission check stays visible."""
+def new_private_file(content: bytes, file_name: str, doctype: str | None, name: str | None):
+	"""A File document, not yet inserted. Callers insert it, so the permission check stays visible.
+
+	Pass no doctype and name when the document does not exist yet, and attach the File after.
+	"""
 	return frappe.get_doc(
 		{
 			"doctype": "File",

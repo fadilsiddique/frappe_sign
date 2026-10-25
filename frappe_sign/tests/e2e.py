@@ -258,3 +258,30 @@ def complete_pending(envelope: str) -> dict:
 
 
 JOB_OPTIONS = {"queue", "timeout", "job_id", "deduplicate", "enqueue_after_commit", "now", "at_front"}
+
+
+# Sign Certificate: "Create test certificate" from Desk.
+
+
+def prepare_certificate() -> dict:
+	"""The company the dialog defaults to, and the start time for purge_certificates."""
+	require_test_site()
+	from frappe_sign.tests.factories import test_company
+
+	company = test_company()
+	if frappe.db.exists("Sign Profile", company):
+		frappe.throw(f"Sign Profile {company} exists already; the e2e run expects none")
+	return {"company": company, "started": str(now_datetime())}
+
+
+def purge_certificates(started: str) -> dict:
+	"""Delete the profiles and certificates created since `started`, with their files and passwords."""
+	require_test_site()
+	since = get_datetime(started)
+	profiles = frappe.get_all("Sign Profile", filters={"creation": [">=", since]}, pluck="name")
+	certificates = frappe.get_all("Sign Certificate", filters={"creation": [">=", since]}, pluck="name")
+	frappe.db.delete("Sign Profile", {"name": ["in", profiles or [""]]})
+	frappe.db.delete("Sign Certificate", {"name": ["in", certificates or [""]]})
+	frappe.db.delete("__Auth", {"doctype": "Sign Certificate", "name": ["in", certificates or [""]]})
+	purge_since(since)
+	return {"profiles": profiles, "certificates": certificates}

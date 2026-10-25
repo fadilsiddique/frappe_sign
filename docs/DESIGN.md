@@ -113,6 +113,8 @@ Customize Form does not allow a Data to Link change, so `erpnext/setup.py` write
 
 `validate` parses the PKCS#12 and rejects expired, wrong-password, or key-less files.
 
+**Create test certificate.** The Sign Certificate list and new form have a button for System Managers. It makes a self-signed certificate (`crypto/selfsigned.py`: RSA 3072, SHA-256, key usage digital signature and non-repudiation, 1 to 10 years) with a random password, stores the `.p12` as a private File and inserts a Sign Certificate of kind Self-signed (`services/certificates.py`). It then uses the certificate in the company's Sign Profile: it creates the profile when there is none, links it when the profile has no certificate, and never replaces a certificate a profile already has. Sealing trusts the self-signed certificate as its own root, so the seal validates in pyHanko. Adobe Reader shows its identity as unknown. It is for trials and pilots.
+
 ### 2.2 Templates
 
 **Sign Template**
@@ -611,6 +613,7 @@ Build output to `frappe_sign/public/frontend/`; a post-build script copies HTML 
 | `void_envelope(envelope, reason)` | Void, notify, log |
 | `download(envelope, kind)` | `original`, `signed`, `certificate` |
 | `publish_template(template)` | New Sign Template Version |
+| `create_test_certificate(company, common_name, years)` | Self-signed Sign Certificate, used in the company's Sign Profile (System Manager) |
 | `upload_pdf(file)` | Sanitize and return metrics |
 
 Standard REST covers plain reads and lists.

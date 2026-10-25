@@ -11,7 +11,16 @@ from frappe.rate_limiter import rate_limit
 from werkzeug.wrappers import Response
 
 from frappe_sign.api.errors import with_error_code
-from frappe_sign.services import audit, cards, doctypes, documents, preview, resolvers, sealing
+from frappe_sign.services import (
+	audit,
+	cards,
+	certificates,
+	doctypes,
+	documents,
+	preview,
+	resolvers,
+	sealing,
+)
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
 from frappe_sign.utils.dates import format_utc
@@ -142,6 +151,15 @@ def get_envelope(envelope: str) -> dict:
 @with_error_code
 def my_signing_link(envelope: str) -> dict:
 	return {"url": envelope_service.my_signing_link(envelope)}
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def create_test_certificate(
+	company: str | None = None, common_name: str | None = None, years: int = 3
+) -> dict:
+	"""A self-signed sealing certificate, used in the company's Sign Profile (System Manager)."""
+	return certificates.create_test_certificate(company, common_name, years)
 
 
 @frappe.whitelist(methods=["POST"])

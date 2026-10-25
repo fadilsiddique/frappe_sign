@@ -116,9 +116,9 @@ frappe_sign/
     ├── compat.py                 feature-detected shims for anything newer than v16.0.0
     ├── frappe_sign/doctype/      17 DocTypes (module "Frappe Sign")
     ├── api/                      staff.py, guest.py, public.py
-    ├── services/                 envelope.py, signing.py, template.py, trigger.py, audit.py, notify.py, events.py, writeback.py, actions.py
+    ├── services/                 envelope.py, signing.py, template.py, trigger.py, audit.py, notify.py, events.py, writeback.py, actions.py, certificates.py
     ├── pdf/                      types.py, source.py, sanitize.py, anchors.py, overlay.py, certificate.py, seal.py, fonts/
-    ├── crypto/                   signer.py (Signer, Pkcs12Signer, RemoteSigner), pkcs12.py (inspect only), tsa.py
+    ├── crypto/                   signer.py (Signer, Pkcs12Signer, RemoteSigner), pkcs12.py (inspect only), selfsigned.py (test certificates), tsa.py
     ├── erpnext/                  resolvers/, dashboards.py, setup.py (custom fields, Link Company)
     ├── jobs/                     render.py, seal.py, events.py, actions.py, bulk.py, reminders.py, triggers.py, housekeeping.py
     ├── utils/                    small shared helpers (hashing, dates, paths)

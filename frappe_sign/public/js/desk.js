@@ -312,6 +312,84 @@ frappe.provide("frappe.ui.form");
 		dialog.show();
 	}
 
+	// Sign Certificate list and new form: "Create test certificate" (ADMIN_GUIDE step 2).
+	desk.test_certificate_dialog = () => {
+		const company_df = frappe.meta.get_docfield("Sign Certificate", "company") || {};
+		const dialog = new frappe.ui.Dialog({
+			title: __("Create test certificate"),
+			fields: [
+				{
+					fieldtype: "HTML",
+					options: `<p class="text-muted small">${__(
+						"Makes a self-signed certificate and uses it in the company's Sign Profile. It seals documents and shows any later change, but Adobe Reader shows its identity as unknown. For a green tick, upload a certificate from a trusted provider instead."
+					)}</p>`,
+				},
+				{
+					fieldname: "company",
+					label: __("Company"),
+					fieldtype: company_df.fieldtype === "Link" ? "Link" : "Data",
+					options: company_df.fieldtype === "Link" ? company_df.options : undefined,
+					default: frappe.defaults.get_user_default("Company"),
+					onchange: () => {
+						const company = dialog.get_value("company");
+						if (company && !dialog.get_value("common_name")) {
+							dialog.set_value("common_name", company);
+						}
+					},
+				},
+				{
+					fieldname: "common_name",
+					label: __("Name on the certificate"),
+					fieldtype: "Data",
+					reqd: 1,
+					default: frappe.defaults.get_user_default("Company"),
+					description: __("Adobe Reader shows this name in the signature panel."),
+				},
+				{
+					fieldname: "years",
+					label: __("Valid for (years)"),
+					fieldtype: "Select",
+					options: ["1", "2", "3", "5", "10"],
+					default: "3",
+				},
+			],
+			primary_action_label: __("Create"),
+			primary_action: async ({ company, common_name, years }) => {
+				const result = await call(
+					"create_test_certificate",
+					{ company, common_name, years: cint(years) },
+					true
+				);
+				dialog.hide();
+				frappe.msgprint({
+					title: __("Certificate created"),
+					indicator: "green",
+					message: profile_message(result),
+				});
+				frappe.set_route("Form", "Sign Certificate", result.certificate);
+			},
+		});
+		dialog.show();
+	};
+
+	function profile_message({ profile, profile_action }) {
+		// get_form_link escapes the name and uses the version's Desk route (/app or /desk).
+		const link = profile ? frappe.utils.get_form_link("Sign Profile", profile, true) : "";
+		if (profile_action === "created") {
+			return __("Sign Profile {0} was created with this certificate.", [link]);
+		}
+		if (profile_action === "linked") {
+			return __("Sign Profile {0} now seals with this certificate.", [link]);
+		}
+		if (profile) {
+			return __(
+				"Sign Profile {0} already has a certificate and keeps it. To use the new one, select it on the profile.",
+				[link]
+			);
+		}
+		return __("Create a Sign Profile for your company and select this certificate on it.");
+	}
+
 	async function call(method, args, post = false) {
 		const response = await frappe.call({
 			method: `${API}.${method}`,

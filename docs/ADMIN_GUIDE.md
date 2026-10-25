@@ -35,9 +35,22 @@ Set up SPF and DKIM for the domain. Without them, invitations often land in spam
 
 ### 2. Sealing certificate
 
+The certificate is your company's digital stamp. Frappe Sign stamps every signed PDF with it, so anyone can see who sealed the PDF and that nobody changed it afterwards.
+
+If you have no certificate yet, for a trial or a pilot:
+
+1. Open the **Sign Certificate** list and click **Create test certificate**.
+2. Select the **Company**. Check the **Name on the certificate** and the years.
+3. Click **Create**.
+
+Frappe Sign makes a self-signed certificate and a random password, and stores them for you. It also uses the certificate in the company's Sign Profile: it creates the profile if there is none, and fills an empty certificate field. It never replaces a certificate that a profile already has.
+
+If you bought a certificate:
+
 1. Open **Sign Certificate** and click **New**.
 2. Attach the `.p12` file and enter its password.
 3. Save. Frappe Sign checks the file, the password and the dates.
+4. Select it on the company's Sign Profile.
 
 A self-signed certificate seals the PDF, but Adobe Reader shows it as "validity unknown". For a green tick in Adobe Reader, buy an AATL document-signing certificate.
 
