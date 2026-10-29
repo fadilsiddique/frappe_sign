@@ -1,6 +1,6 @@
 // Frappe Sign in Desk (DESIGN 4.1): "Send for Signature" on the form, print view and list view of
 // the DocTypes enabled in Sign Settings. Plain Frappe JS with frappe.ui.Dialog; the Vue staff app
-// at /sign is only opened by "Customize".
+// at /sign is only opened by "Preview and edit".
 frappe.provide("frappe_sign.desk");
 frappe.provide("frappe.ui.form");
 
@@ -30,14 +30,11 @@ frappe.provide("frappe.ui.form");
 						frm.doc.sign_envelope
 				  )}">${frappe.utils.escape_html(frm.doc.sign_envelope)}</a>`
 				: "";
-			frm.dashboard.set_headline_alert(
-				`${__("Signature: {0}", [__(status)])}${envelope}`,
-				STATUS_COLORS[status] || "gray"
-			);
+			set_headline(frm, status, envelope);
 		}
 		if (frm.doc.sign_envelope) {
 			frm.add_custom_button(
-				__("Signature Envelope"),
+				__("Signature request"),
 				() => window.open(`/sign/requests/${encodeURIComponent(frm.doc.sign_envelope)}`),
 				__("Signature")
 			);
@@ -48,6 +45,35 @@ frappe.provide("frappe.ui.form");
 			);
 		}
 	});
+
+	// "Signature: Sent", then who it waits for once the server says (an open request only).
+	async function set_headline(frm, status, envelope) {
+		let waiting = "";
+		if (frm.doc.sign_envelope && ["Sent", "Partially Signed"].includes(status)) {
+			try {
+				const names = await call("waiting_on", { envelope: frm.doc.sign_envelope });
+				if (names.length)
+					waiting = ` · ${__("waiting for {0}", [frappe.utils.escape_html(names.join(", "))])}`;
+			} catch (error) {
+				// The plain headline stays; a failed lookup must not break the form.
+			}
+		}
+		frm.dashboard.clear_headline();
+		frm.dashboard.set_headline_alert(
+			`${__("Signature: {0}", [__(status)])}${waiting}${envelope}`,
+			STATUS_COLORS[status] || "gray"
+		);
+	}
+
+	// The recipients are plain rows: the grid's selection column does nothing here.
+	$("<style>")
+		.text(
+			`.frappe-sign-send .grid-row-check, .frappe-sign-send .row-check,
+			.frappe-sign-send .grid-footer, .frappe-sign-send .row-index { display: none !important; }
+			.frappe-sign-send .grid-static-col, .frappe-sign-send .grid-static-col .static-area,
+			.frappe-sign-send .grid-heading-row .grid-static-col { text-align: start; }`
+		)
+		.appendTo("head");
 
 	// Send dialog: template, recipients found on the document, message.
 	desk.send_dialog = async ({ doctype, name, frm, print_format, letter_head }) => {
@@ -89,7 +115,7 @@ frappe.provide("frappe.ui.form");
 					: { fieldtype: "HTML", fieldname: "print_note", options: "" },
 				{
 					fieldname: "recipients",
-					label: __("Recipients"),
+					label: __("Who signs"),
 					fieldtype: "Table",
 					cannot_add_rows: true,
 					cannot_delete_rows: true,
@@ -102,16 +128,9 @@ frappe.provide("frappe.ui.form");
 							fieldtype: "Data",
 							read_only: 1,
 							in_list_view: 1,
-							columns: 2,
+							columns: 3,
 						},
-						{
-							fieldname: "kind",
-							label: __("Kind"),
-							fieldtype: "Data",
-							read_only: 1,
-							in_list_view: 1,
-							columns: 1,
-						},
+						{ fieldname: "kind", label: __("Kind"), fieldtype: "Data", read_only: 1, hidden: 1 },
 						{
 							fieldname: "full_name",
 							label: __("Name"),
@@ -130,6 +149,12 @@ frappe.provide("frappe.ui.form");
 							columns: 4,
 						},
 					],
+				},
+				{
+					fieldname: "message_section",
+					fieldtype: "Section Break",
+					label: __("Add a message"),
+					collapsible: 1,
 				},
 				{ fieldname: "message", label: __("Message to signers"), fieldtype: "Small Text" },
 			],
@@ -182,7 +207,7 @@ frappe.provide("frappe.ui.form");
 					dialog.enable_primary_action();
 				}
 			},
-			secondary_action_label: __("Customize"),
+			secondary_action_label: __("Preview and edit"),
 			secondary_action: () => {
 				const params = new URLSearchParams({
 					doctype,
@@ -194,6 +219,7 @@ frappe.provide("frappe.ui.form");
 				window.open(`/sign/new?${params.toString()}`);
 			},
 		});
+		dialog.$wrapper.addClass("frappe-sign-send");
 		dialog.show();
 		load_recipients(dialog, doctype, name);
 	};

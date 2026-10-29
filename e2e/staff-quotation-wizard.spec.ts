@@ -1,4 +1,4 @@
-// Send wizard with a Print Format source (P2.9): from the Quotation form's dialog, "Customize"
+// Send wizard with a Print Format source (P2.9): from the Quotation form's dialog, "Preview and edit"
 // opens /sign/new with the Quotation; recipients are resolved, the anchors are previewed, and the
 // envelope is sent.
 import { expect, test } from '@playwright/test'
@@ -33,7 +33,7 @@ test('customize a Quotation send in the wizard', async ({ page, context }) => {
   await expect(dialog.getByText('ahmed@gulftrading.example')).toBeVisible()
   const [wizard] = await Promise.all([
     context.waitForEvent('page'),
-    dialog.getByRole('button', { name: 'Customize' }).click(),
+    dialog.getByRole('button', { name: 'Preview and edit' }).click(),
   ])
 
   // Recipients come from the Quotation.

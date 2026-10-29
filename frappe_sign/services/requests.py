@@ -173,3 +173,12 @@ def request_row(doc: Any, people: list[Any], team: set[str], now: datetime, soon
 		row.update(group=group, next=[], expiring_soon=False)
 		row["people"] = [{**person, "next": False} for person in row["people"]]
 	return row
+
+
+def waiting_on(envelope: str) -> list[str]:
+	"""Names of the people a request waits on, for the headline on the source document's form."""
+	doc = frappe.get_doc("Sign Envelope", envelope)
+	doc.check_permission("read")
+	if doc.status not in OPEN:
+		return []
+	return [row.full_name for row in home.next_people(list(doc.recipients), doc.signing_order)]

@@ -34,9 +34,15 @@ test('send a Quotation for signature from Desk', async ({ page }) => {
   // Form: the button opens the dialog with the Customer found on the Quotation.
   await page.goto(`/app/quotation/${quotation}`)
   await page.getByRole('button', { name: 'Send for Signature' }).click()
-  const dialog = page.locator('.modal.show').filter({ hasText: 'Recipients' })
+  const dialog = page.locator('.modal.show').filter({ hasText: 'Who signs' })
   await expect(dialog).toBeVisible()
   await expect(dialog.getByText('ahmed@gulftrading.example')).toBeVisible()
+  // U.12: plain rows without the selection column, the message folded away, "Preview and edit".
+  await expect(dialog.locator('.grid-row-check:visible')).toHaveCount(0)
+  await expect(dialog.getByRole('button', { name: 'Preview and edit' })).toBeVisible()
+  await expect(dialog.getByText('Message to signers')).toBeHidden()
+  await dialog.getByText('Add a message').click()
+  await expect(dialog.getByText('Message to signers')).toBeVisible()
   await page.screenshot({ path: '../e2e/test-results/desk-send-dialog.png' })
   await dialog.getByRole('button', { name: 'Send', exact: true }).click()
   await expect(page.getByText(/Sending SIGN-.* for signature/)).toBeVisible()
@@ -58,6 +64,10 @@ test('send a Quotation for signature from Desk', async ({ page }) => {
   expect(state.envelope!.send_error).toBeNull()
   expect(state.envelope!.status).toBe('Sent')
 
+  // Form headline: the status and who the request waits for.
+  await page.goto(`/app/quotation/${quotation}`)
+  await expect(page.locator('.form-message')).toContainText('waiting for')
+
   // Print view: the same button, for the Print Format on screen.
   await page.goto(`/app/print/Quotation/${quotation}`)
   await expect(page.getByRole('button', { name: 'Send for Signature' })).toBeVisible()
@@ -75,5 +85,11 @@ test('send a Quotation for signature from Desk', async ({ page }) => {
   await expect(page.locator('.form-dashboard').getByText('Sign Envelope')).toBeVisible()
   await page.goto('/app/signatures')
   await expect(page.getByText('Awaiting Others')).toBeVisible()
+  for (const label of ['Open Frappe Sign', 'New request', 'Settings', 'Get started'])
+    await expect(page.locator('.widget.shortcut-widget-box').getByText(label, { exact: true })).toBeVisible()
+  // The sidebar lists only the four working entries, not the internal DocTypes.
+  const sidebar = page.locator('.desk-sidebar, .body-sidebar')
+  await expect(sidebar.getByText('Trigger Log')).toHaveCount(0)
+  await expect(sidebar.getByText('Requests', { exact: true }).first()).toBeVisible()
   await page.screenshot({ path: '../e2e/test-results/desk-signatures-workspace.png' })
 })

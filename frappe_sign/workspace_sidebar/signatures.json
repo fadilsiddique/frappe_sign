@@ -24,7 +24,7 @@
    "icon": "file-text",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Envelopes",
+   "label": "Requests",
    "link_to": "Sign Envelope",
    "link_type": "DocType",
    "show_arrow": 0,
@@ -57,42 +57,6 @@
   {
    "child": 0,
    "collapsible": 1,
-   "icon": "list",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Trigger Log",
-   "link_to": "Sign Trigger Log",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 1,
-   "icon": "building-2",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Profiles",
-   "link_to": "Sign Profile",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 1,
-   "icon": "shield-check",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Certificates",
-   "link_to": "Sign Certificate",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 1,
    "icon": "settings",
    "indent": 0,
    "keep_closed": 0,
@@ -103,7 +67,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-10-25 21:45:00.000000",
+ "modified": "2026-10-29 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Sign",
  "name": "Signatures",

@@ -114,6 +114,11 @@ class TestRequests(SignTestCase):
 		self.assertEqual(row["group"], "draft")
 		self.assertIsNone(row["sent_seconds"])
 
+	def test_waiting_on_names_who_has_to_act(self):
+		name = self.make("Sent")
+		self.assertEqual(len(staff.waiting_on(name)), 1)
+		self.assertEqual(staff.waiting_on(self.make("Completed")), [])
+
 	def test_a_sign_user_sees_only_their_own(self):
 		self.make()
 		user = make_user("requests-sign-user@example.com", "Sign User")

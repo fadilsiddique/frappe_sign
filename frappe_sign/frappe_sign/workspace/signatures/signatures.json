@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\": \"hdr\", \"type\": \"header\", \"data\": {\"text\": \"\\u003cspan class=\\\"h4\\\"\\u003e\\u003cb\\u003eSignatures\\u003c/b\\u003e\\u003c/span\\u003e\", \"col\": 12}}, {\"id\": \"card0\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Awaiting My Signature\", \"col\": 3}}, {\"id\": \"card1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Awaiting Others\", \"col\": 3}}, {\"id\": \"card2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Completed This Month\", \"col\": 3}}, {\"id\": \"card3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expiring In 3 Days\", \"col\": 3}}, {\"id\": \"sp\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Envelopes\", \"col\": 3}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Templates\", \"col\": 3}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Triggers\", \"col\": 3}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Frappe Sign App\", \"col\": 3}}]",
+ "content": "[{\"id\": \"hdr\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Signatures</b></span>\", \"col\": 12}}, {\"id\": \"card0\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Awaiting My Signature\", \"col\": 3}}, {\"id\": \"card1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Awaiting Others\", \"col\": 3}}, {\"id\": \"card2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Completed This Month\", \"col\": 3}}, {\"id\": \"card3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expiring In 3 Days\", \"col\": 3}}, {\"id\": \"sp\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Frappe Sign\", \"col\": 4}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New request\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 4}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Get started\", \"col\": 4}}, {\"id\": \"sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Requests\", \"col\": 4}}, {\"id\": \"sc5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Templates\", \"col\": 4}}]",
  "creation": "2026-10-25 21:42:02.998992",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "label": "Signatures",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-10-25 21:43:01.574648",
+ "modified": "2026-10-29 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Sign",
  "name": "Signatures",
@@ -54,7 +54,35 @@
   {
    "color": "Grey",
    "doc_view": "",
-   "label": "Envelopes",
+   "label": "Open Frappe Sign",
+   "type": "URL",
+   "url": "/sign"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "New request",
+   "type": "URL",
+   "url": "/sign/new"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "Settings",
+   "type": "URL",
+   "url": "/sign/settings"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "Get started",
+   "type": "URL",
+   "url": "/sign"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "Requests",
    "link_to": "Sign Envelope",
    "type": "DocType"
   },
@@ -64,20 +92,6 @@
    "label": "Templates",
    "link_to": "Sign Template",
    "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "",
-   "label": "Triggers",
-   "link_to": "Sign Trigger",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "",
-   "label": "Frappe Sign App",
-   "type": "URL",
-   "url": "/sign"
   }
  ],
  "standard": 1,

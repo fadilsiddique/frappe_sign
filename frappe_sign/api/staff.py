@@ -132,6 +132,12 @@ def download(envelope: str, kind: str = "signed") -> Response:
 
 @frappe.whitelist()
 @with_error_code
+def waiting_on(envelope: str) -> list:
+	return requests.waiting_on(envelope)
+
+
+@frappe.whitelist()
+@with_error_code
 def get_envelope(envelope: str) -> dict:
 	"""Detail page: the envelope, its recipients and the audit timeline (Sign Events are read here
 	after the envelope permission check, since Sign Users have no role on Sign Event)."""
