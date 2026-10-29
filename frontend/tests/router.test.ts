@@ -22,3 +22,14 @@ describe('routers', () => {
     expect(createStaffRouter(createMemoryHistory()).resolve('/nope/deeper').name).toBe('NotFound')
   })
 })
+
+describe('template routes', () => {
+  it('opens the Print Format editor for new and existing templates', () => {
+    const router = createStaffRouter(createMemoryHistory())
+    expect(router.resolve('/templates/new/print-format').name).toBe('NewPrintFormatTemplate')
+    const edit = router.resolve('/templates/STPL-00001/edit')
+    expect(edit.name).toBe('PrintFormatTemplate')
+    expect(edit.params.id).toBe('STPL-00001')
+    expect(router.resolve('/templates/STPL-00001/design').name).toBe('Designer')
+  })
+})

@@ -9,6 +9,8 @@ export interface NavItem {
   href?: string
   // Route names that light this item up.
   activeFor: string[]
+  // Only for a Sign Manager or System Manager (the server checks too).
+  managersOnly?: boolean
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -35,9 +37,19 @@ export const NAV_ITEMS: NavItem[] = [
     route: '/templates',
     activeFor: ['Templates', 'Designer'],
   },
-  // Desk's Sign Settings form until /sign/settings exists (U.9).
-  { key: 'settings', label: 'Settings', icon: 'lucide-settings', href: '/app/sign-settings', activeFor: [] },
+  {
+    key: 'settings',
+    label: 'Settings',
+    icon: 'lucide-settings',
+    route: '/settings',
+    activeFor: ['Settings'],
+    managersOnly: true,
+  },
 ]
+
+export function visibleNavItems(canManage: boolean): NavItem[] {
+  return NAV_ITEMS.filter((item) => canManage || !item.managersOnly)
+}
 
 export const DESK_URL = '/app'
 

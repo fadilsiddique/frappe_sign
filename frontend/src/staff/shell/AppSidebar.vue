@@ -8,10 +8,11 @@ import { errorMessage } from '../api'
 import { useDashboard, useSetupStatus } from '../home/resources'
 import { stepsLeft } from '../home/setupSteps'
 import type { Dashboard, SetupStatus } from '../home/types'
-import { DESK_URL, isActive, NAV_ITEMS } from './nav'
+import { DESK_URL, isActive, visibleNavItems } from './nav'
 
 const route = useRoute()
 const boot = readBoot()
+const items = visibleNavItems(boot.can_manage)
 const userName = boot.full_name || boot.user || ''
 
 // Shared with Home (one request each).
@@ -54,7 +55,7 @@ const userMenu = [{ label: __('Log out'), icon: 'lucide-log-out', onClick: logOu
     </div>
     <div class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pt-1">
       <SidebarItem
-        v-for="item in NAV_ITEMS"
+        v-for="item in items"
         :key="item.key"
         :label="__(item.label)"
         :icon="item.icon"

@@ -68,9 +68,9 @@ describe('setup steps', () => {
     const links = Object.fromEntries(stepViews(status).map((v) => [v.key, v.route ?? v.href]))
     expect(links).toEqual({
       email: '/app/email-account',
-      seal: '/app/sign-certificate',
-      profile: '/app/sign-profile/Gulf%20Trading%20LLC',
-      documents: '/app/sign-settings',
+      seal: '/settings',
+      profile: '/settings',
+      documents: { path: '/settings', query: { tab: 'documents' } },
       template: '/templates',
       test: '/new',
     })

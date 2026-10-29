@@ -11,6 +11,8 @@ export interface Boot {
   // Staff app only: the sidebar's user menu.
   full_name: string | null
   user_image: string | null
+  // Staff app only: may open Settings (Sign Manager or System Manager).
+  can_manage: boolean
   lang: string
   dir: 'ltr' | 'rtl'
   branding: Branding
@@ -28,6 +30,7 @@ const DEFAULT_BOOT: Boot = {
   user: null,
   full_name: null,
   user_image: null,
+  can_manage: true,
   lang: 'en',
   dir: 'ltr',
   branding: { company: null, logo: null, brand_color: null },

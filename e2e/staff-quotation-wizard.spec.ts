@@ -45,13 +45,13 @@ test('customize a Quotation send in the wizard', async ({ page, context }) => {
   // Preview: the sign_field() anchors of the Print Format, drawn on the rendered pages.
   await expect(wizard.getByTestId('anchor-preview')).toBeVisible()
   await expect(wizard.getByTestId('anchor')).toHaveCount(3)
-  await expect(wizard.getByText('No signer has this role; the field stays empty.')).toBeVisible()
+  await expect(wizard.getByTestId('warnings')).toBeVisible()
   await expect(wizard.getByTestId('anchor-preview').locator('canvas').first()).toBeVisible()
   await wizard.waitForTimeout(1000)
   await wizard.screenshot({ path: '../e2e/test-results/wizard-anchor-preview.png', fullPage: true })
-  await wizard.getByTestId('preview-next').click()
+  await wizard.getByTestId('next').click()
 
   await wizard.getByTestId('send').click()
   await expect(wizard.getByTestId('envelope-detail')).toBeVisible()
-  await expect(wizard.getByTestId('recipient').first()).toContainText('ahmed@gulftrading.example')
+  await expect(wizard.getByTestId('person').first()).toContainText('Ahmed')
 })

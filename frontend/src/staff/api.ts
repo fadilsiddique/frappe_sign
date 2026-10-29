@@ -28,3 +28,20 @@ export function errorMessage(error: unknown): string {
   if (messages?.length) return messages.join(' ').replace(/<[^>]+>/g, '')
   return error instanceof Error ? error.message : String(error)
 }
+
+// A public image (company logo): the signing page and emails show it to people who are not logged in.
+export async function uploadPublicImage(file: File): Promise<string> {
+  const body = new FormData()
+  body.append('file', file, file.name)
+  body.append('is_private', '0')
+  const csrf = window.csrf_token
+  const response = await fetch('/api/method/upload_file', {
+    method: 'POST',
+    body,
+    credentials: 'same-origin',
+    headers: csrf && csrf !== 'None' ? { 'X-Frappe-CSRF-Token': csrf } : {},
+  })
+  const result = (await response.json()) as { message?: { file_url?: string }; _server_messages?: string }
+  if (!response.ok || !result.message?.file_url) throw new Error(`Could not upload ${file.name}`)
+  return result.message.file_url
+}

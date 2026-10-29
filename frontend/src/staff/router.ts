@@ -20,11 +20,23 @@ export const routes: RouteRecordRaw[] = [
   { path: '/new', name: 'SendWizard', component: () => import('./pages/SendWizard.vue') },
   { path: '/templates', name: 'Templates', component: () => import('./pages/Templates.vue') },
   {
+    path: '/templates/new/print-format',
+    name: 'NewPrintFormatTemplate',
+    component: () => import('./pages/PrintFormatTemplate.vue'),
+  },
+  {
+    path: '/templates/:id/edit',
+    name: 'PrintFormatTemplate',
+    component: () => import('./pages/PrintFormatTemplate.vue'),
+    props: true,
+  },
+  {
     path: '/templates/:id/design',
     name: 'Designer',
     component: () => import('./pages/Designer.vue'),
     props: true,
   },
+  { path: '/settings', name: 'Settings', component: () => import('./pages/Settings.vue') },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('./pages/Home.vue') },
 ]
 

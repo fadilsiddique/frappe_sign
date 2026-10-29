@@ -1,5 +1,7 @@
 // Words and links for the "Set up signing" steps (UX_PLAN "Home"). The server says what is done;
-// this file says it to the user. Until /sign/settings exists (U.9), setup opens the Desk forms.
+// this file says it to the user. The seal, profile and documents steps open Settings; email is an
+// Email Account, which only Desk edits.
+import type { RouteDestination } from 'frappe-ui'
 import { __ } from '@/shared/translate'
 import { shortDate } from '../format'
 import type { SetupKey, SetupStatus, SetupStep } from './types'
@@ -15,7 +17,7 @@ export interface StepView {
   summary: string | null
   text: string
   action: string
-  route?: string
+  route?: RouteDestination
   href?: string
 }
 
@@ -49,7 +51,7 @@ function view(step: SetupStep): Omit<StepView, 'number' | 'done' | 'optional' | 
           'The seal proves the signed PDF was not changed after signing. A test seal is fine to start.',
         ),
         action: facts.expired ? __('Create a new seal') : __('Create a seal'),
-        href: '/app/sign-certificate',
+        route: '/settings',
       }
     case 'profile': {
       const profile = str(facts.profile)
@@ -59,7 +61,7 @@ function view(step: SetupStep): Omit<StepView, 'number' | 'done' | 'optional' | 
         summary: profile || null,
         text: __('Your logo and color appear on the signing page and in emails.'),
         action: __('Edit profile'),
-        href: profile ? `/app/sign-profile/${encodeURIComponent(profile)}` : '/app/sign-profile/new',
+        route: '/settings',
       }
     }
     case 'documents':
@@ -71,7 +73,7 @@ function view(step: SetupStep): Omit<StepView, 'number' | 'done' | 'optional' | 
           'Choose which ERPNext documents can be sent for signature. Most teams start with Quotation.',
         ),
         action: __('Choose documents'),
-        href: '/app/sign-settings',
+        route: { path: '/settings', query: { tab: 'documents' } },
       }
     case 'template':
       return {

@@ -23,6 +23,7 @@ test('design, publish and send a template', async ({ page }) => {
   page.once('dialog', (dialog) => dialog.accept('E2E Designer Template'))
   await page.goto('/sign/templates')
   await page.getByRole('button', { name: 'New template' }).click()
+  await page.getByTestId('kind-pdf').click()
   await expect(page.getByTestId('designer')).toBeVisible()
   await page.getByTestId('upload-pdf').setInputFiles(PDF)
   const pageBox = page.getByTestId('page-1')
@@ -49,7 +50,9 @@ test('design, publish and send a template', async ({ page }) => {
 
   // Send it with the wizard.
   await page.goto('/sign/new')
+  await page.getByTestId('choice-template').click()
   await page.getByRole('button', { name: 'E2E Designer Template' }).click()
+  await page.getByTestId('next').click()
   await page.getByPlaceholder('Full name').fill('Ahmed Khan')
   await page.getByPlaceholder('Email').fill('ahmed.e2e@example.com')
   await page.getByRole('button', { name: 'Next' }).click()
@@ -57,8 +60,9 @@ test('design, publish and send a template', async ({ page }) => {
 
   // The envelope detail with its audit trail.
   await expect(page.getByTestId('envelope-detail')).toBeVisible()
-  await expect(page.getByTestId('recipient')).toContainText('ahmed.e2e@example.com')
+  await expect(page.getByTestId('person').first()).toContainText('Ahmed Khan')
+  await page.getByRole('button', { name: 'Show audit details' }).click()
   await expect(page.getByTestId('event').first()).toContainText('Created')
-  await expect(page.getByTestId('chain')).toHaveText('Hash chain verified')
+  await expect(page.getByTestId('chain')).toHaveAttribute('aria-label', 'Verified')
   await page.screenshot({ path: '../e2e/test-results/staff-envelope.png' })
 })

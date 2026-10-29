@@ -104,7 +104,7 @@ Two columns: the work queue (wide) and a side panel (320 px). The side panel goe
   5. First template
   6. Send a test
 
-  The server (`get_setup_status`) reports what is done and who may fix each step; the staff app words it. "Documents you sign" counts only with ERPNext. Until Settings exists (U.9), steps 1 to 4 open their Desk forms.
+  The server (`get_setup_status`) reports what is done and who may fix each step; the staff app words it. "Documents you sign" counts only with ERPNext. Steps 2 to 4 open Settings; step 1 opens the Email Account in Desk.
 - **After setup, the side panel shows:**
   - This month: Completed, Waiting and Declined, as figures in one panel, not as separate cards.
   - Expiring soon: each request, who has not signed, and a Remind button.
@@ -192,7 +192,7 @@ A split view: the list on the left (about 400 px) and a preview of the selected 
 - **Documents tab:** enabled DocTypes, with the default template and the number of sends per DocType. Add one with a picker (System Manager).
 - **Signing tab:** expiry, reminders, emailed code, consent text.
 - **Advanced tab:** timestamp servers. The Phase 3 health panel (P3.7) goes here later.
-- **Permissions:** a Sign Manager can see Settings. A System Manager can change everything.
+- **Permissions:** a Sign Manager can see Settings. A System Manager can change everything (the server checks the role on every save, so a Sign Manager's Desk rights on Sign Profile do not apply here).
 
 ### Guest signing `/s/<token>` (phone first, 390 px)
 

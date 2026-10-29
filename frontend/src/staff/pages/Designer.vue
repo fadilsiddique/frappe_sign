@@ -1,15 +1,17 @@
 <script setup lang="ts">
 // Template designer (DESIGN 7.4): palette, pages, properties; save and publish a version.
 import { Button, FormControl, toast } from 'frappe-ui'
-import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { __ } from '@/shared/translate'
 import type { PageMetric } from '@/shared/coords'
 import { errorMessage, fetchPdf, fileToBase64, staff } from '../api'
 import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import FieldProperties from '../designer/FieldProperties.vue'
+import Palette from '../designer/Palette.vue'
+import PdfDropZone from '../designer/PdfDropZone.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
-import { FIELD_TYPES, useDesigner, type FieldType } from '../designer/store'
+import { useDesigner, type FieldType } from '../designer/store'
 import { otpModeLabel, signingOrderLabel } from '../labels'
 import { call } from 'frappe-ui'
 
@@ -21,6 +23,7 @@ const placing = ref<FieldType | null>(null)
 const saving = ref(false)
 const loadError = ref('')
 const publishedVersion = ref<string | null>(null)
+const saveState = computed(() => (saving.value ? __('Saving') : store.dirty ? __('Unsaved') : __('Saved')))
 
 interface TemplateDoc {
   name: string
@@ -48,9 +51,7 @@ async function load() {
   }
 }
 
-async function upload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
+async function upload(file: File) {
   try {
     await save(false)
     const result = await staff<{ metrics: PageMetric[] }>('upload_pdf', {
@@ -64,6 +65,11 @@ async function upload(event: Event) {
   } catch (error) {
     toast.error(errorMessage(error))
   }
+}
+
+function replace(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (file) void upload(file)
 }
 
 async function save(notify = true) {
@@ -107,67 +113,79 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
 
 <template>
   <div class="flex h-full flex-col" data-testid="designer">
-    <header class="flex items-center gap-3 border-b border-outline-gray-1 px-4 py-2">
-      <Button variant="ghost" :label="__('Templates')" @click="router.push('/templates')" />
+    <header
+      class="flex flex-wrap items-center gap-2 border-b border-outline-gray-1 bg-surface-base px-4 py-2"
+    >
+      <Button
+        variant="ghost"
+        icon="lucide-arrow-left"
+        :aria-label="__('Templates')"
+        @click="router.push('/templates')"
+      />
       <FormControl
         v-model="store.title"
-        class="w-72"
+        class="w-64 sm:w-72"
         :aria-label="__('Title')"
         @change="store.dirty = true"
       />
-      <span class="text-sm text-ink-gray-5">{{
-        publishedVersion ? __('Published: {0}', [publishedVersion]) : __('Not published')
-      }}</span>
+      <span class="text-sm text-ink-gray-6" data-testid="save-state" role="status">
+        {{ saveState }} ·
+        {{ publishedVersion ? __('Published: {0}', [publishedVersion]) : __('Not published') }}
+      </span>
       <div class="ms-auto flex items-center gap-2">
-        <Button :disabled="!store.canUndo" :label="__('Undo')" @click="store.undo()" />
-        <Button :disabled="!store.canRedo" :label="__('Redo')" @click="store.redo()" />
+        <Button
+          variant="ghost"
+          icon="lucide-undo-2"
+          :aria-label="__('Undo')"
+          :disabled="!store.canUndo"
+          data-testid="undo"
+          @click="store.undo()"
+        />
+        <Button
+          variant="ghost"
+          icon="lucide-redo-2"
+          :aria-label="__('Redo')"
+          :disabled="!store.canRedo"
+          data-testid="redo"
+          @click="store.redo()"
+        />
         <label
-          class="cursor-pointer rounded bg-surface-gray-2 px-3 py-1.5 text-sm text-ink-gray-8 hover:bg-surface-gray-3"
+          v-if="pdf"
+          class="cursor-pointer rounded bg-surface-gray-2 px-3 py-1.5 text-base text-ink-gray-8 hover:bg-surface-gray-3"
         >
-          {{ pdf ? __('Replace PDF') : __('Upload PDF') }}
+          {{ __('Replace PDF') }}
           <input
             type="file"
             accept="application/pdf"
             class="hidden"
-            data-testid="upload-pdf"
-            @change="upload"
+            data-testid="replace-pdf"
+            @change="replace"
           />
         </label>
-        <Button :loading="saving" :label="__('Save')" @click="save()" />
+        <Button variant="subtle" :loading="saving" :label="__('Save')" @click="save()" />
         <Button variant="solid" :label="__('Publish')" :disabled="!pdf" @click="publish" />
       </div>
     </header>
     <p v-if="loadError" class="p-4 text-ink-red-4">{{ loadError }}</p>
     <div v-else class="flex min-h-0 flex-1">
-      <aside
-        class="w-48 shrink-0 space-y-1 overflow-y-auto border-e border-outline-gray-1 p-3"
-        data-testid="palette"
-      >
-        <h3 class="mb-2 text-sm font-semibold text-ink-gray-8">{{ __('Add field') }}</h3>
-        <p class="mb-2 text-xs text-ink-gray-5">
-          {{ __('For {0}. Pick a type, then click the page.', [store.activeRole || '-']) }}
-        </p>
-        <button
-          v-for="type in FIELD_TYPES"
-          :key="type"
-          type="button"
-          class="block w-full rounded px-2 py-1.5 text-start text-sm"
-          :class="placing === type ? 'bg-surface-gray-4 font-medium' : 'hover:bg-surface-gray-2'"
-          :data-testid="`palette-${type}`"
-          @click="placing = placing === type ? null : type"
-        >
-          {{ __(type) }}
-        </button>
+      <aside class="w-52 shrink-0 overflow-y-auto border-e border-outline-gray-1 bg-surface-base p-3">
+        <Palette
+          :placing="placing"
+          :role="store.activeRole || ''"
+          @pick="placing = placing === $event ? null : $event"
+        />
       </aside>
       <main class="min-w-0 flex-1 overflow-y-auto bg-surface-gray-2 p-4">
         <DesignerCanvas v-if="pdf" :source="pdf" :placing="placing" @placed="placing = null" />
-        <div v-else class="mx-auto mt-20 max-w-sm text-center text-ink-gray-6">
-          {{ __('Upload the PDF to place fields on it.') }}
-        </div>
+        <PdfDropZone v-else @file="upload" />
       </main>
-      <aside class="w-80 shrink-0 space-y-6 overflow-y-auto border-s border-outline-gray-1 p-3">
-        <div class="space-y-2">
-          <h3 class="text-sm font-semibold text-ink-gray-8">{{ __('Template') }}</h3>
+      <aside
+        class="flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-s border-outline-gray-1 bg-surface-base p-3"
+      >
+        <RolesPanel />
+        <FieldProperties />
+        <div class="flex flex-col gap-3">
+          <h3 class="text-base font-semibold text-ink-gray-9">{{ __('Signing') }}</h3>
           <FormControl
             v-model="store.signingOrder"
             type="select"
@@ -181,8 +199,6 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
             :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
           />
         </div>
-        <FieldProperties />
-        <RolesPanel />
       </aside>
     </div>
   </div>

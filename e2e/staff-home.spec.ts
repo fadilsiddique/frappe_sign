@@ -60,11 +60,11 @@ test('the setup panel leads an empty site through setup', async ({ page }) => {
   await answerSetup(page, 1)
   await page.reload()
   await expect(panel.locator('[data-step="email"]')).toContainText('sign@gulftrading.example')
-  await expect(openStep.getByRole('link', { name: 'Create a seal' })).toHaveAttribute('href', '/app/sign-certificate')
+  await expect(openStep.getByRole('link', { name: 'Create a seal' })).toHaveAttribute('href', '/sign/settings')
 
   await answerSetup(page, 3)
   await page.reload()
-  await expect(openStep.getByRole('link', { name: 'Choose documents' })).toHaveAttribute('href', '/app/sign-settings')
+  await expect(openStep.getByRole('link', { name: 'Choose documents' })).toHaveAttribute('href', '/sign/settings?tab=documents')
 
   // The last steps stay in the staff app.
   await answerSetup(page, 5)

@@ -42,7 +42,7 @@ describe('SetupPanel', () => {
     expect(details[0]!.element.closest('li')!.dataset.step).toBe('seal')
     const action = details[0]!.find('a')
     expect(action.text()).toContain('Create a seal')
-    expect(action.attributes('href')).toBe('/app/sign-certificate')
+    expect(action.attributes('href')).toBe('/settings')
   })
 
   it('shows what a done step set up, and opens any step on click', async () => {

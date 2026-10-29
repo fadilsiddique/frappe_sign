@@ -2,6 +2,8 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { activityLines, type ActivityEvent } from '@/staff/requests/activity'
+import { nextPeople, type Person } from '@/staff/requests/people'
+import { checkWarnings } from '@/staff/send/warnings'
 import { requestLine } from '@/staff/requests/lines'
 import RequestList from '@/staff/requests/RequestList.vue'
 import RequestsToolbar from '@/staff/requests/RequestsToolbar.vue'
@@ -220,5 +222,80 @@ describe('filters and routes', () => {
     }
     expect(redirect('/envelopes')).toEqual({ path: '/requests', query: { status: 'open' } })
     expect(redirect('/envelopes/:id')).toEqual({ path: '/requests/SIGN-1', query: { status: 'open' } })
+  })
+})
+
+describe('nextPeople', () => {
+  const person = (name: string, status: string, order: number, kind = 'Signer'): Person => ({
+    name,
+    role_label: name,
+    kind,
+    routing_order: order,
+    full_name: name,
+    email: `${name}@example.com`,
+    status,
+    signed_on: null,
+    viewed_on: null,
+    decline_reason: null,
+  })
+
+  it('is the lowest unfinished order in a signing order, and ignores copies', () => {
+    const people = [
+      person('a', 'Signed', 1),
+      person('b', 'Viewed', 2),
+      person('c', 'Pending', 3),
+      person('d', 'Sent', 3, 'CC'),
+    ]
+    expect([...nextPeople(people, 'Sequential')]).toEqual(['b'])
+  })
+
+  it('is everyone still waiting when signing all at once', () => {
+    const people = [person('a', 'Signed', 1), person('b', 'Sent', 2), person('c', 'Viewed', 3)]
+    expect([...nextPeople(people, 'Parallel')]).toEqual(['b', 'c'])
+  })
+
+  it('is empty when everyone finished', () => {
+    expect(nextPeople([person('a', 'Signed', 1)], 'Sequential').size).toBe(0)
+  })
+})
+
+describe('checkWarnings', () => {
+  const anchor = (role: string) => ({
+    tag: role,
+    role,
+    field_type: 'Signature',
+    n: 1,
+    page: 1,
+    x: 0,
+    y: 0,
+    w: 1,
+    h: 1,
+  })
+  const recipient = (role_label: string, kind = 'Signer') => ({
+    role_label,
+    kind,
+    routing_order: 1,
+    full_name: 'A',
+    email: 'a@example.com',
+  })
+
+  it('warns about a role nobody has and a signer without a field', () => {
+    const warnings = checkWarnings(
+      [anchor('Customer'), anchor('Witness')],
+      [recipient('Customer'), recipient('Company')],
+    )
+    expect(warnings).toHaveLength(2)
+    expect(warnings[0]).toContain('Witness')
+    expect(warnings[1]).toContain('Company')
+  })
+
+  it('matches roles with spaces by their underscore token, and ignores copies', () => {
+    expect(
+      checkWarnings([anchor('Sales_Manager')], [recipient('Sales Manager'), recipient('Archive', 'CC')]),
+    ).toEqual([])
+  })
+
+  it('says so when the document has no sign_field()', () => {
+    expect(checkWarnings([], [recipient('Customer')])).toHaveLength(1)
   })
 })

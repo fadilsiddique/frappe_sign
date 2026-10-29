@@ -1,20 +1,29 @@
 <script setup lang="ts">
-// Request detail: people and their progress, audit timeline, actions (DESIGN 7.2). U.5 redesigns it.
-import { Button, createResource, toast } from 'frappe-ui'
-import { computed, onBeforeUnmount } from 'vue'
+// A request's own page (UX_PLAN "Request detail"): the PDF, with the signed values once there are
+// any, beside the people as a step list, the main action for its state and what happened.
+import { Button, createResource, Dropdown } from 'frappe-ui'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import PdfViewer from '@/shared/components/PdfViewer.vue'
+import type { PageMetric } from '@/shared/coords'
 import { __ } from '@/shared/translate'
-import { errorMessage, STAFF_API, staff } from '../api'
+import { errorMessage, fetchPdf } from '../api'
 import AppPageHeader from '../components/AppPageHeader.vue'
 import ResourceState from '../components/ResourceState.vue'
 import StatusBadge from '../components/StatusBadge.vue'
-import { roleKindLabel } from '../labels'
+import { shortDate } from '../format'
+import type { ActivityEvent } from '../requests/activity'
+import ActivityTimeline from '../requests/ActivityTimeline.vue'
+import PeopleSteps from '../requests/PeopleSteps.vue'
+import type { Person } from '../requests/people'
+import { downloadUrl, useRequestActions } from '../requests/useRequestActions'
+import { useRequestView } from '../requests/useRequestView'
 
 const props = defineProps<{ id: string }>()
 
 interface Detail {
   envelope: Record<string, string | null>
-  recipients: Array<Record<string, string | number | null>>
-  events: Array<{ seq: number; event: string; at: string; actor: string | null; ip: string | null }>
+  recipients: Person[]
+  events: ActivityEvent[]
   chain_ok: boolean
   can_write: boolean
 }
@@ -26,33 +35,59 @@ const detail = createResource({
 })
 const data = computed(() => detail.data as Detail | null)
 const envelope = computed(() => data.value?.envelope ?? {})
-const open = computed(() => ['Sent', 'In Progress'].includes(String(envelope.value.status)))
+const actions = useRequestActions(() => detail.reload())
+const { open, primary, menu } = useRequestView(
+  computed(() =>
+    data.value
+      ? {
+          ...data.value.envelope,
+          name: props.id,
+          status: String(data.value.envelope.status),
+          can_write: data.value.can_write,
+        }
+      : null,
+  ),
+  actions,
+)
 
-async function act(method: string, args: Record<string, unknown>, done: string) {
+const sentLine = computed(() => {
+  const sentOn = envelope.value.sent_on
+  const sender = envelope.value.sender
+  if (!sentOn) return __('Not sent yet')
+  return sender
+    ? __('Sent {0} by {1}', [shortDate(sentOn.slice(0, 10)), sender])
+    : __('Sent {0}', [shortDate(sentOn.slice(0, 10))])
+})
+
+// The PDF: the sealed one once there is one, else the original. It is read again when the seal lands.
+const kind = computed(() =>
+  envelope.value.signed_sha256 ? 'signed' : envelope.value.original_sha256 ? 'original' : null,
+)
+const pages = computed<PageMetric[]>(() => {
   try {
-    await staff(method, { envelope: props.id, ...args })
-    toast.success(done)
-    await detail.reload()
-  } catch (error) {
-    toast.error(errorMessage(error))
+    return JSON.parse(String(envelope.value.page_metrics ?? '[]')) as PageMetric[]
+  } catch {
+    return []
   }
-}
+})
+const pdf = shallowRef<ArrayBuffer | null>(null)
+const pdfError = ref('')
+watch(
+  kind,
+  async (value) => {
+    pdf.value = null
+    pdfError.value = ''
+    if (!value) return
+    try {
+      pdf.value = await fetchPdf(downloadUrl(props.id, value))
+    } catch (error) {
+      pdfError.value = errorMessage(error)
+    }
+  },
+  { immediate: true },
+)
 
-function voidEnvelope() {
-  const reason = window.prompt(__('Why are you voiding this request?'))
-  if (reason) void act('void_envelope', { reason }, __('Voided'))
-}
-
-function resend(recipient: string, email: string) {
-  const next = window.prompt(__('Send a new link to'), email)
-  if (next) void act('resend', { recipient, email: next }, __('New link sent'))
-}
-
-function downloadUrl(kind: string) {
-  return `/api/method/${STAFF_API}download?envelope=${encodeURIComponent(props.id)}&kind=${kind}`
-}
-
-// The envelope changes as signers act and the seal job runs; refresh while it is open.
+// The request changes as people sign and the seal job runs; refresh while it is open.
 const timer = window.setInterval(() => {
   const busy =
     ['Queued', 'Sealing'].includes(String(envelope.value.sealing_state)) ||
@@ -63,127 +98,93 @@ onBeforeUnmount(() => window.clearInterval(timer))
 </script>
 
 <template>
-  <AppPageHeader :title="String(envelope.title ?? __('Request'))">
-    <template v-if="data" #actions>
-      <Button
-        v-if="envelope.status === 'Draft' && envelope.send_state !== 'Queued' && data.can_write"
-        variant="solid"
-        :label="__('Send')"
-        @click="act('send_envelope', {}, __('Sending'))"
-      />
-      <Button
-        v-if="open && data.can_write"
-        :label="__('Remind')"
-        @click="act('remind', {}, __('Reminder sent'))"
-      />
-      <Button v-if="open && data.can_write" theme="red" :label="__('Void')" @click="voidEnvelope" />
-      <Button
-        v-if="envelope.sealing_state === 'Failed'"
-        :label="__('Retry seal')"
-        @click="act('retry_seal', {}, __('Sealing queued'))"
-      />
-      <a
-        v-if="envelope.original_sha256"
-        :href="downloadUrl('original')"
-        class="rounded bg-surface-gray-2 px-3 py-1.5 text-sm text-ink-gray-8"
-        >{{ __('Original PDF') }}</a
-      >
-      <a
-        v-if="envelope.signed_sha256"
-        :href="downloadUrl('signed')"
-        class="rounded bg-surface-gray-2 px-3 py-1.5 text-sm text-ink-gray-8"
-        >{{ __('Signed PDF') }}</a
-      >
-      <a
-        v-if="envelope.signed_sha256"
-        :href="downloadUrl('certificate')"
-        class="rounded bg-surface-gray-2 px-3 py-1.5 text-sm text-ink-gray-8"
-        >{{ __('Certificate') }}</a
-      >
-    </template>
-  </AppPageHeader>
+  <AppPageHeader :title="String(envelope.title ?? __('Request'))" />
   <ResourceState :resource="detail" :rows="4">
-    <div v-if="data" class="max-w-5xl space-y-6 p-4 sm:p-5" data-testid="envelope-detail">
-      <div>
-        <p class="text-sm text-ink-gray-6">{{ envelope.name }}</p>
-        <div class="mt-2">
-          <StatusBadge
-            :status="String(envelope.status)"
-            :sealing="String(envelope.sealing_state)"
-            :sending="String(envelope.send_state)"
+    <div
+      v-if="data"
+      class="flex flex-col gap-4 p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:p-5"
+      data-testid="envelope-detail"
+    >
+      <aside
+        class="flex flex-col gap-5 rounded-lg border border-outline-gray-1 bg-surface-base p-5 lg:sticky lg:top-5 lg:order-2"
+        :aria-label="__('Request details')"
+      >
+        <div class="flex flex-col gap-1.5">
+          <span class="flex flex-wrap items-center gap-2">
+            <StatusBadge
+              :status="String(envelope.status)"
+              :sealing="String(envelope.sealing_state)"
+              :sending="String(envelope.send_state)"
+            />
+            <span class="text-sm text-ink-gray-6">{{ sentLine }}</span>
+          </span>
+          <h2 class="text-xl font-semibold text-ink-gray-9 lg:sr-only" data-testid="detail-title">
+            {{ envelope.title }}
+          </h2>
+          <a
+            v-if="envelope.reference_name"
+            :href="`/app/${String(envelope.reference_doctype).toLowerCase().replace(/ /g, '-')}/${encodeURIComponent(String(envelope.reference_name))}`"
+            class="text-sm text-ink-gray-7 underline decoration-outline-gray-3 underline-offset-2 hover:text-ink-gray-9"
+            >{{ __(String(envelope.reference_doctype)) }} {{ envelope.reference_name }}</a
+          >
+          <p v-if="envelope.send_error" class="text-sm text-ink-red-4">{{ envelope.send_error }}</p>
+          <p v-if="envelope.void_reason" class="text-sm text-ink-gray-7">
+            {{ __('Reason: {0}', [String(envelope.void_reason)]) }}
+          </p>
+        </div>
+
+        <div v-if="primary || menu.length" class="flex items-center gap-2">
+          <Button
+            v-if="primary"
+            class="flex-1"
+            variant="solid"
+            :label="primary.label"
+            :icon-left="primary.icon"
+            :href="primary.href"
+            :route="primary.route"
+            data-testid="primary-action"
+            @click="primary.run?.()"
+          />
+          <Dropdown v-if="menu.length" :options="menu" placement="right">
+            <Button
+              variant="outline"
+              icon="lucide-ellipsis"
+              :aria-label="__('More actions')"
+              data-testid="more-actions"
+            />
+          </Dropdown>
+        </div>
+
+        <PeopleSteps
+          :people="data.recipients"
+          :order="envelope.signing_order"
+          :status="String(envelope.status)"
+          :can-act="data.can_write"
+          @remind="(person) => actions.remind(id, person.name)"
+          @new-link="(person) => actions.newLink(id, person.name, person.email)"
+        />
+
+        <div class="border-t border-outline-gray-1 pt-4">
+          <ActivityTimeline
+            :events="data.events"
+            :people="data.recipients"
+            :chain-ok="data.chain_ok"
+            :audit-head="envelope.audit_head"
           />
         </div>
-        <p v-if="envelope.send_error" class="mt-2 text-sm text-ink-red-4">{{ envelope.send_error }}</p>
-      </div>
-      <section class="rounded-lg border border-outline-gray-1 bg-surface-base">
-        <h2 class="border-b border-outline-gray-1 px-4 py-3 text-base font-semibold text-ink-gray-8">
-          {{ __('People') }}
-        </h2>
-        <div
-          v-for="row in data.recipients"
-          :key="String(row.name)"
-          class="flex flex-wrap items-center justify-between gap-2 px-4 py-3"
-          data-testid="recipient"
-        >
-          <div>
-            <p class="text-base text-ink-gray-9">
-              {{ row.full_name }}
-              <span class="text-sm text-ink-gray-5"
-                >· {{ row.role_label }} ({{ roleKindLabel(String(row.kind)) }})</span
-              >
-            </p>
-            <p class="text-sm text-ink-gray-5">{{ row.email }}</p>
-            <p v-if="row.decline_reason" class="text-sm text-ink-red-4">{{ row.decline_reason }}</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-ink-gray-7"
-              >{{ __(String(row.status))
-              }}<template v-if="row.signed_on"> · {{ row.signed_on }}</template></span
-            >
-            <Button
-              v-if="open && data.can_write && ['Sent', 'Viewed'].includes(String(row.status))"
-              size="sm"
-              :label="__('New link')"
-              @click="resend(String(row.name), String(row.email))"
-            />
-          </div>
-        </div>
-      </section>
+      </aside>
 
-      <section class="rounded-lg border border-outline-gray-1 bg-surface-base">
-        <div class="flex items-center justify-between border-b border-outline-gray-1 px-4 py-3">
-          <h2 class="text-base font-semibold text-ink-gray-8">{{ __('Audit trail') }}</h2>
-          <span
-            class="text-sm"
-            :class="data.chain_ok ? 'font-medium text-ink-green-4' : 'font-medium text-ink-red-4'"
-            data-testid="chain"
-          >
-            {{ data.chain_ok ? __('Hash chain verified') : __('Hash chain broken') }}
-          </span>
-        </div>
-        <ol class="divide-y divide-outline-gray-1">
-          <li
-            v-for="event in data.events"
-            :key="event.seq"
-            class="grid grid-cols-[3rem_1fr] gap-2 px-4 py-2 text-sm"
-            data-testid="event"
-          >
-            <span class="text-ink-gray-5">#{{ event.seq }}</span>
-            <span>
-              <span class="font-medium text-ink-gray-9">{{ __(event.event) }}</span>
-              <span class="text-ink-gray-6">
-                · {{ event.at }}<template v-if="event.actor"> · {{ event.actor }}</template
-                ><template v-if="event.ip"> · {{ event.ip }}</template></span
-              >
-            </span>
-          </li>
-        </ol>
-        <p
-          v-if="envelope.audit_head"
-          class="break-all border-t border-outline-gray-1 px-4 py-2 text-xs text-ink-gray-5"
-        >
-          {{ __('Audit head on the certificate: {0}', [String(envelope.audit_head)]) }}
+      <section
+        class="min-w-0 rounded-lg bg-surface-gray-2 p-3 lg:order-1 lg:p-5"
+        :aria-label="__('Document')"
+        data-testid="detail-pdf"
+      >
+        <p v-if="pdfError" class="py-10 text-center text-sm text-ink-red-4">{{ pdfError }}</p>
+        <p v-else-if="!kind" class="py-10 text-center text-sm text-ink-gray-6">
+          {{ __('The document is not ready yet.') }}
         </p>
+        <PdfViewer v-else-if="pdf" :source="pdf" :pages="pages" @error="pdfError = errorMessage($event)" />
+        <p v-else class="py-10 text-center text-sm text-ink-gray-6">{{ __('Loading the document') }}</p>
       </section>
     </div>
   </ResourceState>
