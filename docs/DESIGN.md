@@ -422,7 +422,7 @@ The dispatcher (`services/trigger.dispatch`) handles `after_insert`, `on_update`
 ### 4.8 Dashboards and portal
 
 - `override_doctype_dashboards` adds a "Signatures" group to Customer, Supplier and Employee dashboards via `party_type` / `party` on Sign Envelope.
-- Portal menu item "My Documents" lists envelopes where the logged-in user's email is a recipient, with signed copy download.
+- Portal menu item "My signed documents" (`/my-signatures`, `www/my_signatures.py`) lists Completed envelopes where the logged-in user's email (case-insensitive) is a Signer or Approver who signed. Rows carry only `name`, `title`, `company` and `completed_on`: no source document and no other recipients. `api/portal.download` (login required, never guest) streams the sealed PDF with `Cache-Control: no-store` and writes a `Downloaded` event with channel `portal`. A name that is not the user's gets the same permission error as one that does not exist. `services/portal.py` reads without document permissions because portal users have none on Sign Envelope; the email filter is the access check.
 
 ---
 

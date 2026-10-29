@@ -29,6 +29,11 @@ website_route_rules = [
 # sign_field() places signature fields in Print Formats (DESIGN 4.2).
 jinja = {"methods": ["frappe_sign.jinja.sign_field"]}
 
+# Portal menu: "My signed documents" for any logged-in person (DESIGN 4.9).
+standard_portal_menu_items = [
+	{"title": "My signed documents", "route": "/my-signatures"},
+]
+
 # Signatures group on party dashboards (DESIGN 4.8); these DocTypes exist only with ERPNext.
 override_doctype_dashboards = {
 	"Customer": "frappe_sign.erpnext.dashboards.customer",
