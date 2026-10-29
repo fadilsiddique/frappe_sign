@@ -961,3 +961,39 @@ Could not read the certificate: {0},تعذّرت قراءة الشهادة: {0}
 Sign Certificate {0}: {1},شهادة التوقيع {0}: {1}
 This PKCS#11 library is not in the site's list of allowed libraries.,مكتبة PKCS#11 هذه ليست في قائمة المكتبات المسموح بها للموقع.
 "PKCS#11: {""type"": ""pkcs11"", ""module_path"": ""/usr/lib/softhsm/libsofthsm2.so"", ""token_label"": ""..."", ""key_label"": ""...""}. CSC: {""type"": ""csc"", ""service_url"": ""https://..."", ""credential_id"": ""...""}","لـ PKCS#11: {""type"": ""pkcs11"", ""module_path"": ""/usr/lib/softhsm/libsofthsm2.so"", ""token_label"": ""..."", ""key_label"": ""...""}. ولـ CSC: {""type"": ""csc"", ""service_url"": ""https://..."", ""credential_id"": ""...""}"
+All {0} servers answer.,كل الخوادم ({0}) تردّ.
+Automatic sending,الإرسال التلقائي
+Check that a long-queue worker is running.,تأكد من أن عامل الطابور الطويل (long) يعمل.
+"Create a seal in Settings, Company.",أنشئ ختماً في الإعدادات، الشركة.
+Email delivery,تسليم البريد الإلكتروني
+Invitations land in spam unless the sending domain publishes an SPF record that lists your mail server and a DKIM key. Ask your mail provider for both.,تصل الدعوات إلى البريد المزعج ما لم ينشر نطاق الإرسال سجل SPF يذكر خادم بريدك ومفتاح DKIM. اطلب الاثنين من مزوّد بريدك.
+No company profile yet.,لا يوجد ملف توقيع للشركة بعد.
+No failed runs in the last 24 hours.,لا توجد عمليات فاشلة في آخر 24 ساعة.
+No sender email account is set up.,لم يُعدّ حساب بريد للمرسِل.
+Nothing is waiting to be sealed.,لا شيء بانتظار الختم.
+Open Sign Trigger Log in Desk and filter by Failed to see why.,افتح سجل مشغّل التوقيع في سطح المكتب وصفِّ حسب «فشل» لمعرفة السبب.
+Open the request and use Retry seal.,افتح الطلب واستخدم «إعادة محاولة الختم».
+SPF and DKIM found for {0}.,تم العثور على SPF وDKIM للنطاق {0}.
+Sealing queue,طابور الختم
+"Sealing tries the servers in order. Add another server in Settings, Advanced.",يجرّب الختم الخوادم بالترتيب. أضف خادماً آخر في الإعدادات، متقدمة.
+The DNS records could not be checked from this server.,تعذّر فحص سجلات DNS من هذا الخادم.
+"The oldest, {0}, has waited {1} minutes.",أقدمها، {0}، ينتظر منذ {1} دقيقة.
+"Upload a new certificate in Settings, Company before the old one ends.",ارفع شهادة جديدة في الإعدادات، الشركة قبل انتهاء القديمة.
+no DKIM key found for {0} (only common selectors are tried),لم يُعثر على مفتاح DKIM للنطاق {0} (تُجرَّب المحددات الشائعة فقط)
+{0} failed runs in the last 24 hours.,فشلت {0} عملية في آخر 24 ساعة.
+{0} has no SPF record,النطاق {0} ليس له سجل SPF
+{0} seals failed ({1}).,فشل ختم {0} ({1}).
+{0}: no seal certificate,{0}: لا توجد شهادة ختم
+{0}: the end date is not known yet,{0}: تاريخ الانتهاء غير معروف بعد
+{0}: the seal ends in {1} days,{0}: ينتهي الختم بعد {1} يوماً
+{0}: the seal has ended,{0}: انتهى الختم
+{0}: valid until {1},{0}: صالح حتى {1}
+Health,الصحة
+Fine,سليم
+For your information,للعلم
+Needs a look,يحتاج إلى نظرة
+Needs fixing,يحتاج إلى إصلاح
+Everything looks fine.,كل شيء يبدو سليماً.
+Something needs a look.,هناك ما يحتاج إلى نظرة.
+Something needs fixing now.,هناك ما يحتاج إلى إصلاح الآن.
+Check again,افحص مرة أخرى

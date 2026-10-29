@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
+import hashlib
+import secrets
 from collections.abc import Callable, Iterable
 
-from asn1crypto import tsp
+from asn1crypto import algos, tsp
 from pyhanko.sign.timestamps import HTTPTimeStamper, TimeStamper, TimestampRequestError
 
 TIMEOUT_SECONDS = 10
@@ -54,3 +57,27 @@ class FallbackTimeStamper(TimeStamper):
 				return response
 			failures.append(f"{url}: status {status}")
 		raise TimestampRequestError("No TSA granted a timestamp. " + "; ".join(failures))
+
+
+def probe(url: str, timeout: int = 5, factory: TimeStamperFactory = http_timestamper) -> str | None:
+	"""Ask one TSA for a timestamp of a dummy digest. None when it grants one, else why not.
+	Used by the health panel; it never raises."""
+	request = tsp.TimeStampReq(
+		{
+			"version": "v1",
+			"message_imprint": tsp.MessageImprint(
+				{
+					"hash_algorithm": algos.DigestAlgorithm({"algorithm": "sha256"}),
+					"hashed_message": hashlib.sha256(b"frappe-sign-health-check").digest(),
+				}
+			),
+			"nonce": secrets.randbits(63),
+			"cert_req": True,
+		}
+	)
+	try:
+		response = asyncio.run(factory(url, timeout).async_request_tsa_response(request))
+		status = response["status"]["status"].native
+	except (TimestampRequestError, OSError, ValueError) as error:
+		return f"{url}: {error}"
+	return None if status in GRANTED else f"{url}: status {status}"

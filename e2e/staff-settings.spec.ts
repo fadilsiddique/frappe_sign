@@ -91,6 +91,17 @@ test('a System Manager sets up the company, the documents and the defaults', asy
   await page.getByTestId('settings-tab-advanced').click()
   await expect(page.getByTestId('tsa-urls')).toBeVisible()
 
+  // Health tab (P3.7): the seal just uploaded is valid, every check shows a status.
+  await page.getByTestId('settings-tab-health').click()
+  await expect(page.getByTestId('health-summary')).toBeVisible()
+  await expect(page.getByTestId('health-seal')).toHaveAttribute('data-status', /ok|warn/)
+  for (const key of ['tsa', 'seals', 'triggers', 'email']) {
+    await expect(page.getByTestId(`health-${key}`)).toHaveAttribute('data-status', /ok|info|warn|fail/)
+  }
+  await page.getByTestId('health-refresh').click()
+  await expect(page.getByTestId('health-tsa')).toBeVisible()
+  await page.screenshot({ path: `${SHOTS}/p37-settings-health-1440.png` })
+
   // Phone width.
   await page.setViewportSize({ width: 390, height: 844 })
   await page.getByTestId('settings-tab-company').click()

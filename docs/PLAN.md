@@ -138,7 +138,7 @@ Make the app easy to understand and pleasant to use before Phase 3. The screen a
 | [x] P3.4 | Portal "My Documents" | Contact sees and downloads own signed docs only |
 | [x] P3.5 | Full Arabic UI, RTL layout, Arabic Email Templates | RTL visual QA on all screens |
 | [x] P3.6 | `RemoteSigner` (PKCS#11 and CSC) behind `Signer` | Tested with SoftHSM in CI |
-| P3.7 | Health panel: cert expiry, TSA reachability, oldest queued seal, failed triggers 24 h, SPF/DKIM hints | Visible in settings |
+| [x] P3.7 | Health panel: cert expiry, TSA reachability, oldest queued seal, failed triggers 24 h, SPF/DKIM hints | Visible in settings |
 | P3.8 | Security review against DESIGN.md section 5; `pip-audit`, `yarn audit`; load test 150-page PDFs, 50 concurrent signers | Findings fixed or tracked |
 | P3.9 | Docs: README, admin guide, API reference, CHANGELOG; tag v1.0.0 | Release published |
 

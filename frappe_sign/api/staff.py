@@ -17,6 +17,7 @@ from frappe_sign.services import (
 	certificates,
 	doctypes,
 	documents,
+	health,
 	home,
 	pickers,
 	preview,
@@ -243,6 +244,14 @@ def upload_certificate(
 	`file` or base64 `content`."""
 	file_name, data = uploaded_file(file_name, content)
 	return certificates.upload_certificate(company, file_name, data, password, kind)
+
+
+@frappe.whitelist()
+@with_error_code
+def get_health(refresh: bool = False) -> dict:
+	"""Settings, Health: seal end dates, timestamp servers, the sealing queue, failed triggers and
+	the sender's SPF and DKIM. `refresh` asks the timestamp servers again."""
+	return health.report(bool(frappe.parse_json(refresh)))
 
 
 @frappe.whitelist()

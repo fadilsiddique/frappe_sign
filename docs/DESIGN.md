@@ -573,9 +573,11 @@ Build output to `frappe_sign/public/frontend/`; a post-build script copies HTML 
 | `/sign/templates` | Templates | Grid of cards; New template asks the kind first |
 | `/sign/templates/new/print-format`, `/sign/templates/:id/edit` | Print Format template editor | DocType, Print Format, people, after-sign choices, preview, publish |
 | `/sign/templates/:id/design` | Designer | Place and configure fields, preview as signer, publish |
-| `/sign/settings` | Settings | Company, Documents, Signing and Advanced tabs (health panel in P3.7) |
+| `/sign/settings` | Settings | Company, Documents, Signing, Advanced and Health tabs |
 
 The public `/sign-verify` page is a server-rendered page, not part of the SPA: a drop zone or a request ID, and a result card (genuine, changed after signing, not sealed, not found). Emails use a table-based shell with the Sign Profile logo, name and brand color (`services/notify.py`).
+
+**Health tab (P3.7).** `services/health.py`, read through `api.staff.get_health` by a Sign Manager or System Manager. Five checks, each `ok`, `info`, `warn` or `fail`, with a detail and a hint: seal certificates (warn within 30 days, fail when ended or missing); timestamp servers (a real RFC 3161 request to each, `crypto/tsa.probe`, cached ten minutes, "Check again" refreshes; warn when some fail, fail when all do); the sealing queue (oldest Queued or Sealing envelope: warn at 15 minutes, fail at 60 or when any seal Failed); Sign Trigger Logs that failed in the last 24 hours (warn); the sender domain's SPF record and DKIM key (dnspython; DKIM tries common selectors, so a miss is only `info`; without a resolver the panel gives hints). The overall status is the worst check. Nothing secret is returned.
 
 ### 7.3 Guest flow
 

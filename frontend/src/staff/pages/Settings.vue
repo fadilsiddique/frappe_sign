@@ -11,6 +11,7 @@ import ResourceState from '../components/ResourceState.vue'
 import AdvancedTab from '../settings/AdvancedTab.vue'
 import CompanyTab from '../settings/CompanyTab.vue'
 import DocumentsTab from '../settings/DocumentsTab.vue'
+import HealthTab from '../settings/HealthTab.vue'
 import SigningTab from '../settings/SigningTab.vue'
 import { SETTINGS_TABS, type SettingsData, type SettingsTab } from '../settings/types'
 import { useSetupStatus } from '../home/resources'
@@ -95,7 +96,8 @@ function move(event: KeyboardEvent, index: number) {
         <CompanyTab v-if="tab === 'company'" :data="data" @changed="changed" />
         <DocumentsTab v-else-if="tab === 'documents'" :data="data" @changed="changed" />
         <SigningTab v-else-if="tab === 'signing'" :data="data" @changed="changed" />
-        <AdvancedTab v-else :data="data" @changed="changed" />
+        <AdvancedTab v-else-if="tab === 'advanced'" :data="data" @changed="changed" />
+        <HealthTab v-else />
       </div>
     </ResourceState>
   </div>

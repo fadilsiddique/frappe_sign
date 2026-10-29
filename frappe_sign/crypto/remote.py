@@ -34,30 +34,32 @@ from pyhanko.sign.signers.csc_signer import (
 )
 
 from frappe_sign.crypto.signer import SignerError
-from frappe_sign.utils.remote_config import CSC, PKCS11, parse_config
+
+PKCS11, CSC = "pkcs11", "csc"
 
 # What a token, a library or a service can raise before a signature exists.
 REMOTE_ERRORS = (PKCS11Error, SigningError, aiohttp.ClientError, TimeoutError, OSError, RuntimeError)
 
 
 class RemoteSigner:
-	def __init__(
-		self, config: dict[str, Any] | str, pin: str | None = None, token: str | None = None
-	) -> None:
-		self._config = parse_config(config)
+	def __init__(self, config: dict[str, Any], pin: str | None = None, token: str | None = None) -> None:
+		"""`config` is already validated (utils/remote_config.parse_config): crypto/ imports no utils."""
+		self._config = dict(config)
 		self._pin = pin
 		self._token = token
 
 	def __repr__(self) -> str:
-		return f"RemoteSigner({self._config['type']}, <secrets hidden>)"
+		return f"RemoteSigner({self._config.get('type')}, <secrets hidden>)"
 
 	@asynccontextmanager
 	async def open(self) -> AsyncIterator[signers.Signer]:
-		opener = self._open_pkcs11 if self._config["type"] == PKCS11 else self._open_csc
+		opener = self._open_pkcs11 if self._config.get("type") == PKCS11 else self._open_csc
 		try:
 			async with opener() as signer:
 				require_valid_now(signer.signing_cert, datetime.now(UTC))
 				yield signer
+		except KeyError as error:
+			raise SignerError(f"The remote signing settings are incomplete: {error}") from error
 		except REMOTE_ERRORS as error:
 			# The message never holds the PIN: pyHanko and python-pkcs11 do not put it there.
 			raise SignerError(f"Remote signing failed: {type(error).__name__}: {error}") from error

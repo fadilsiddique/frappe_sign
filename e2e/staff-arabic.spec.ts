@@ -82,6 +82,8 @@ test('the settings tabs in Arabic', async ({ page }) => {
   for (let index = 1; index < count; index++) {
     await tabs.nth(index).click()
     await page.waitForLoadState('networkidle')
+    // The health tab asks the timestamp servers, which takes a moment on the first visit.
+    if (index === count - 1) await expect(page.getByTestId('health-summary')).toBeVisible({ timeout: 40_000 })
     await page.screenshot({ path: `${OUT}/10-settings-tab-${index + 1}.png`, fullPage: true })
     expect(await untranslated(page)).toEqual([])
   }

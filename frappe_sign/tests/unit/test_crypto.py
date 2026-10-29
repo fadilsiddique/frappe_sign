@@ -12,7 +12,7 @@ from pyhanko.sign.timestamps.dummy_client import DummyTimeStamper
 
 from frappe_sign.crypto.pkcs12 import Pkcs12Error, inspect, require_usable
 from frappe_sign.crypto.signer import Pkcs12Signer, Signer, SignerError
-from frappe_sign.crypto.tsa import DEFAULT_TSA_URLS, FallbackTimeStamper, tsa_urls_or_default
+from frappe_sign.crypto.tsa import DEFAULT_TSA_URLS, FallbackTimeStamper, probe, tsa_urls_or_default
 
 CERTS = Path(__file__).resolve().parents[1] / "fixtures" / "certs"
 PASSWORD = b"fixture-seal"
@@ -130,3 +130,15 @@ class TestTimestamps(UnitTestCase):
 	def test_needs_at_least_one_url(self):
 		with self.assertRaises(ValueError):
 			FallbackTimeStamper([])
+
+
+class TestProbe(UnitTestCase):
+	def test_a_granting_server_probes_clean(self):
+		self.assertIsNone(probe("http://up.test", factory=lambda url, timeout: dummy_tsa()))
+
+	def test_a_failing_server_gives_the_reason(self):
+		reason = probe("http://down.test", factory=lambda url, timeout: FailingTimeStamper(url))
+		self.assertIn("down.test", reason or "")
+
+	def test_an_unreachable_host_is_not_an_exception(self):
+		self.assertIsNotNone(probe("http://127.0.0.1:9", timeout=1))
