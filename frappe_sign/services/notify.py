@@ -8,6 +8,7 @@ event handler. Emails reference the source document when there is one, so they s
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import frappe
@@ -16,6 +17,7 @@ from frappe.desk.doctype.notification_log.notification_log import make_notificat
 from frappe.email.doctype.email_account.email_account import EmailAccount
 from frappe.utils import escape_html, get_url
 
+from frappe_sign.utils.boot import profile_branding
 from frappe_sign.utils.dates import format_local
 
 INVITATION = "Frappe Sign Invitation"
@@ -26,6 +28,8 @@ DECLINED = "Frappe Sign Declined"
 VOIDED = "Frappe Sign Voided"
 FAILED = "Frappe Sign Failed"
 REALTIME_EVENT = "frappe_sign_envelope"
+DEFAULT_BRAND = "#111827"
+HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
 def signing_link(token: str) -> str:
@@ -135,13 +139,52 @@ def sender_email(envelope: Any) -> str:
 
 
 def base_context(envelope: Any) -> dict[str, Any]:
+	brand = brand_color(envelope)
 	return {
+		"brand_color": brand,
+		"button_text_color": contrast_color(brand),
 		"envelope": envelope.name,
 		"envelope_title": escape_html(envelope.title or ""),
 		"message": escape_html(envelope.message or ""),
 		"sender_name": escape_html(frappe.utils.get_fullname(envelope.sender) if envelope.sender else ""),
 		"company": escape_html(envelope.company or ""),
 	}
+
+
+def brand_color(envelope: Any) -> str:
+	"""The Sign Profile color for buttons, or a neutral dark gray when none is set."""
+	color = profile_branding(envelope.company).get("brand_color") or ""
+	return color if HEX_COLOR.match(color) else DEFAULT_BRAND
+
+
+def contrast_color(background: str) -> str:
+	"""Black or white text, whichever reads better on `background` (#RRGGBB)."""
+	red, green, blue = (int(background[i : i + 2], 16) for i in (1, 3, 5))
+	return "#111827" if (red * 299 + green * 587 + blue * 114) / 1000 > 150 else "#ffffff"
+
+
+def wrap(message: str, envelope: Any) -> str:
+	"""Put `message` in the branded shell: logo and company name on top, the body, then a footer.
+
+	Table based HTML with inline styles, so Gmail and Outlook render it the same way.
+	"""
+	branding = profile_branding(envelope.company)
+	name = escape_html(branding["company"] or envelope.company or "")
+	logo = branding["logo"]
+	mark = (
+		f'<img src="{escape_html(get_url(logo))}" alt="{name}" height="32" '
+		'style="display:block;height:32px;width:auto;border:0">'
+		if logo
+		else ""
+	)
+	title = f'<span style="font-size:16px;font-weight:600;color:#111827">{name}</span>' if name else ""
+	return SHELL.format(
+		mark=mark,
+		gap=" " if mark and title else "",
+		title=title,
+		body=message,
+		footer=escape_html(_("Sent with Frappe Sign")),
+	)
 
 
 def template_email(envelope: Any) -> str | None:
@@ -163,6 +206,7 @@ def send(
 	now: bool = False,
 ) -> None:
 	subject, message = render(template, context)
+	message = wrap(message, envelope)
 	reference_doctype, reference_name = reference_of(envelope)
 	frappe.sendmail(
 		recipients=recipients,
@@ -246,18 +290,41 @@ def publish_realtime(envelope: str) -> None:
 	)
 
 
+SHELL = (
+	'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" '
+	'style="background:#f3f4f6;padding:24px 12px"><tr><td align="center">'
+	'<table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" '
+	'style="max-width:560px;width:100%;background:#ffffff;border-radius:8px;'
+	'font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111827">'
+	'<tr><td style="padding:20px 28px;border-bottom:1px solid #e5e7eb">'
+	'<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>'
+	'<td style="vertical-align:middle">{mark}</td><td style="vertical-align:middle;padding-left:10px">'
+	"{title}</td></tr></table></td></tr>"
+	'<tr><td style="padding:28px">{body}</td></tr>'
+	'<tr><td style="padding:16px 28px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280">'
+	"{footer}</td></tr></table></td></tr></table>"
+)
+
+BUTTON = (
+	'<p style="margin:24px 0"><a href="{{{{ link }}}}" style="display:inline-block;'
+	"background:{{{{ brand_color }}}};color:{{{{ button_text_color }}}};padding:12px 24px;"
+	'border-radius:6px;text-decoration:none;font-weight:600">{label}</a></p>'
+)
+
 FALLBACK = {
 	INVITATION: (
 		"{{ sender_name }} sent you {{ envelope_title }} to sign",
 		"<p>Hello {{ recipient_name }},</p><p>{{ sender_name }} asks you to review and sign "
 		"<b>{{ envelope_title }}</b>.</p>{% if message %}<p>{{ message }}</p>{% endif %}"
-		'<p><a href="{{ link }}">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>',
+		+ BUTTON.format(label="Review and sign")
+		+ "<p>The link expires on {{ expires_on }}.</p>",
 	),
 	REMINDER: (
 		"Reminder: {{ envelope_title }} is waiting for your signature",
 		"<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your "
-		'signature.</p><p><a href="{{ link }}">Review and sign</a></p><p>The link expires on '
-		"{{ expires_on }}.</p>",
+		"signature.</p>"
+		+ BUTTON.format(label="Review and sign")
+		+ "<p>The link expires on {{ expires_on }}.</p>",
 	),
 	OTP: (
 		"Your code for {{ envelope_title }}: {{ otp }}",

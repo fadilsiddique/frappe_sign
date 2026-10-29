@@ -4,7 +4,7 @@
   "name": "Frappe Sign Invitation",
   "subject": "{{ sender_name }} sent you {{ envelope_title }} to sign",
   "use_html": 1,
-  "response_html": "<p>Hello {{ recipient_name }},</p><p>{{ sender_name }} asks you to review and sign <b>{{ envelope_title }}</b>.</p>{% if message %}<p>{{ message }}</p>{% endif %}<p><a href=\"{{ link }}\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
+  "response_html": "<p>Hello {{ recipient_name }},</p><p>{{ sender_name }} asks you to review and sign <b>{{ envelope_title }}</b>.</p>{% if message %}<p>{{ message }}</p>{% endif %}<p style=\"margin:24px 0\"><a href=\"{{ link }}\" style=\"display:inline-block;background:{{ brand_color }};color:{{ button_text_color }};padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
   "response": null
  },
  {
@@ -12,7 +12,7 @@
   "name": "Frappe Sign Reminder",
   "subject": "Reminder: {{ envelope_title }} is waiting for your signature",
   "use_html": 1,
-  "response_html": "<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your signature.</p><p><a href=\"{{ link }}\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
+  "response_html": "<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your signature.</p><p style=\"margin:24px 0\"><a href=\"{{ link }}\" style=\"display:inline-block;background:{{ brand_color }};color:{{ button_text_color }};padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600\">Review and sign</a></p><p>The link expires on {{ expires_on }}.</p>",
   "response": null
  },
  {

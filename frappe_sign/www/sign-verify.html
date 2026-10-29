@@ -3,21 +3,59 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block page_content %}
-<main class="sign-verify" style="max-width: 640px; margin: 2rem auto; padding: 0 16px;">
-	<h1 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ _("Verify a signed document") }}</h1>
-	<p class="text-muted">{{ _("Upload the signed PDF to check that it is unchanged and sealed, or enter the envelope ID printed on its certificate.") }}</p>
-	<form id="sign-verify-form" style="margin-top: 1.5rem;">
-		<div class="form-group">
-			<label for="sign-verify-file">{{ _("Signed PDF") }}</label>
-			<input id="sign-verify-file" name="file" type="file" accept="application/pdf" class="form-control">
-		</div>
-		<div class="form-group">
-			<label for="sign-verify-envelope">{{ _("Envelope ID") }}</label>
-			<input id="sign-verify-envelope" name="envelope" type="text" class="form-control" maxlength="140" placeholder="SIGN-2026-00001" value="{{ envelope|e }}">
-		</div>
-		<button type="submit" class="btn btn-primary">{{ _("Verify") }}</button>
+<style>
+	.sv { max-width: 560px; margin: 40px auto; padding: 0 16px; color: #111827; }
+	.sv h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+	.sv-lead { font-size: 14px; color: #4b5563; margin: 0 0 24px; }
+	.sv label.sv-drop { display: flex; margin: 0; flex-direction: column; align-items: center; gap: 8px; padding: 32px 16px; border: 1.5px dashed #9ca3af; border-radius: 10px; background: #f9fafb; text-align: center; cursor: pointer; }
+	.sv-drop:hover, .sv-drop:focus-within, .sv-drop.is-over { border-color: #111827; background: #f3f4f6; }
+	.sv-drop svg { width: 28px; height: 28px; color: #4b5563; }
+	.sv-drop strong { font-size: 14px; font-weight: 600; }
+	.sv-drop span { font-size: 13px; color: #4b5563; }
+	.sv-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+	.sv-file { display: none; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
+	.sv-file.is-set { display: flex; }
+	.sv-file button { border: 0; background: none; color: #4b5563; font-size: 13px; cursor: pointer; text-decoration: underline; }
+	.sv-or { display: flex; align-items: center; gap: 12px; margin: 20px 0; font-size: 13px; color: #4b5563; }
+	.sv-or::before, .sv-or::after { content: ""; flex: 1; height: 1px; background: #e5e7eb; }
+	.sv label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+	.sv-input { width: 100%; box-sizing: border-box; height: 36px; padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+	.sv-go { margin-top: 20px; width: 100%; height: 40px; border: 0; border-radius: 6px; background: #111827; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+	.sv-go:disabled { opacity: .6; cursor: default; }
+	.sv-card { margin-top: 24px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+	.sv-head { display: flex; gap: 12px; padding: 16px; align-items: flex-start; }
+	.sv-head svg { width: 28px; height: 28px; flex-shrink: 0; }
+	.sv-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+	.sv-head p { font-size: 13px; color: #4b5563; margin: 2px 0 0; }
+	.sv-card.is-good .sv-head { background: #f0fdf4; } .sv-card.is-good .sv-head svg { color: #15803d; }
+	.sv-card.is-bad .sv-head { background: #fef2f2; } .sv-card.is-bad .sv-head svg { color: #b91c1c; }
+	.sv-card.is-info .sv-head svg { color: #4b5563; }
+	.sv-rows { margin: 0; padding: 0; list-style: none; }
+	.sv-rows li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 16px; border-top: 1px solid #e5e7eb; font-size: 14px; }
+	.sv-rows li span:first-child { color: #4b5563; }
+	.sv-rows li span:last-child { text-align: end; overflow-wrap: anywhere; }
+	.sv-section { padding: 8px 16px; border-top: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #4b5563; background: #f9fafb; }
+	.footer-powered, .footer-powered a.text-muted { color: #4b5563 !important; }
+	.footer-powered a.text-muted { text-decoration: underline; }
+	.sv-go:focus-visible, .sv-input:focus-visible, .sv-file button:focus-visible { outline: 2px solid #111827; outline-offset: 2px; }
+</style>
+<main class="sv">
+	<h1>{{ _("Verify a signed document") }}</h1>
+	<p class="sv-lead">{{ _("Check that a signed PDF is unchanged and sealed. Nothing you upload is kept.") }}</p>
+	<form id="sign-verify-form" novalidate>
+		<label class="sv-drop" id="sv-drop" for="sign-verify-file">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg>
+			<strong>{{ _("Drop the signed PDF here") }}</strong>
+			<span>{{ _("or click to choose a file") }}</span>
+			<input id="sign-verify-file" name="file" type="file" accept="application/pdf">
+		</label>
+		<div class="sv-file" id="sv-file"><span id="sv-file-name"></span><button type="button" id="sv-file-clear">{{ _("Remove") }}</button></div>
+		<div class="sv-or">{{ _("or") }}</div>
+		<label for="sign-verify-envelope">{{ _("Request ID") }}</label>
+		<input id="sign-verify-envelope" class="sv-input" name="envelope" type="text" maxlength="140" placeholder="SIGN-2026-00001" value="{{ envelope|e }}" autocomplete="off">
+		<button type="submit" class="sv-go" id="sv-go">{{ _("Verify") }}</button>
 	</form>
-	<section id="sign-verify-result" aria-live="polite" style="margin-top: 1.5rem;"></section>
+	<section id="sign-verify-result" aria-live="polite"></section>
 </main>
 {% endblock %}
 
@@ -26,62 +64,149 @@
 (function () {
 	const form = document.getElementById("sign-verify-form");
 	const result = document.getElementById("sign-verify-result");
+	const drop = document.getElementById("sv-drop");
+	const input = document.getElementById("sign-verify-file");
+	const fileBox = document.getElementById("sv-file");
+	const go = document.getElementById("sv-go");
 	const t = (text) => (window.__ ? window.__(text) : text);
 
-	function line(label, value, good) {
-		const row = document.createElement("p");
-		const strong = document.createElement("strong");
-		strong.textContent = label + ": ";
-		row.appendChild(strong);
-		row.appendChild(document.createTextNode(value));
-		if (good !== undefined) row.style.color = good ? "#15803d" : "#b91c1c";
-		return row;
+	const ICONS = {
+		good: '<path d="M12 22c5.5-2 8-6 8-11V5l-8-3-8 3v6c0 5 2.5 9 8 11z"/><path d="m9 12 2 2 4-4"/>',
+		bad: '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+		info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+	};
+
+	function el(tag, className, text) {
+		const node = document.createElement(tag);
+		if (className) node.className = className;
+		if (text !== undefined) node.textContent = text;
+		return node;
+	}
+
+	function icon(kind) {
+		const wrap = el("div");
+		wrap.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[kind]}</svg>`;
+		return wrap.firstChild;
+	}
+
+	function card(kind, title, note, groups) {
+		const root = el("div", `sv-card is-${kind}`);
+		root.setAttribute("data-testid", `verify-${kind}`);
+		const head = el("div", "sv-head");
+		head.appendChild(icon(kind));
+		const text = el("div");
+		text.appendChild(el("h2", "", title));
+		if (note) text.appendChild(el("p", "", note));
+		head.appendChild(text);
+		root.appendChild(head);
+		for (const group of groups) {
+			if (!group.rows.length) continue;
+			if (group.title) root.appendChild(el("div", "sv-section", group.title));
+			const list = el("ul", "sv-rows");
+			for (const [label, value] of group.rows) {
+				const row = el("li");
+				row.appendChild(el("span", "", label));
+				row.appendChild(el("span", "", value));
+				list.appendChild(row);
+			}
+			root.appendChild(list);
+		}
+		return root;
 	}
 
 	function show(data) {
 		result.replaceChildren();
-		if (!data.found && !data.seal) {
-			result.appendChild(line(t("Result"), t("No envelope with this ID was found."), false));
-			return;
-		}
-		if (data.seal) {
-			const seal = data.seal;
-			if (!seal.signed) result.appendChild(line(t("Seal"), t("This PDF has no digital seal."), false));
-			else {
-				result.appendChild(line(t("Seal"), seal.intact && seal.valid ? t("Intact and valid") : t("Broken: the PDF was changed after sealing"), seal.intact && seal.valid));
-				if (seal.signer) result.appendChild(line(t("Sealed by"), seal.signer));
-				if (seal.signed_at) result.appendChild(line(t("Timestamp"), seal.signed_at, seal.timestamp_valid));
-			}
-			result.appendChild(line(t("Matches a completed envelope"), data.matches ? t("Yes") : t("No"), Boolean(data.matches)));
-		}
+		const seal = data.seal;
+		const sealOk = seal && seal.signed && seal.intact && seal.valid;
+		const details = [];
+		const signers = (data.signers || []).map((s) => [s.name, `${s.role ? s.role + ", " : ""}${s.signed_on}`]);
 		if (data.found) {
-			result.appendChild(line(t("Envelope"), data.envelope));
-			result.appendChild(line(t("Status"), data.status));
-			if (data.completed_on) result.appendChild(line(t("Completed"), data.completed_on));
-			for (const signer of data.signers || []) {
-				result.appendChild(line(signer.role, `${signer.name}, ${signer.signed_on}`));
-			}
+			details.push([t("Request"), data.envelope], [t("Status"), data.status]);
+			if (data.completed_on) details.push([t("Completed"), data.completed_on]);
 		}
+		const sealRows = [];
+		if (seal && seal.signed) {
+			if (seal.signer) sealRows.push([t("Sealed by"), seal.signer]);
+			if (seal.signed_at) sealRows.push([t("Sealed on"), seal.signed_at]);
+		}
+		const groups = [
+			{ title: "", rows: details },
+			{ title: t("Signed by"), rows: signers },
+			{ title: t("Company seal"), rows: sealRows },
+		];
+		let node;
+		if (seal && !seal.signed) {
+			node = card("bad", t("Not sealed"), t("This PDF has no digital seal. It may not be a signed copy."), groups);
+		} else if (seal && !sealOk) {
+			node = card("bad", t("Changed after signing"), t("The PDF was changed after it was sealed. Do not rely on it."), groups);
+		} else if (seal && !data.matches) {
+			node = card("bad", t("Not the signed copy"), t("The seal is intact, but this file does not match the signed copy of this request."), groups);
+		} else if (seal) {
+			node = card("good", t("This document is genuine"), t("It is unchanged since everyone signed."), groups);
+		} else if (data.found) {
+			node = card("info", t("Request found"), data.sealed ? t("The signed copy is sealed. Upload the PDF to check your copy.") : t("This request has not been sealed yet."), groups);
+		} else {
+			node = card("bad", t("Nothing found"), t("No request with this ID was found. Check the ID printed on the certificate."), []);
+		}
+		result.appendChild(node);
 	}
+
+	function failure(message) {
+		result.replaceChildren(card("bad", t("The check failed"), message, []));
+	}
+
+	function setFile(file) {
+		document.getElementById("sv-file-name").textContent = file ? file.name : "";
+		fileBox.classList.toggle("is-set", Boolean(file));
+	}
+
+	input.addEventListener("change", () => setFile(input.files[0]));
+	document.getElementById("sv-file-clear").addEventListener("click", () => {
+		input.value = "";
+		setFile(null);
+	});
+	for (const name of ["dragenter", "dragover"]) {
+		drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.add("is-over"); });
+	}
+	for (const name of ["dragleave", "drop"]) {
+		drop.addEventListener(name, () => drop.classList.remove("is-over"));
+	}
+	drop.addEventListener("drop", (event) => {
+		event.preventDefault();
+		const file = event.dataTransfer.files[0];
+		if (!file) return;
+		const transfer = new DataTransfer();
+		transfer.items.add(file);
+		input.files = transfer.files;
+		setFile(file);
+	});
 
 	async function verify(event) {
 		if (event) event.preventDefault();
 		const body = new FormData();
-		const file = document.getElementById("sign-verify-file").files[0];
+		const file = input.files[0];
 		const envelope = document.getElementById("sign-verify-envelope").value.trim();
 		if (file) body.append("file", file);
 		if (envelope) body.append("envelope", envelope);
-		if (!file && !envelope) return;
-		result.textContent = t("Checking...");
-		const headers = { Accept: "application/json" };
-		if (window.frappe && frappe.csrf_token && frappe.csrf_token !== "None") headers["X-Frappe-CSRF-Token"] = frappe.csrf_token;
-		const response = await fetch("/api/method/frappe_sign.api.public.verify", { method: "POST", body, headers });
-		const json = await response.json().catch(() => ({}));
-		if (!response.ok) {
-			result.replaceChildren(line(t("Error"), response.status === 429 ? t("Too many checks. Try again in a minute.") : t("The check failed."), false));
+		if (!file && !envelope) {
+			failure(t("Drop the signed PDF or enter the request ID."));
 			return;
 		}
-		show(json.message);
+		go.disabled = true;
+		go.textContent = t("Checking...");
+		const headers = { Accept: "application/json" };
+		if (window.frappe && frappe.csrf_token && frappe.csrf_token !== "None") headers["X-Frappe-CSRF-Token"] = frappe.csrf_token;
+		try {
+			const response = await fetch("/api/method/frappe_sign.api.public.verify", { method: "POST", body, headers });
+			const json = await response.json().catch(() => ({}));
+			if (!response.ok) failure(response.status === 429 ? t("Too many checks. Try again in a minute.") : t("Try again in a moment."));
+			else show(json.message);
+		} catch (error) {
+			failure(t("Check your connection and try again."));
+		} finally {
+			go.disabled = false;
+			go.textContent = t("Verify");
+		}
 	}
 
 	form.addEventListener("submit", verify);
