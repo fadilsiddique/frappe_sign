@@ -34,7 +34,13 @@ class TestSetupStatus(SignTestCase):
 		super().setUp()
 		self.refuse_commits()
 		# An empty site, inside this test's transaction (rolled back afterwards).
-		for doctype in ("Email Account", "Sign Envelope", "Sign Template", "Sign Profile", "Sign Enabled DocType"):
+		for doctype in (
+			"Email Account",
+			"Sign Envelope",
+			"Sign Template",
+			"Sign Profile",
+			"Sign Enabled DocType",
+		):
 			frappe.db.delete(doctype)
 
 	def steps(self) -> dict:
@@ -70,7 +76,9 @@ class TestSetupStatus(SignTestCase):
 
 	def test_an_expired_seal_is_to_do(self):
 		profile = make_profile(test_company())
-		frappe.db.set_value("Sign Certificate", profile.sealing_certificate, "valid_to", add_days(now_datetime(), -1))
+		frappe.db.set_value(
+			"Sign Certificate", profile.sealing_certificate, "valid_to", add_days(now_datetime(), -1)
+		)
 		seal = self.steps()["seal"]
 		self.assertFalse(seal["done"])
 		self.assertTrue(seal["facts"]["expired"])

@@ -38,6 +38,13 @@ class PermissionCase(SigningCase):
 
 
 class TestEnvelopeVisibility(PermissionCase):
+	def test_events_say_how_long_ago_they_happened(self):
+		name = self.alice_envelope()
+		with self.as_user(ALICE):
+			events = staff.get_envelope(name)["events"]
+		self.assertTrue(events)
+		self.assertTrue(all(0 <= event["ago_seconds"] < 300 for event in events))
+
 	def test_sender_recipient_other_and_manager(self):
 		name = self.alice_envelope()
 		with self.as_user(ALICE):

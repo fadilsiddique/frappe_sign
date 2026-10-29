@@ -54,6 +54,34 @@ def create_home_requests() -> dict:
 	return {"for_me": for_me.name, "for_customer": for_customer.name, "started": str(started)}
 
 
+def create_sent_requests() -> dict:
+	"""Five requests for the Sent page: waiting on a customer, waiting on Administrator (a colleague),
+	a draft, a completed one and a declined one. Purge them with purge_created(started)."""
+	require_test_site()
+	started = now_datetime()
+	admin = {"role_label": "Customer", "full_name": "Administrator", "email": "admin@example.com"}
+	customer = {"role_label": "Customer", "full_name": "Ahmed Khan", "email": "ahmed@example.com"}
+	company = {"role_label": "Company", "full_name": "Fatima Ali", "email": "fatima@example.com"}
+	names = {}
+	with run_as("Administrator"):
+		make_email_account(skip_smtp_check=True)
+		version = publish_template()
+		for key, title, people in (
+			("customer", "E2E Supply Quotation", [customer, company]),
+			("team", "E2E Lease for Unit 4B", [admin, company]),
+			("draft", "E2E Draft Terms", [customer, company]),
+			("done", "E2E Signed Order", [customer, company]),
+			("declined", "E2E Declined Offer", [customer, company]),
+		):
+			names[key] = make_draft(version, recipients=people, title=title).name
+		with capture_tokens():
+			for key in ("customer", "team", "done", "declined"):
+				send_now(names[key])
+		frappe.db.set_value("Sign Envelope", names["done"], {"status": "Completed", "completed_on": started})
+		frappe.db.set_value("Sign Envelope", names["declined"], "status", "Declined")
+	return {**names, "started": str(started)}
+
+
 def envelope_state(envelope: str) -> dict:
 	require_test_site()
 	doc = frappe.get_doc("Sign Envelope", envelope)

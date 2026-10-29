@@ -96,8 +96,8 @@ describe('WaitingPanel', () => {
     group,
     next: [{ full_name: 'Omar Farouk', status: 'Sent', viewed_seconds: null }],
     people: [
-      { full_name: 'Fatima Ali', kind: 'Signer', status: 'Signed', next: false },
-      { full_name: 'Omar Farouk', kind: 'Signer', status: 'Sent', next: true },
+      { name: 'r1', full_name: 'Fatima Ali', kind: 'Signer', status: 'Signed', next: false },
+      { name: 'r2', full_name: 'Omar Farouk', kind: 'Signer', status: 'Sent', next: true },
     ],
     signed: 1,
     total: 2,
@@ -115,7 +115,7 @@ describe('WaitingPanel', () => {
     expect(groups.map((g) => g.attributes('data-group'))).toEqual(['outside', 'team'])
     expect(groups[0]!.findAll('[data-testid="waiting-row"]')).toHaveLength(2)
     const first = groups[0]!.find('[data-testid="waiting-row"]')
-    expect(first.attributes('href')).toBe('/envelopes/A')
+    expect(first.attributes('href')).toBe('/requests/A')
     expect(first.text()).toContain('Next: Omar Farouk, not opened yet')
     expect(first.text()).toContain('1 of 2')
     expect(groups[0]!.findAll('[data-testid="waiting-row"]')[1]!.text()).toMatch(/Ends /)

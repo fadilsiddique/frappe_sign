@@ -26,7 +26,7 @@ frappe.provide("frappe.ui.form");
 		// The form message sits above the tabs; the dashboard is inside "Connections" in v16.
 		if (status && status !== "Not Sent") {
 			const envelope = frm.doc.sign_envelope
-				? ` · <a href="/sign/envelopes/${encodeURIComponent(
+				? ` · <a href="/sign/requests/${encodeURIComponent(
 						frm.doc.sign_envelope
 				  )}">${frappe.utils.escape_html(frm.doc.sign_envelope)}</a>`
 				: "";
@@ -38,7 +38,7 @@ frappe.provide("frappe.ui.form");
 		if (frm.doc.sign_envelope) {
 			frm.add_custom_button(
 				__("Signature Envelope"),
-				() => window.open(`/sign/envelopes/${encodeURIComponent(frm.doc.sign_envelope)}`),
+				() => window.open(`/sign/requests/${encodeURIComponent(frm.doc.sign_envelope)}`),
 				__("Signature")
 			);
 		}

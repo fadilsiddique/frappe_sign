@@ -38,7 +38,7 @@ function expiry(row: WaitingRow): string {
       </h2>
       <RouterLink
         v-if="rows.length"
-        to="/envelopes"
+        to="/requests"
         class="rounded text-sm text-ink-gray-7 hover:text-ink-gray-9 hover:underline focus-visible:focus-ring"
         >{{ __('See all sent') }}</RouterLink
       >
@@ -62,7 +62,7 @@ function expiry(row: WaitingRow): string {
       <RouterLink
         v-for="row in group.rows"
         :key="row.name"
-        :to="`/envelopes/${row.name}`"
+        :to="`/requests/${row.name}`"
         class="flex items-center gap-3.5 border-t border-outline-gray-1 px-4 py-3 hover:bg-surface-gray-1 focus-visible:focus-ring"
         data-testid="waiting-row"
       >

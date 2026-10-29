@@ -4,7 +4,7 @@
 defineProps<{ people: Array<{ status: string; next: boolean }> }>()
 
 function tone(person: { status: string; next: boolean }): string {
-  if (person.status === 'Signed') return 'bg-green-500 text-ink-white ring-green-500'
+  if (person.status === 'Signed') return 'bg-green-500 text-white ring-green-500'
   if (person.next) return 'bg-surface-base text-ink-blue-6 ring-blue-500'
   return 'bg-surface-base text-ink-gray-6 ring-gray-300'
 }

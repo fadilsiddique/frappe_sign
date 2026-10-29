@@ -68,7 +68,7 @@ async function remind(row: WaitingRow) {
       </span>
       <span class="flex min-w-0 flex-1 flex-col gap-0.5">
         <RouterLink
-          :to="`/envelopes/${row.name}`"
+          :to="`/requests/${row.name}`"
           class="truncate text-base font-medium text-ink-gray-9 hover:underline"
         >
           {{ row.title }}

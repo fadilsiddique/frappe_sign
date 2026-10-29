@@ -267,7 +267,7 @@ async function send() {
       // The draft exists; open it so the sender can fix the problem and send from there.
       toast.error(errorMessage(error))
     }
-    await router.push(`/envelopes/${name}`)
+    await router.push(`/requests/${name}`)
   } catch (error) {
     toast.error(errorMessage(error))
   } finally {
@@ -288,7 +288,7 @@ async function sendDocument() {
       letter_head: doc.letterHead || null,
     })
     toast.success(__('Sending {0}', [name]))
-    await router.push(`/envelopes/${name}`)
+    await router.push(`/requests/${name}`)
   } catch (error) {
     toast.error(errorMessage(error))
   } finally {

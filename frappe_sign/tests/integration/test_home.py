@@ -61,6 +61,9 @@ class TestHome(SignTestCase):
 			[(p["full_name"], p["status"], p["next"]) for p in row["people"]],
 			[("Ahmed Khan", "Signed", False), ("Fatima Ali", "Sent", True)],
 		)
+		self.assertEqual(
+			[p["name"] for p in row["people"]], [self.row(name, "Customer"), self.row(name, "Company")]
+		)
 		self.assertEqual((row["signed"], row["total"]), (1, 2))
 
 	def test_opened_shows_how_long_ago(self):

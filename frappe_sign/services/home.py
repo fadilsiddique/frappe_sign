@@ -8,6 +8,7 @@ those envelopes only.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 import frappe
@@ -18,7 +19,7 @@ from frappe_sign.utils.dates import after
 
 WAITING_LIMIT = 20
 SOON_DAYS = 3
-RECIPIENT_FIELDS = ["parent", "full_name", "email", "kind", "status", "routing_order", "viewed_on"]
+RECIPIENT_FIELDS = ["name", "parent", "full_name", "email", "kind", "status", "routing_order", "viewed_on"]
 
 
 def dashboard() -> dict[str, Any]:
@@ -27,7 +28,7 @@ def dashboard() -> dict[str, Any]:
 	return {"to_sign": to_sign(user, now), "waiting": waiting(user, now), "month": month(user)}
 
 
-def to_sign(user: str, now) -> list[dict[str, Any]]:
+def to_sign(user: str, now: datetime) -> list[dict[str, Any]]:
 	email = frappe.db.get_value("User", user, "email")
 	mine = frappe.get_all(
 		"Sign Envelope Recipient",
@@ -54,7 +55,7 @@ def to_sign(user: str, now) -> list[dict[str, Any]]:
 	]
 
 
-def waiting(user: str, now) -> list[dict[str, Any]]:
+def waiting(user: str, now: datetime) -> list[dict[str, Any]]:
 	envelopes = frappe.get_list(
 		"Sign Envelope",
 		filters={"status": ["in", OPEN], "sender": user},
@@ -62,28 +63,32 @@ def waiting(user: str, now) -> list[dict[str, Any]]:
 		order_by="sent_on desc",
 		limit=WAITING_LIMIT,
 	)
+	by_envelope, team = load_people([doc.name for doc in envelopes])
+	soon = after(days=SOON_DAYS)
+	return [waiting_row(doc, by_envelope.get(doc.name, []), team, now, soon) for doc in envelopes]
+
+
+def load_people(names: list[str]) -> tuple[dict[str, list[Any]], set[str]]:
+	"""The people each request waits on (no copies, no delegated rows), in signing order, and which
+	of their emails belong to colleagues."""
 	rows = frappe.get_all(
 		"Sign Envelope Recipient",
 		filters={
 			"parenttype": "Sign Envelope",
-			"parent": ["in", [doc.name for doc in envelopes] or [""]],
+			"parent": ["in", names or [""]],
 			"kind": ["!=", "CC"],
 			"status": ["!=", "Delegated"],
 		},
 		fields=RECIPIENT_FIELDS,
 		order_by="routing_order asc, idx asc",
 	)
-	by_envelope: dict[str, list] = {}
+	by_envelope: dict[str, list[Any]] = {}
 	for row in rows:
 		by_envelope.setdefault(row.parent, []).append(row)
-	team = colleagues({row.email for row in rows if row.email})
-	soon = after(days=SOON_DAYS)
-	return [
-		waiting_row(doc, by_envelope.get(doc.name, []), team, now, soon) for doc in envelopes
-	]
+	return by_envelope, colleagues({row.email for row in rows if row.email})
 
 
-def waiting_row(doc, people: list, team: set[str], now, soon) -> dict[str, Any]:
+def waiting_row(doc: Any, people: list[Any], team: set[str], now: datetime, soon: datetime) -> dict[str, Any]:
 	nexts = next_people(people, doc.signing_order)
 	next_ids = {id(row) for row in nexts}
 	return {
@@ -100,7 +105,13 @@ def waiting_row(doc, people: list, team: set[str], now, soon) -> dict[str, Any]:
 			for row in nexts
 		],
 		"people": [
-			{"full_name": row.full_name, "kind": row.kind, "status": row.status, "next": id(row) in next_ids}
+			{
+				"name": row.name,
+				"full_name": row.full_name,
+				"kind": row.kind,
+				"status": row.status,
+				"next": id(row) in next_ids,
+			}
 			for row in people
 		],
 		"signed": sum(row.status == "Signed" for row in people),
@@ -111,7 +122,7 @@ def waiting_row(doc, people: list, team: set[str], now, soon) -> dict[str, Any]:
 	}
 
 
-def next_people(people: list, signing_order: str | None) -> list:
+def next_people(people: list[Any], signing_order: str | None) -> list[Any]:
 	"""Who the request waits on: every unsigned person at once, or the lowest order still open."""
 	open_rows = [row for row in people if row.status not in DONE]
 	if signing_order == "Parallel" or not open_rows:
@@ -146,9 +157,9 @@ def month(user: str) -> dict[str, int]:
 	}
 
 
-def seconds_since(moment, now) -> int:
+def seconds_since(moment: Any, now: datetime) -> int:
 	return max(0, int((now - get_datetime(moment)).total_seconds())) if moment else 0
 
 
-def date_only(moment) -> str | None:
+def date_only(moment: Any) -> str | None:
 	return str(get_datetime(moment).date()) if moment else None

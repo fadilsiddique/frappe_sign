@@ -19,13 +19,14 @@ from frappe_sign.services import (
 	documents,
 	home,
 	preview,
+	requests,
 	resolvers,
 	sealing,
 	setup,
 )
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
-from frappe_sign.utils.dates import format_utc
+from frappe_sign.utils.dates import format_utc, utc_now
 
 
 @frappe.whitelist()
@@ -38,6 +39,39 @@ def get_dashboard() -> dict:
 @with_error_code
 def get_setup_status() -> dict:
 	return setup.setup_status()
+
+
+@frappe.whitelist()
+@with_error_code
+def list_requests(
+	status: str = "open",
+	search: str | None = None,
+	reference_doctype: str | None = None,
+	sender: str | None = None,
+	date_from: str | None = None,
+	date_to: str | None = None,
+	start: int = 0,
+	limit: int = 50,
+) -> dict:
+	return requests.list_requests(status, search, reference_doctype, sender, date_from, date_to, start, limit)
+
+
+@frappe.whitelist()
+@with_error_code
+def request_counts(
+	search: str | None = None,
+	reference_doctype: str | None = None,
+	sender: str | None = None,
+	date_from: str | None = None,
+	date_to: str | None = None,
+) -> dict:
+	return requests.request_counts(search, reference_doctype, sender, date_from, date_to)
+
+
+@frappe.whitelist()
+@with_error_code
+def request_filter_options() -> dict:
+	return requests.filter_options()
 
 
 @frappe.whitelist(methods=["POST"])
@@ -149,7 +183,14 @@ def get_envelope(envelope: str) -> dict:
 			}
 			for row in doc.recipients
 		],
-		"events": [{**event, "at": format_utc(event.at)} for event in events],
+		"events": [
+			{
+				**event,
+				"at": format_utc(event.at),
+				"ago_seconds": max(0, int((utc_now() - event.at).total_seconds())),
+			}
+			for event in events
+		],
 		"chain_ok": audit.verify_chain(envelope).ok,
 		"can_write": bool(doc.has_permission("write")),
 	}

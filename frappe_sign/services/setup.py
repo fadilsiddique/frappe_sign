@@ -47,7 +47,7 @@ def step(key: str, done: bool, can_fix: bool, required: bool = True, **facts: An
 
 def email_step(profile: str | None) -> dict[str, Any]:
 	email_id = outgoing_email(profile)
-	return step("email", email_id, frappe.has_permission("Email Account", "write"), email_id=email_id)
+	return step("email", bool(email_id), frappe.has_permission("Email Account", "write"), email_id=email_id)
 
 
 def outgoing_email(profile: str | None) -> str | None:
@@ -86,7 +86,7 @@ def profile_step(profile: str | None) -> dict[str, Any]:
 	branded = profile and frappe.db.get_value("Sign Profile", profile, ["logo", "brand_color"], as_dict=True)
 	return step(
 		"profile",
-		branded and (branded.logo or branded.brand_color),
+		bool(branded and (branded.logo or branded.brand_color)),
 		frappe.has_permission("Sign Profile", "write"),
 		profile=profile,
 	)

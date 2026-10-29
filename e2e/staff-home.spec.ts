@@ -97,7 +97,7 @@ test('Home shows what waits for me and whom I wait on', async ({ page }) => {
 
   // A waiting row opens the request.
   await outside.click()
-  await expect(page).toHaveURL(new RegExp(`/sign/envelopes/${requests.for_customer}$`))
+  await expect(page).toHaveURL(new RegExp(`/sign/requests/${requests.for_customer}$`))
 
   // Sign opens the signing page for my own link.
   await page.goBack()

@@ -29,7 +29,7 @@ const Page = defineComponent({ render: () => h('p', 'page') })
 function makeRouter() {
   return createRouter({
     history: createMemoryHistory(),
-    routes: ['Home', 'Envelopes', 'Envelope', 'SendWizard', 'Templates', 'Designer'].map((name) => ({
+    routes: ['Home', 'Requests', 'Request', 'SendWizard', 'Templates', 'Designer'].map((name) => ({
       name,
       path: name === 'Home' ? '/' : `/${name.toLowerCase()}`,
       component: Page,

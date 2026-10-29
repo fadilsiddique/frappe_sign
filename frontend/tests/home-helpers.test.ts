@@ -129,7 +129,13 @@ describe('Home lines', () => {
   })
 
   it('names who has not signed', () => {
-    const person = (full_name: string, status: string) => ({ full_name, status, kind: 'Signer', next: false })
+    const person = (full_name: string, status: string) => ({
+      name: full_name,
+      full_name,
+      status,
+      kind: 'Signer',
+      next: false,
+    })
     expect(notSignedYet(waiting([], [person('Rania Saleh', 'Signed'), person('Fatima Ali', 'Sent')]))).toBe(
       'Fatima Ali has not signed.',
     )

@@ -110,7 +110,7 @@ class TestShellRoutes(IntegrationTestCase):
 	def test_shells_render(self):
 		if not (WWW / "s.html").exists():
 			self.skipTest("Frontend not built: run `bench build --app frappe_sign` first.")
-		for path, entry in (("s/abc123", "guest-"), ("sign/envelopes", "staff-")):
+		for path, entry in (("s/abc123", "guest-"), ("sign/requests", "staff-")):
 			with self.subTest(path=path):
 				frappe.set_user("Guest" if path.startswith("s/") else "Administrator")
 				frappe.utils.set_request(method="GET", path=path)

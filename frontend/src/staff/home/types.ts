@@ -10,6 +10,7 @@ export interface ToSignRow {
 }
 
 export interface WaitingPerson {
+  name: string
   full_name: string
   kind: string
   status: string

@@ -25,8 +25,8 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'sent',
     label: 'Sent',
     icon: 'lucide-send',
-    route: '/envelopes',
-    activeFor: ['Envelopes', 'Envelope', 'SendWizard'],
+    route: '/requests',
+    activeFor: ['Requests', 'Request', 'SendWizard'],
   },
   {
     key: 'templates',

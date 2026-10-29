@@ -10,7 +10,7 @@ export function askedLine(row: ToSignRow): string {
     : __('{0} asked you to sign, {1}', [row.sender_name, when])
 }
 
-export function nextLine(row: WaitingRow): string {
+export function nextLine(row: Pick<WaitingRow, 'next'>): string {
   const [first, second, ...rest] = row.next
   if (!first) return __('Everyone has signed. Sealing the PDF.')
   if (!second) {

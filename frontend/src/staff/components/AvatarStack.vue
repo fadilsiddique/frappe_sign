@@ -49,7 +49,7 @@ const hidden = computed(() => props.people.slice(shown.value.length))
       <Avatar size="sm" :label="person.name" :image="person.image ?? undefined" />
       <span
         v-if="person.state === 'signed'"
-        class="absolute -bottom-1 -end-1 grid size-3.5 place-items-center rounded-full border-[1.5px] border-white bg-green-500 text-ink-white"
+        class="absolute -bottom-1 -end-1 grid size-3.5 place-items-center rounded-full border-[1.5px] border-white bg-green-500 text-white"
         aria-hidden="true"
       >
         <span class="lucide-check size-2" />

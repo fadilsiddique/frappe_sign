@@ -23,8 +23,8 @@ function toggle(step: StepView) {
 }
 
 function dot(step: StepView): string {
-  if (step.done) return 'bg-green-500 text-ink-white ring-green-500'
-  if (step.key === current.value) return 'bg-surface-gray-9 text-ink-white ring-gray-900'
+  if (step.done) return 'bg-green-500 text-white ring-green-500'
+  if (step.key === current.value) return 'bg-surface-gray-9 text-white ring-gray-900'
   return 'bg-surface-base text-ink-gray-6 ring-gray-300'
 }
 </script>

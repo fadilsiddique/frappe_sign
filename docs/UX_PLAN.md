@@ -122,13 +122,14 @@ Two columns: the work queue (wide) and a side panel (320 px). The side panel goe
 
 A split view: the list on the left (about 400 px) and a preview of the selected request on the right. The preview goes under the list on narrow screens.
 
-- **Toolbar:** filter pills with counts, then a search box and a Filter button (DocType, sender, date). The pills are Open, Completed, Closed and All. Open is the default, and it holds waiting requests and drafts.
+- **Toolbar:** filter pills with counts, then a search box (title, document number, person) and a Filter button that opens a row of choices: document type, sent by (when more than one sender), and a from and to date (the day the request was made). The pills are Open, Completed, Closed and All. Open is the default, and it holds waiting requests and drafts.
 - **List:** grouped under headings with counts: Waiting on customers and suppliers, Waiting on your team, Drafts, Completed, Closed.
   - Each row: the title, the "Next: ..." line, the progress ("1 of 2") and a short expiry ("Ends 5 Nov", amber when it ends in 3 days or less).
   - The selected row has a gray background and a dark bar at its start edge. The keyboard moves the selection.
 - **Preview pane:**
   - The status badge, "Sent 22 Oct by Mariam Haddad", the title, and the source document as a link.
-  - The primary action, which fits the state: Remind, Download signed PDF, Continue (draft), or Send again (declined, expired). Other actions go in a menu.
+  - The primary action, which fits the state: Remind (waiting), Download signed PDF (completed), Send (draft) or Send again (declined, voided, expired). Other actions go in a menu: Original PDF, Certificate, Retry seal and Void request (which asks for a reason).
+  - There is no "Copy link": a signing link works as the recipient, so showing it to the sender would weaken D10. The sender can send a new link to one person (New link).
   - A page thumbnail, beside the people as a step list. The heading says "People, in signing order" or "People, all at once". Each person shows the role in plain words, the state and the time. Remind and New link appear on the person who is next.
   - Activity in plain words, with a "Verified" shield and "Show audit details".
 - **Open the full detail (U.5):** the title in the preview opens `/sign/requests/<id>`.
