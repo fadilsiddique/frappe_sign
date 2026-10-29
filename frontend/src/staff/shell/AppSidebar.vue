@@ -1,21 +1,35 @@
 <script setup lang="ts">
-import { Avatar, call, createResource, Dropdown, Sidebar, SidebarHeader, SidebarItem, toast } from 'frappe-ui'
+import { Avatar, call, Dropdown, Sidebar, SidebarHeader, SidebarItem, toast } from 'frappe-ui'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { readBoot } from '@/shared/boot'
 import { __ } from '@/shared/translate'
 import { errorMessage } from '../api'
+import { useDashboard, useSetupStatus } from '../home/resources'
+import { stepsLeft } from '../home/setupSteps'
+import type { Dashboard, SetupStatus } from '../home/types'
 import { DESK_URL, isActive, NAV_ITEMS } from './nav'
 
 const route = useRoute()
 const boot = readBoot()
 const userName = boot.full_name || boot.user || ''
 
-const dashboard = createResource({ url: 'frappe_sign.api.staff.get_dashboard', auto: true })
+// Shared with Home (one request each).
+const dashboard = useDashboard()
+const setup = useSetupStatus()
 const toSign = computed(() => {
-  const count = (dashboard.data as { needs_my_signature?: unknown[] } | null)?.needs_my_signature?.length
+  const count = (dashboard.data as Dashboard | null)?.to_sign.length
   return count ? String(count) : undefined
 })
+const setupLeft = computed(() => {
+  const status = setup.data as SetupStatus | null
+  const left = status ? stepsLeft(status) : 0
+  return left ? __('{0} left', [left]) : undefined
+})
+const suffixes: Record<string, () => string | undefined> = {
+  'to-sign': () => toSign.value,
+  settings: () => setupLeft.value,
+}
 
 async function logOut() {
   try {
@@ -47,7 +61,7 @@ const userMenu = [{ label: __('Log out'), icon: 'lucide-log-out', onClick: logOu
         :route="item.route"
         :href="item.href"
         :active="isActive(item, route.name)"
-        :suffix="item.key === 'to-sign' ? toSign : undefined"
+        :suffix="suffixes[item.key]?.()"
         class="data-[state=active]:!bg-surface-gray-3 data-[state=active]:!shadow-none"
         :data-testid="`nav-${item.key}`"
       />

@@ -103,6 +103,8 @@ Two columns: the work queue (wide) and a side panel (320 px). The side panel goe
   4. Documents you sign (enabled DocTypes)
   5. First template
   6. Send a test
+
+  The server (`get_setup_status`) reports what is done and who may fix each step; the staff app words it. "Documents you sign" counts only with ERPNext. Until Settings exists (U.9), steps 1 to 4 open their Desk forms.
 - **After setup, the side panel shows:**
   - This month: Completed, Waiting and Declined, as figures in one panel, not as separate cards.
   - Expiring soon: each request, who has not signed, and a Remind button.

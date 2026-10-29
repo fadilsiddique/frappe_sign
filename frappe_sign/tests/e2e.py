@@ -35,6 +35,25 @@ def create_guest_envelope(otp_mode: str = "Off") -> dict:
 	return {"envelope": draft.name, "token": box[customer.name], "started": str(started)}
 
 
+def create_home_requests() -> dict:
+	"""Two sent requests for the Home page: one waits for Administrator's signature, one for a
+	customer. Purge them with purge_created(started)."""
+	require_test_site()
+	started = now_datetime()
+	admin = {"role_label": "Customer", "full_name": "Administrator", "email": "admin@example.com"}
+	customer = {"role_label": "Customer", "full_name": "Ahmed Khan", "email": "ahmed@example.com"}
+	company = {"role_label": "Company", "full_name": "Fatima Ali", "email": "fatima@example.com"}
+	with run_as("Administrator"):
+		make_email_account(skip_smtp_check=True)
+		version = publish_template()
+		for_me = make_draft(version, recipients=[admin, company], title="E2E Lease for Unit 4B")
+		for_customer = make_draft(version, recipients=[customer, company], title="E2E Supply Quotation")
+		with capture_tokens():
+			send_now(for_me.name)
+			send_now(for_customer.name)
+	return {"for_me": for_me.name, "for_customer": for_customer.name, "started": str(started)}
+
+
 def envelope_state(envelope: str) -> dict:
 	require_test_site()
 	doc = frappe.get_doc("Sign Envelope", envelope)

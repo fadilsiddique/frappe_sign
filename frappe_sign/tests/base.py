@@ -50,6 +50,19 @@ class SignTestCase(IntegrationTestCase):
 	def as_user(self, user: str):
 		return run_as(user)
 
+	def refuse_commits(self):
+		"""For tests that delete site rows to start from an empty site: any commit, including the
+		implicit one before a schema change (frappe.db.sql_ddl), fails the test instead of making the
+		deletions permanent."""
+
+		def refuse(*args, **kwargs):
+			raise AssertionError("This test deletes site data and must not commit.")
+
+		for method in ("commit", "sql_ddl"):
+			patcher = patch.object(frappe.db, method, side_effect=refuse)
+			patcher.start()
+			self.addCleanup(patcher.stop)
+
 
 def remove_files_since(started) -> None:
 	for file_url, is_private in frappe.get_all(

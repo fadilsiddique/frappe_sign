@@ -4,13 +4,16 @@ import { expect, type Page } from '@playwright/test'
 export async function drawSignature(page: Page) {
   const pad = page.getByTestId('pad')
   await expect(pad).toBeVisible()
-  // The sheet slides up; a box read mid-slide puts the stroke below the pad, on the backdrop,
-  // which closes the sheet. Wait until the pad stops moving.
+  // The sheet slides up from below the screen. A box read before or during the slide puts the
+  // stroke below the pad, on the footer or the backdrop. Wait until the pad is fully on screen and
+  // has stopped moving.
+  const screenHeight = page.viewportSize()!.height
   let box = (await pad.boundingBox())!
   await expect(async () => {
     const settled = (await pad.boundingBox())!
     const moved = settled.y !== box.y
     box = settled
+    expect(box.y + box.height).toBeLessThanOrEqual(screenHeight)
     expect(moved).toBe(false)
   }).toPass({ intervals: [100] })
   const points = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9].map((x, i) => ({

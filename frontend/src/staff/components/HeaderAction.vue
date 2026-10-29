@@ -4,11 +4,19 @@
 import { Button, type RouteDestination } from 'frappe-ui'
 import { useIsMobile } from '../shell/useIsMobile'
 
-defineProps<{ label: string; icon: string; route?: RouteDestination }>()
+withDefaults(
+  defineProps<{
+    label: string
+    icon: string
+    route?: RouteDestination
+    variant?: 'solid' | 'subtle' | 'outline' | 'ghost'
+  }>(),
+  { route: undefined, variant: 'solid' },
+)
 const isMobile = useIsMobile()
 </script>
 
 <template>
-  <Button v-if="isMobile" variant="solid" :icon="icon" :label="label" :aria-label="label" :route="route" />
-  <Button v-else variant="solid" :icon-left="icon" :label="label" :route="route" />
+  <Button v-if="isMobile" :variant="variant" :icon="icon" :label="label" :aria-label="label" :route="route" />
+  <Button v-else :variant="variant" :icon-left="icon" :label="label" :route="route" />
 </template>

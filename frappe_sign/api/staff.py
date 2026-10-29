@@ -17,9 +17,11 @@ from frappe_sign.services import (
 	certificates,
 	doctypes,
 	documents,
+	home,
 	preview,
 	resolvers,
 	sealing,
+	setup,
 )
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
@@ -29,7 +31,13 @@ from frappe_sign.utils.dates import format_utc
 @frappe.whitelist()
 @with_error_code
 def get_dashboard() -> dict:
-	return envelope_service.dashboard()
+	return home.dashboard()
+
+
+@frappe.whitelist()
+@with_error_code
+def get_setup_status() -> dict:
+	return setup.setup_status()
 
 
 @frappe.whitelist(methods=["POST"])

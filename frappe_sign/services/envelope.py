@@ -679,32 +679,3 @@ def my_signing_link(name: str) -> str:
 	token = issue_link(doc, row)
 	audit.append(name, "Delivered", recipient_row=row.name, payload={"email": email, "channel": "desk"})
 	return notify.signing_link(token)
-
-
-def dashboard() -> dict[str, Any]:
-	"""Home cards: needs my signature, waiting for others, completed this month, expiring soon."""
-	user = frappe.session.user
-	email = frappe.db.get_value("User", user, "email")
-	waiting_rows = frappe.get_all(
-		"Sign Envelope Recipient",
-		filters={"parenttype": "Sign Envelope", "email": email, "status": ["in", WAITING]},
-		pluck="parent",
-	)
-	open_filter = {"status": ["in", OPEN]}
-	month_start = frappe.utils.get_first_day(frappe.utils.today())
-	soon = after(days=3)
-	return {
-		"needs_my_signature": frappe.get_list(
-			"Sign Envelope",
-			filters={**open_filter, "name": ["in", waiting_rows or [""]]},
-			fields=["name", "title", "sender", "expires_on"],
-			order_by="sent_on desc",
-		),
-		"waiting_for_others": frappe.db.count("Sign Envelope", {**open_filter, "sender": user}),
-		"completed_this_month": frappe.db.count(
-			"Sign Envelope", {"status": COMPLETED, "sender": user, "completed_on": [">=", month_start]}
-		),
-		"expiring_soon": frappe.db.count(
-			"Sign Envelope", {**open_filter, "sender": user, "expires_on": ["<=", soon]}
-		),
-	}

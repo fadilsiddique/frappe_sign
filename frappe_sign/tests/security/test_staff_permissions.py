@@ -154,10 +154,12 @@ class TestStaffActions(PermissionCase):
 		self.alice_envelope()
 		with self.as_user(ALICE):
 			cards = staff.get_dashboard()
-		self.assertEqual(cards["waiting_for_others"], 1)
+		self.assertEqual([row["name"] for row in cards["waiting"]], [self.name])
+		self.assertEqual(cards["month"]["waiting"], 1)
 		with self.as_user(RECIPIENT):
 			cards = staff.get_dashboard()
-		self.assertEqual([row.name for row in cards["needs_my_signature"]], [self.name])
+		self.assertEqual([row["name"] for row in cards["to_sign"]], [self.name])
+		self.assertEqual(cards["waiting"], [], "the recipient did not send it")
 
 
 class TestDownloadsAndVerify(PermissionCase):

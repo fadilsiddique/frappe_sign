@@ -6,10 +6,23 @@ import App from '@/staff/App.vue'
 import AppSidebar from '@/staff/shell/AppSidebar.vue'
 import { NAV_ITEMS } from '@/staff/shell/nav'
 
-// The sidebar's dashboard call: two documents wait for the user's signature.
+// The sidebar's calls: two documents wait for the user's signature, and 3 setup steps are left.
 vi.mock('frappe-ui', async (original) => ({
   ...(await original<typeof import('frappe-ui')>()),
-  createResource: () => ({ data: { needs_my_signature: [{}, {}] } }),
+  createResource: ({ url }: { url: string }) => ({
+    data: url.endsWith('get_dashboard')
+      ? { to_sign: [{}, {}], waiting: [], month: { completed: 0, waiting: 0, declined: 0 } }
+      : {
+          complete: false,
+          steps: ['email', 'seal', 'profile', 'documents'].map((key, index) => ({
+            key,
+            done: index === 0,
+            required: true,
+            can_fix: true,
+            facts: {},
+          })),
+        },
+  }),
 }))
 
 const Page = defineComponent({ render: () => h('p', 'page') })
@@ -65,6 +78,12 @@ describe('AppSidebar', () => {
     // The suffix sits beside the link, in the same row.
     const row = sidebar.find('[data-testid="nav-to-sign"]').element.closest('[data-slot="sidebar-item"]')
     expect(row?.textContent).toContain('2')
+  })
+
+  it('counts the setup steps left beside Settings', async () => {
+    const sidebar = await mountAt('/')
+    const row = sidebar.find('[data-testid="nav-settings"]').element.closest('[data-slot="sidebar-item"]')
+    expect(row?.textContent).toContain('3 left')
   })
 
   it('lights up the section of the current page', async () => {
