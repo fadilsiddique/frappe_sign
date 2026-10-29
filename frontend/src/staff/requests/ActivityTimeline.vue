@@ -5,12 +5,16 @@ import { computed, ref } from 'vue'
 import { __ } from '@/shared/translate'
 import { activityLines, type ActivityEvent } from './activity'
 
-const props = defineProps<{
-  events: ActivityEvent[]
-  people: Array<{ name: string; full_name: string }>
-  chainOk?: boolean
-  auditHead?: string | null
-}>()
+// `chainOk` stays undefined when the caller does not know; Vue would cast a missing Boolean to false.
+const props = withDefaults(
+  defineProps<{
+    events: ActivityEvent[]
+    people: Array<{ name: string; full_name: string }>
+    chainOk?: boolean
+    auditHead?: string | null
+  }>(),
+  { chainOk: undefined, auditHead: null },
+)
 
 const showAudit = ref(false)
 const lines = computed(() => activityLines(props.events, props.people))

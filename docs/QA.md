@@ -2,6 +2,37 @@
 
 Tick each item on a site with an outgoing Email Account and a Sign Profile with a sealing certificate. Items marked (auto) are also covered by the Playwright tests in `e2e/` (`yarn e2e` in `frontend/`, see `frontend/playwright.config.ts`).
 
+## U.13: Quality pass
+
+Screenshots are in `docs/ux/after/` (`u13-*`, with `-rtl` for right to left).
+
+- [ ] (auto) Home, Sent, New request, Templates and Settings at 1440 and 390 px, left to right and right to left: no sideways scroll, no serious axe finding (WCAG A and AA, contrast included). `e2e/staff-qa.spec.ts`.
+- [ ] (auto) Guest consent and signing screens, the expired screen and `/sign-verify` at 390 px, both directions: same checks. `e2e/guest-qa.spec.ts`.
+- [ ] (auto) The first Tab shows a focus ring on every staff, guest and verify page.
+- [ ] (auto) Guest bundle 94.7 KB gzipped (budget 250 KB): `yarn size`.
+- [x] (auto) Stale browsers: the app shells and `/sign-verify` send no-cache headers, and every built asset has a content hash in its name, so an old cache cannot serve old code.
+- [ ] Read the Arabic screens with a native reader once the translations land (P3.5). The right to left checks use English text with `dir="rtl"`, so they test layout, not wording.
+- [ ] Screen reader pass on the signing page and the Sent list (the automated checks do not cover reading order).
+- [ ] Gate 2.5 walk-through on a fresh site by someone who has not seen the app: under 15 minutes, no docs, no help.
+
+## U.11: Verify page and branded emails
+
+Use a Sign Profile with a logo and a brand color. Send a request to your own Gmail and Outlook web addresses.
+
+- [ ] (auto) `/sign-verify`: a dropped PDF without a seal shows "Not sealed"; an unknown request ID shows "Nothing found"; nothing scrolls sideways at 390 px.
+- [ ] A sealed PDF from a completed request shows "This document is genuine", the signers and the seal owner. The same PDF with one byte changed shows "Changed after signing".
+- [ ] The invitation, reminder, completed and declined emails show the logo and company name on top, one button in the brand color, and the footer, in Gmail web and Outlook web.
+- [ ] A light brand color (such as yellow) gets dark button text; a dark one gets white text.
+- [ ] A Sign Profile with no logo and no color gives a plain dark button and no broken image.
+- [ ] The logo file is public: a private logo shows as a broken image in the email (known limit).
+
+## U.12: Desk touch points
+
+- [ ] (auto) The send dialog has no checkbox column and no Kind column; the message sits behind "Add a message"; the second button reads "Preview and edit".
+- [ ] (auto) A sent document's form shows "Signature: Sent", "waiting for <name>" and the request link.
+- [ ] (auto) The Signatures workspace has shortcuts for Open Frappe Sign, New request, Settings and Get started. The sidebar lists Home, Requests, Templates, Triggers and Settings only.
+- [ ] Sign Event, Sign Capture and other internal DocTypes are still found through the Desk search bar.
+
 ## P2.9: Send wizard with a Print Format source
 
 - [ ] (auto) Quotation form, Send for Signature, Customize: `/sign/new` opens with the Quotation, the template and the Customer's contact filled in.

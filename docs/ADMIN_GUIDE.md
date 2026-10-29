@@ -133,9 +133,9 @@ Each run writes a **Sign Trigger Log**. A failed run also adds a comment to the 
 - From the form: **Send for Signature**. The dialog fills the recipients from the document. Check them, then click **Send**.
 - From the print view: **Send for Signature** sends the Print Format and Letter Head on screen.
 - From the list view: select documents, then **Actions > Send for Signature**. Documents without an email for a signer are skipped. A notification lists them.
-- **Customize** in the dialog opens the send wizard. It shows the PDF with the fields before you send.
+- **Add a message** in the dialog opens an optional note to the signers. **Preview and edit** opens the send wizard, which shows the PDF with the fields before you send.
 
-The document shows **Signature: Sent**, then **Partially Signed** and **Signed**. When everyone signs, the sealed PDF is attached to the document.
+The document shows **Signature: Sent**, with who it is waiting for, then **Partially Signed** and **Signed**. When everyone signs, the sealed PDF is attached to the document.
 
 ## When the document changes
 

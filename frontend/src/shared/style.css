@@ -11,3 +11,17 @@ body,
   --sign-brand: #0f766e;
   --sign-brand-soft: rgb(15 118 110 / 0.08);
 }
+
+/* WCAG AA (U.13): frappe-ui's muted gray is too light for small text on the nav and its counts. */
+.text-xs-medium.text-ink-gray-5 {
+  color: var(--ink-gray-7);
+}
+
+[data-slot='sidebar-item-suffix'] .text-ink-gray-4 {
+  color: var(--ink-gray-6);
+}
+
+/* The subtle blue badge (Sent) is just under 4.5:1 with ink-blue-7. */
+.text-ink-blue-7.bg-surface-blue-2 {
+  color: var(--ink-blue-8);
+}

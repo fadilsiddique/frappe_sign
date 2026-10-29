@@ -120,9 +120,9 @@ Make the app easy to understand and pleasant to use before Phase 3. The screen a
 | [x] U.8 | Designer polish: drop zone, palette with icons and groups, compact people panel, save state, icon undo and redo | Visual review at 1440 px; existing designer tests pass |
 | [x] U.9 | Settings `/sign/settings`: Company (profiles, sender status, seal status with Create test seal and Upload), Documents (enabled DocTypes, default template), Signing, Advanced | A Sign Manager sees it, a System Manager changes it; integration tests for the new APIs |
 | [x] U.10 | Guest page: company branding, clear consent checkbox, progress bar, floating "Next" field button, More menu, review before finish, done and terminal screens | Playwright at 390 px; guest bundle under 250 KB gzipped |
-| U.11 | Verify page drop zone and result card; branded invitation, reminder, completed and declined emails | Emails render in Gmail web and Outlook web (manual) |
-| U.12 | Desk: cleaner send dialog, Signatures workspace shortcuts, internal DocTypes off the sidebar, headline shows who it waits for | Playwright for the send dialog; Desk script stays a bundle |
-| U.13 | QA pass: after screenshots in `docs/ux/after/`, RTL check, keyboard and contrast check, stale-browser check, ADMIN_GUIDE and DESIGN 7 updated | Checklist in UX_PLAN.md "Quality bar" holds for every screen |
+| [x] U.11 | Verify page drop zone and result card; branded invitation, reminder, completed and declined emails | Emails render in Gmail web and Outlook web (manual) |
+| [x] U.12 | Desk: cleaner send dialog, Signatures workspace shortcuts, internal DocTypes off the sidebar, headline shows who it waits for | Playwright for the send dialog; Desk script stays a bundle |
+| [x] U.13 | QA pass: after screenshots in `docs/ux/after/`, RTL check, keyboard and contrast check, stale-browser check, ADMIN_GUIDE and DESIGN 7 updated | Checklist in UX_PLAN.md "Quality bar" holds for every screen |
 
 **Gate 2.5:** On a fresh site, someone who has not seen the app sets up a company seal, a profile, Quotation and a template, and sends a Quotation for signature, without the docs and without help, in under 15 minutes. The user approves the after screenshots.
 

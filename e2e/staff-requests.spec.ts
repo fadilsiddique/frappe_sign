@@ -102,6 +102,9 @@ test("the preview shows people and activity, reminds, and voids with a reason", 
   await expect(preview.getByTestId("preview-title")).toHaveText(
     "E2E Supply Quotation",
   );
+  // An intact audit trail shows the "Verified" shield, not a warning.
+  await expect(preview.getByLabel("Verified")).toBeVisible();
+  await expect(preview.getByLabel("Audit trail broken")).toHaveCount(0);
   await expect(preview.getByTestId("person")).toHaveCount(2);
   await expect(preview.getByTestId("person").first()).toContainText(
     "Ahmed Khan",

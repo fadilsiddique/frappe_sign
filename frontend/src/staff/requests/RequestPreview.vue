@@ -21,6 +21,7 @@ interface Detail {
   envelope: Record<string, string | null>
   recipients: Person[]
   events: ActivityEvent[]
+  chain_ok: boolean
   can_write: boolean
 }
 
@@ -123,7 +124,12 @@ const sentLine = computed(() => {
       />
 
       <div class="border-t border-outline-gray-1 pt-4">
-        <ActivityTimeline :key="row.name" :events="data.events" :people="data.recipients" />
+        <ActivityTimeline
+          :key="row.name"
+          :events="data.events"
+          :people="data.recipients"
+          :chain-ok="data.chain_ok"
+        />
       </div>
     </template>
   </section>

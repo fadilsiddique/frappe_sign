@@ -44,8 +44,16 @@ function move(event: KeyboardEvent, step: number) {
     @keydown.down="move($event, 1)"
     @keydown.up="move($event, -1)"
   >
-    <div v-for="group in groups" :key="group.key" class="flex flex-col" :data-group="group.key">
+    <div
+      v-for="group in groups"
+      :key="group.key"
+      class="flex flex-col"
+      role="group"
+      :aria-label="__(group.label)"
+      :data-group="group.key"
+    >
       <h3
+        aria-hidden="true"
         class="flex gap-2 border-b border-outline-gray-1 bg-surface-gray-1 px-4 py-2 text-sm font-medium text-ink-gray-8 sm:px-5"
       >
         {{ __(group.label) }}<span class="font-normal text-ink-gray-6">{{ group.rows.length }}</span>

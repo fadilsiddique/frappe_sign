@@ -561,20 +561,22 @@ Build output to `frappe_sign/public/frontend/`; a post-build script copies HTML 
 
 | Route | Screen | Purpose |
 | --- | --- | --- |
-| `/sign` | Home | Cards: needs my signature, waiting for others, completed this month, expiring soon |
-| `/sign/envelopes` | List | Filters: status, DocType, party, sender; saved views |
-| `/sign/envelopes/:id` | Detail | PDF preview, recipient progress, audit timeline; remind, resend, void, download |
-| `/sign/new` | Send wizard | Source, recipients, fields, review and send |
-| `/sign/templates` | Templates | Filter by DocType and Company |
+| `/sign` | Home | Work queue ("For you to sign", "Waiting on others") beside the "Set up signing" steps, then this month and expiring soon |
+| `/sign/requests` | Sent | Split view: grouped list with tabs, search and filters, and a preview pane (`/sign/envelopes` redirects here) |
+| `/sign/requests/:id` | Request detail | PDF beside a people step list, state-based primary action, plain activity timeline, audit details on demand |
+| `/sign/new` | Send wizard | Document (ERPNext document, template or upload), People, Check, Send |
+| `/sign/templates` | Templates | Grid of cards; New template asks the kind first |
+| `/sign/templates/new/print-format`, `/sign/templates/:id/edit` | Print Format template editor | DocType, Print Format, people, after-sign choices, preview, publish |
 | `/sign/templates/:id/design` | Designer | Place and configure fields, preview as signer, publish |
-| `/sign/triggers` | Triggers | Rules and recent logs |
-| `/sign/settings` | Settings | Profiles, certificate status, enabled DocTypes, health panel |
+| `/sign/settings` | Settings | Company, Documents, Signing and Advanced tabs (health panel in P3.7) |
+
+The public `/sign-verify` page is a server-rendered page, not part of the SPA: a drop zone or a request ID, and a result card (genuine, changed after signing, not sealed, not found). Emails use a table-based shell with the Sign Profile logo, name and brand color (`services/notify.py`).
 
 ### 7.3 Guest flow
 
 `/s/:token`: Verify (OTP), Review and consent, Sign, Done. Terminal screens: Declined, Expired, Voided, Waiting, Already signed.
 
-- Sticky "Start" then "Next field" button jumps through required fields.
+- A slim progress bar and a floating "Next" button that jumps to the next field. Delegate and Decline sit in a "More" menu.
 - Signature bottom sheet: Draw, Type (Arabic and Latin fonts), Upload.
 - Pinch zoom, page thumbnails, collapsible field panel on mobile.
 - Branding from Sign Profile through CSS variables.
