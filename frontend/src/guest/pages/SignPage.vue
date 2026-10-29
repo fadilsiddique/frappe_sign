@@ -17,7 +17,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flow-root min-h-full bg-surface-gray-2 px-3 pb-6">
+  <div class="flow-root min-h-full bg-surface-gray-2 px-3">
     <div
       v-if="state.screen === 'loading'"
       class="flex h-screen items-center justify-center text-ink-gray-5"
@@ -47,6 +47,8 @@ onMounted(() => {
     <TerminalScreen
       v-else
       :screen="state.screen as any"
+      :title="state.summary?.envelope.title"
+      :company="state.summary?.envelope.company"
       :waiting-for="state.waitingFor"
       :completed="state.completed"
       :error="state.error"

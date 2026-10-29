@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { SignApiError } from '@/shared/api'
-import { canFinish, nextRequired, remaining, terminalFor } from '@/guest/flow'
+import { canFinish, nextRequired, progress, remaining, reviewItems, terminalFor } from '@/guest/flow'
 import type { GuestField } from '@/guest/types'
 
 function field(key: string, page: number, y: number, extra: Partial<GuestField> = {}): GuestField {
@@ -73,5 +73,28 @@ describe('next field', () => {
     expect(nextRequired(done)).toBeUndefined()
     expect(canFinish(done)).toBe(true)
     expect(canFinish(fields)).toBe(false)
+  })
+})
+
+describe('progress and review', () => {
+  const fields = [
+    field('a', 1, 0.1, { type: 'Signature', filled: true }),
+    field('b', 1, 0.2, { type: 'Text', value: 'Riyadh', filled: true }),
+    field('c', 1, 0.3, { type: 'Signature' }),
+    field('d', 1, 0.4, { type: 'Date Signed', read_only: true }),
+  ]
+
+  it('counts required fields the signer fills by hand', () => {
+    expect(progress(fields)).toEqual({ done: 2, total: 3 })
+    const named = [field('n', 1, 0.5, { type: 'Full Name' }), field('s', 1, 0.6, { type: 'Signature' })]
+    expect(progress(named)).toEqual({ done: 0, total: 1 })
+  })
+
+  it('lists what was filled, in reading order, without automatic fields', () => {
+    const items = reviewItems(fields)
+    expect(items.map((i) => i.key)).toEqual(['a', 'b', 'c'])
+    expect(items[1].text).toBe('Riyadh')
+    expect(items[0].text).toBe('')
+    expect(items[2].done).toBe(false)
   })
 })

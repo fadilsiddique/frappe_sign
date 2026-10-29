@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { Button } from 'frappe-ui'
 import { computed, nextTick, reactive, ref } from 'vue'
 import PdfViewer from '@/shared/components/PdfViewer.vue'
 import { __ } from '@/shared/translate'
-import { canFinish, editable, isCapture, nextRequired, remaining } from '../flow'
+import { canFinish, editable, isCapture, nextRequired, progress } from '../flow'
 import { readAsDataUrl } from '../signature'
 import type { GuestField } from '../types'
 import type { GuestFlow } from '../useGuestFlow'
+import BrandIcon from './BrandIcon.vue'
 import FieldBox from './FieldBox.vue'
+import GuestHeader from './GuestHeader.vue'
 import MoreSheet from './MoreSheet.vue'
+import ReviewSheet from './ReviewSheet.vue'
 import SignatureSheet from './SignatureSheet.vue'
 import ValueSheet from './ValueSheet.vue'
 
@@ -24,11 +26,13 @@ const signatureField = ref<GuestField | null>(null)
 const valueField = ref<GuestField | null>(null)
 const more = ref<'decline' | 'delegate' | null>(null)
 const confirming = ref(false)
+const menu = ref(false)
 const previews = reactive<Record<string, string>>({})
 const attachmentInput = ref<HTMLInputElement | null>(null)
 const pendingAttachment = ref<GuestField | null>(null)
 
-const left = computed(() => remaining(fields.value))
+const count = computed(() => progress(fields.value))
+const upcoming = computed(() => nextRequired(fields.value, active.value ?? undefined))
 const ready = computed(() => canFinish(fields.value))
 
 function fieldsOn(page: number) {
@@ -60,8 +64,13 @@ async function openField(field: GuestField) {
   }
 }
 
+function choose(mode: 'decline' | 'delegate') {
+  menu.value = false
+  more.value = mode
+}
+
 async function next() {
-  const field = nextRequired(fields.value, active.value ?? undefined)
+  const field = upcoming.value
   if (!field) return
   await reveal(field)
   await openField(field)
@@ -93,35 +102,73 @@ async function attach(event: Event) {
 
 <template>
   <div class="flex min-h-full flex-col bg-surface-gray-2" data-testid="sign">
-    <header class="sticky top-0 z-10 border-b border-outline-gray-1 bg-surface-base px-4 py-3">
-      <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <h1 class="truncate text-base font-semibold text-ink-gray-9">{{ summary.envelope.title }}</h1>
-          <p class="truncate text-sm text-ink-gray-5">
-            {{ __('From {0}', [summary.envelope.sender_name]) }}
-          </p>
+    <div class="sticky top-0 z-10">
+      <GuestHeader :title="summary.envelope.title" :company="summary.envelope.company">
+        <div class="relative">
+          <button
+            type="button"
+            class="flex size-9 items-center justify-center rounded-lg text-ink-gray-7 hover:bg-surface-gray-2"
+            :aria-label="__('More')"
+            aria-haspopup="menu"
+            :aria-expanded="menu"
+            data-testid="more"
+            @click="menu = !menu"
+          >
+            <BrandIcon name="more" />
+          </button>
+          <template v-if="menu">
+            <div class="fixed inset-0 z-10" @click="menu = false" />
+            <div
+              role="menu"
+              class="absolute end-0 top-10 z-20 w-56 rounded-lg border border-outline-gray-2 bg-surface-base p-1 shadow-lg"
+            >
+              <button
+                v-if="summary.recipient.can_delegate"
+                type="button"
+                role="menuitem"
+                class="flex w-full rounded px-3 py-2 text-start text-base text-ink-gray-8 hover:bg-surface-gray-2"
+                data-testid="open-delegate"
+                @click="choose('delegate')"
+              >
+                {{ __('Pass to someone else') }}
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                class="flex w-full rounded px-3 py-2 text-start text-base text-ink-red-4 hover:bg-surface-gray-2"
+                data-testid="open-decline"
+                @click="choose('decline')"
+              >
+                {{ __('Decline to sign') }}
+              </button>
+            </div>
+          </template>
         </div>
-        <div class="flex shrink-0 gap-1">
-          <Button
-            v-if="summary.recipient.can_delegate"
-            size="sm"
-            variant="ghost"
-            :label="__('Delegate')"
-            @click="more = 'delegate'"
-          />
-          <Button
-            size="sm"
-            variant="ghost"
-            theme="red"
-            :label="__('Decline')"
-            data-testid="open-decline"
-            @click="more = 'decline'"
-          />
-        </div>
+      </GuestHeader>
+      <div
+        v-if="count.total"
+        class="h-1 bg-surface-gray-3"
+        role="progressbar"
+        :aria-valuemin="0"
+        :aria-valuemax="count.total"
+        :aria-valuenow="count.done"
+        :aria-label="__('Signing progress')"
+      >
+        <div
+          class="h-full transition-all"
+          :style="{ width: `${(count.done / count.total) * 100}%`, background: 'var(--sign-brand)' }"
+        />
       </div>
-    </header>
+    </div>
 
-    <main class="flex-1 px-2 py-3 pb-28">
+    <p class="px-4 pt-3 text-sm text-ink-gray-6" data-testid="progress">
+      <template v-if="isApprover || !count.total">{{ __('Read the document, then approve it.') }}</template>
+      <template v-else>
+        {{ __('{0} of {1} done', [count.done, count.total]) }}
+      </template>
+    </p>
+
+    <main class="flex-1 px-2 py-3 pb-32">
       <PdfViewer ref="viewer" :source="state.pdf" :pages="summary.pages">
         <template #page="{ page }">
           <FieldBox
@@ -137,40 +184,36 @@ async function attach(event: Event) {
       </PdfViewer>
     </main>
 
-    <footer
-      class="fixed inset-x-0 bottom-0 z-20 border-t border-outline-gray-1 bg-surface-base px-4 py-3 shadow-lg"
-    >
+    <div class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 px-4 pb-5">
       <p
         v-if="state.error && !signatureField && !valueField && !more"
-        class="mb-2 text-sm text-ink-red-4"
+        class="pointer-events-auto rounded-lg bg-surface-base px-3 py-2 text-sm text-ink-red-4 shadow"
         role="alert"
       >
         {{ state.error }}
       </p>
-      <div class="mx-auto flex max-w-lg items-center gap-3">
-        <p class="min-w-0 flex-1 text-sm text-ink-gray-6" data-testid="progress">
-          <template v-if="isApprover">{{ __('Review the document, then approve it.') }}</template>
-          <template v-else-if="left">{{ __('{0} required fields left', [left]) }}</template>
-          <template v-else>{{ __('All required fields are filled.') }}</template>
-        </p>
-        <Button
-          v-if="!ready"
-          variant="solid"
-          size="md"
-          :label="active ? __('Next field') : __('Start')"
-          data-testid="next"
-          @click="next"
-        />
-        <Button
-          v-else
-          variant="solid"
-          size="md"
-          :label="isApprover ? __('Approve') : __('Finish')"
-          data-testid="finish"
-          @click="confirming = true"
-        />
-      </div>
-    </footer>
+      <button
+        v-if="!ready"
+        type="button"
+        class="pointer-events-auto flex h-12 items-center gap-2 rounded-full px-6 text-base font-medium text-white shadow-lg"
+        :style="{ background: 'var(--sign-brand)' }"
+        data-testid="next"
+        @click="next"
+      >
+        {{ upcoming ? __('Next: {0}', [__(upcoming.type)]) : __('Next') }}
+        <BrandIcon name="arrow-down" class="size-4" />
+      </button>
+      <button
+        v-else
+        type="button"
+        class="pointer-events-auto flex h-12 items-center gap-2 rounded-full px-8 text-base font-medium text-white shadow-lg"
+        :style="{ background: 'var(--sign-brand)' }"
+        data-testid="finish"
+        @click="confirming = true"
+      >
+        {{ isApprover ? __('Approve') : __('Review and finish') }}
+      </button>
+    </div>
 
     <input
       ref="attachmentInput"
@@ -203,36 +246,14 @@ async function attach(event: Event) {
       @decline="(reason) => flow.decline(reason)"
       @delegate="(name, email) => flow.delegate(name, email)"
     />
-
-    <div
-      v-if="confirming"
-      class="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div class="w-full max-w-sm rounded-lg bg-surface-base p-5 shadow-xl" data-testid="confirm">
-        <h2 class="text-lg font-semibold text-ink-gray-9">
-          {{ isApprover ? __('Approve this document?') : __('Finish signing?') }}
-        </h2>
-        <p class="mt-2 text-base text-ink-gray-6">
-          {{
-            __('Your signature and the date are added to the document. You cannot change them afterwards.')
-          }}
-        </p>
-        <p v-if="state.error" class="mt-2 text-sm text-ink-red-4" role="alert">{{ state.error }}</p>
-        <div class="mt-5 flex gap-2">
-          <Button class="flex-1" size="md" :label="__('Back')" @click="confirming = false" />
-          <Button
-            class="flex-1"
-            variant="solid"
-            size="md"
-            :loading="state.busy"
-            :label="isApprover ? __('Approve') : __('Finish')"
-            data-testid="confirm-finish"
-            @click="flow.finish()"
-          />
-        </div>
-      </div>
-    </div>
+    <ReviewSheet
+      :open="confirming"
+      :fields="fields"
+      :approver="isApprover"
+      :busy="state.busy"
+      :error="state.error"
+      @close="confirming = false"
+      @confirm="flow.finish()"
+    />
   </div>
 </template>

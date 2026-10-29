@@ -73,3 +73,37 @@ export function remaining(fields: GuestField[]): number {
 export function canFinish(fields: GuestField[]): boolean {
   return remaining(fields) === 0
 }
+
+// Required fields the signer fills by hand: how many are done, out of how many.
+export function progress(fields: GuestField[]): { done: number; total: number } {
+  // Name and email fill themselves, so they are not steps the signer takes.
+  const required = fields.filter(
+    (f) => editable(f) && f.required && !(AUTOFILL_TYPES as readonly string[]).includes(f.type),
+  )
+  return { done: required.filter(isDone).length, total: required.length }
+}
+
+export interface ReviewItem {
+  key: string
+  type: GuestField['type']
+  page: number
+  // Text to show; empty for signatures and other images, which show a "Signed" tick.
+  text: string
+  done: boolean
+}
+
+// What the signer is about to commit to, in reading order, for the review before finishing.
+export function reviewItems(fields: GuestField[]): ReviewItem[] {
+  return ordered(fields)
+    .filter(
+      (f) =>
+        editable(f) && !(AUTOFILL_TYPES as readonly string[]).includes(f.type) && (f.required || isDone(f)),
+    )
+    .map((f) => ({
+      key: f.key,
+      type: f.type,
+      page: f.page,
+      text: isCapture(f) ? '' : f.type === 'Checkbox' ? '' : (f.value ?? ''),
+      done: isDone(f),
+    }))
+}

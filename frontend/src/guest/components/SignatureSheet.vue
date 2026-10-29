@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Draw (signature_pad), Type (bundled script fonts) or Upload an image (DESIGN 7.3).
-import { BottomSheet, Button } from 'frappe-ui'
+import { BottomSheet } from 'frappe-ui'
 import type SignaturePad from 'signature_pad'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { __ } from '@/shared/translate'
@@ -13,9 +13,14 @@ const emit = defineEmits<{ close: []; save: [method: string, image: string] }>()
 
 type Tab = 'Draw' | 'Type' | 'Upload'
 const tab = ref<Tab>('Draw')
+// A press that starts while the sheet slides in lands on the backdrop; do not let it close the sheet.
+const SLIDE_MS = 500
+let openedAt = 0
 const open = computed({
   get: () => Boolean(props.field),
-  set: (value) => value || emit('close'),
+  set: (value) => {
+    if (!value && Date.now() - openedAt > SLIDE_MS) emit('close')
+  },
 })
 const canvas = ref<HTMLCanvasElement | null>(null)
 const typed = ref('')
@@ -44,7 +49,8 @@ async function setupPad() {
 
 watch(
   () => [props.field, tab.value] as const,
-  ([field, current]) => {
+  ([field, current], [before]) => {
+    if (field && !before) openedAt = Date.now()
     localError.value = ''
     if (field && current === 'Draw') void setupPad()
   },
@@ -114,12 +120,15 @@ async function save() {
       </div>
 
       <div v-if="tab === 'Draw'">
-        <canvas
-          ref="canvas"
-          class="h-44 w-full touch-none rounded border border-outline-gray-2 bg-surface-base"
-          :aria-label="__('Draw your signature here')"
-          data-testid="pad"
-        />
+        <div class="relative">
+          <canvas
+            ref="canvas"
+            class="h-44 w-full touch-none rounded-lg border border-outline-gray-2 bg-surface-base"
+            :aria-label="__('Draw your signature here')"
+            data-testid="pad"
+          />
+          <div class="pointer-events-none absolute inset-x-4 bottom-10 border-b border-outline-gray-3" />
+        </div>
         <div class="mt-1 flex justify-between text-sm text-ink-gray-5">
           <span>{{ __('Sign with your finger or mouse') }}</span>
           <button type="button" class="text-ink-gray-7 underline" :disabled="empty" @click="clear">
@@ -168,15 +177,16 @@ async function save() {
       <p class="text-xs text-ink-gray-5">
         {{ __('By saving, you agree that this is your electronic signature.') }}
       </p>
-      <Button
-        class="w-full"
-        variant="solid"
-        size="md"
-        :loading="busy"
-        :label="__('Save signature')"
+      <button
+        type="button"
+        class="h-12 w-full rounded-lg text-base font-medium text-white disabled:opacity-50"
+        :style="{ background: 'var(--sign-brand)' }"
+        :disabled="busy"
         data-testid="save-signature"
         @click="save"
-      />
+      >
+        {{ __('Save signature') }}
+      </button>
     </div>
   </BottomSheet>
 </template>
