@@ -133,7 +133,7 @@ Make the app easy to understand and pleasant to use before Phase 3. The screen a
 | ID | Task | Done when |
 | --- | --- | --- |
 | [x] P3.1 | WhatsApp OTP and invitation via `frappe_whatsapp` (soft dependency) | Works when installed; cleanly hidden when not |
-| P3.2 | Reminders, expiry, certificate expiry warnings, session purge, date triggers | Scheduler tests with frozen time |
+| [x] P3.2 | Reminders, expiry, certificate expiry warnings, session purge, date triggers | Scheduler tests with frozen time |
 | P3.3 | Bulk send from list view (long queue, progress via realtime) | 100 documents processed, per-doc results logged |
 | P3.4 | Portal "My Documents" | Contact sees and downloads own signed docs only |
 | P3.5 | Full Arabic UI, RTL layout, Arabic Email Templates | RTL visual QA on all screens |

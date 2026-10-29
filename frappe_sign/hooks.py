@@ -82,7 +82,11 @@ scheduler_events = {
 	"cron": {
 		# Failed seals retry after 1, 5 and 30 minutes (DESIGN 5.4).
 		"* * * * *": ["frappe_sign.jobs.seal.retry_due"],
+		# Expiry and reminders (DESIGN 8).
+		"*/15 * * * *": ["frappe_sign.jobs.reminders.run"],
 	},
+	# Certificate warnings, session purge and date triggers.
+	"daily": ["frappe_sign.jobs.housekeeping.run"],
 }
 
 # Sign Users see envelopes they sent, receive or were shared (DESIGN 1).

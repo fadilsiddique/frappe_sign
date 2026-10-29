@@ -606,13 +606,17 @@ def expire(name: str) -> bool:
 	return True
 
 
-def expire_due() -> list[str]:
-	names = frappe.get_all(
+def expiring() -> list[str]:
+	"""Open envelopes whose expires_on has passed and that no seal has started on."""
+	return frappe.get_all(
 		"Sign Envelope",
 		filters={"status": ["in", OPEN], "expires_on": ["<", now_datetime()], "sealing_state": "Not Started"},
 		pluck="name",
 	)
-	return [name for name in names if expire(name)]
+
+
+def expire_due() -> list[str]:
+	return [name for name in expiring() if expire(name)]
 
 
 def original_pdf(doc: Any) -> bytes:

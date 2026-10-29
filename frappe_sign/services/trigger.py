@@ -10,7 +10,7 @@ queries: it enqueues jobs with enqueue_after_commit, so nothing runs if the host
 - Lifecycle: cancel or delete voids the open envelopes; a change while one is open sets
   source_changed and tells the sender; an amendment voids what is still open on the amended
   document. jobs.triggers.lifecycle runs as the envelope's sender.
-- The Date event is evaluated by the daily scheduler (P3.2), not here.
+- The Date event is evaluated by services/schedule.py in the daily job, not here.
 """
 
 from __future__ import annotations
