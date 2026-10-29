@@ -332,3 +332,60 @@ def purge_certificates(started: str) -> dict:
 	frappe.db.delete("__Auth", {"doctype": "Sign Certificate", "name": ["in", certificates or [""]]})
 	purge_since(since)
 	return {"profiles": profiles, "certificates": certificates}
+
+
+SETTINGS_MANAGER = "e2e-settings-manager@example.com"
+SETTINGS_MANAGER_PASSWORD = "E2e-settings-9x!"
+
+
+def prepare_settings() -> dict:
+	"""A site for the Settings spec: no Sign Profile, a Sign Manager who can log in, and the
+	signing defaults to restore. Undo with purge_settings(started, expiry)."""
+	require_test_site()
+	from frappe_sign.tests.factories import test_company
+
+	company = test_company()
+	if frappe.db.exists("Sign Profile", company):
+		frappe.throw(f"Sign Profile {company} exists already; the e2e run expects none")
+	started = now_datetime()
+	user = frappe.get_doc(
+		{
+			"doctype": "User",
+			"email": SETTINGS_MANAGER,
+			"first_name": "Settings Manager",
+			"new_password": SETTINGS_MANAGER_PASSWORD,
+			"send_welcome_email": 0,
+		}
+	).insert()
+	user.add_roles("Sign Manager")
+	return {
+		"company": company,
+		"started": str(started),
+		"expiry": frappe.db.get_single_value("Sign Settings", "default_expiry_days"),
+		"user": SETTINGS_MANAGER,
+		"password": SETTINGS_MANAGER_PASSWORD,
+	}
+
+
+def purge_settings(started: str, expiry: int) -> dict:
+	"""Undo prepare_settings and what the spec did: profiles and seals, the DocType it turned on
+	(with its custom fields), the signing defaults and the Sign Manager."""
+	from frappe_sign.services import doctypes
+
+	require_test_site()
+	removed = purge_certificates(started)
+	for name in frappe.get_all(
+		"Sign Enabled DocType", filters={"parent": "Sign Settings"}, pluck="reference_doctype"
+	):
+		if frappe.db.exists(
+			"Custom Field",
+			{"dt": name, "fieldname": "sign_status", "creation": [">=", get_datetime(started)]},
+		):
+			with run_as("Administrator"):
+				frappe.db.delete(
+					"Sign Enabled DocType", {"parent": "Sign Settings", "reference_doctype": name}
+				)
+				doctypes.remove_custom_fields(name)
+	frappe.db.set_single_value("Sign Settings", "default_expiry_days", expiry)
+	frappe.delete_doc("User", SETTINGS_MANAGER, force=True)
+	return removed

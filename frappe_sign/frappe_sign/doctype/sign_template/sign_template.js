@@ -9,6 +9,7 @@ frappe.ui.form.on("Sign Template", {
 	},
 
 	refresh(frm) {
+		show_staff_app_intro(frm);
 		if (frm.is_new()) return;
 		// Senders see only published versions; Print Format templates are published from here.
 		frm.add_custom_button(__("Publish"), async () => {
@@ -31,3 +32,18 @@ frappe.ui.form.on("Sign Template", {
 		}
 	},
 });
+
+// Print Format templates are easier to make in the staff app (UX_PLAN "Templates").
+function show_staff_app_intro(frm) {
+	const own_pdf = frm.doc.source_type === "Uploaded PDF";
+	const path = frm.is_new()
+		? "/sign/templates"
+		: `/sign/templates/${encodeURIComponent(frm.doc.name)}/${own_pdf ? "design" : "edit"}`;
+	const link = `<a href="${path}">${__("Open it in Frappe Sign")}</a>`;
+	frm.set_intro(
+		`<b>${__("Easier in Frappe Sign")}</b>: ${__(
+			"pick the Print Format, name the people who sign and preview the page."
+		)} ${link}`,
+		"blue"
+	);
+}

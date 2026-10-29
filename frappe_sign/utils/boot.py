@@ -4,6 +4,7 @@ import frappe
 from frappe.utils.jinja_globals import is_rtl
 
 STAFF_ROLES = frozenset({"Sign Manager", "Sign User", "System Manager"})
+MANAGER_ROLES = frozenset({"Sign Manager", "System Manager"})
 EMPTY_BRANDING = {"company": None, "logo": None, "brand_color": None}
 
 

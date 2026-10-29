@@ -8,6 +8,7 @@ from frappe.website.path_resolver import resolve_path
 from frappe.website.serve import get_response
 
 from frappe_sign.tests.factories import test_company
+from frappe_sign.utils.users import run_as
 from frappe_sign.www import s as guest_page
 from frappe_sign.www import sign as staff_page
 
@@ -52,10 +53,18 @@ class TestShellContext(IntegrationTestCase):
 		self.assertTrue(context.boot["csrf_token"])
 		self.assertEqual(
 			set(context.boot["frappe_sign"]),
-			{"user", "full_name", "user_image", "lang", "dir", "branding", "messages"},
+			{"user", "full_name", "user_image", "can_manage", "lang", "dir", "branding", "messages"},
 		)
+		self.assertTrue(context.boot["frappe_sign"]["can_manage"])
 		self.assertEqual(context.boot["frappe_sign"]["dir"], "ltr")
 		self.assertEqual(context.boot["frappe_sign"]["full_name"], "Administrator")
+
+	def test_a_sign_user_cannot_manage(self):
+		make_user("boot-sign-user@example.com", ["Sign User"])
+		with run_as("boot-sign-user@example.com"):
+			context = frappe._dict()
+			staff_page.get_context(context)
+		self.assertFalse(context.boot["frappe_sign"]["can_manage"])
 
 	def test_staff_boot_uses_the_only_profile_branding(self):
 		frappe.get_doc(

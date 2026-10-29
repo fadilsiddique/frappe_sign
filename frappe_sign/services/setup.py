@@ -11,9 +11,8 @@ from typing import Any
 
 import frappe
 from frappe.email.doctype.email_account.email_account import EmailAccount
-from frappe.utils import get_datetime, now_datetime
 
-from frappe_sign.services import notify
+from frappe_sign.services import certificates, notify
 from frappe_sign.utils.boot import STAFF_ROLES
 
 STEPS = ("email", "seal", "profile", "documents", "template", "test")
@@ -66,20 +65,10 @@ def outgoing_email(profile: str | None) -> str | None:
 def seal_step(profile: str | None) -> dict[str, Any]:
 	can_fix = frappe.has_permission("Sign Certificate", "create")
 	certificate = profile and frappe.db.get_value("Sign Profile", profile, "sealing_certificate")
-	details = certificate and frappe.db.get_value(
-		"Sign Certificate", certificate, ["kind", "valid_to"], as_dict=True
-	)
-	if not details:
-		return step("seal", False, can_fix, kind=None, valid_to=None, expired=False)
-	expired = bool(details.valid_to) and get_datetime(details.valid_to) <= now_datetime()
-	return step(
-		"seal",
-		not expired,
-		can_fix,
-		kind=details.kind,
-		valid_to=str(details.valid_to.date()) if details.valid_to else None,
-		expired=expired,
-	)
+	seal = certificates.seal_details(certificate)
+	result = step("seal", bool(seal["kind"]) and not seal["expired"], can_fix)
+	result["facts"] = seal
+	return result
 
 
 def profile_step(profile: str | None) -> dict[str, Any]:

@@ -5,7 +5,7 @@ from urllib.parse import quote
 import frappe
 from frappe import _
 
-from frappe_sign.utils.boot import STAFF_ROLES, base_boot, profile_branding
+from frappe_sign.utils.boot import MANAGER_ROLES, STAFF_ROLES, base_boot, profile_branding
 
 no_cache = 1
 sitemap = 0
@@ -25,5 +25,6 @@ def get_context(context):
 	boot = base_boot(frappe.session.user, profile_branding(company))
 	# The sidebar's user menu shows who is signed in; the guest page never gets these.
 	boot["full_name"] = frappe.utils.get_fullname(frappe.session.user)
+	boot["can_manage"] = bool(MANAGER_ROLES.intersection(frappe.get_roles()))
 	boot["user_image"] = frappe.db.get_value("User", frappe.session.user, "user_image")
 	context.boot = {"csrf_token": frappe.sessions.get_csrf_token(), "frappe_sign": boot}

@@ -18,11 +18,14 @@ from frappe_sign.services import (
 	doctypes,
 	documents,
 	home,
+	pickers,
 	preview,
 	requests,
 	resolvers,
 	sealing,
+	settings_page,
 	setup,
+	template_catalog,
 )
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services import template as template_service
@@ -156,6 +159,8 @@ def get_envelope(envelope: str) -> dict:
 				"sent_on",
 				"expires_on",
 				"completed_on",
+				"reference_doctype",
+				"reference_name",
 				"signing_order",
 				"otp_mode",
 				"original_sha256",
@@ -205,10 +210,69 @@ def my_signing_link(envelope: str) -> dict:
 @frappe.whitelist(methods=["POST"])
 @with_error_code
 def create_test_certificate(
-	company: str | None = None, common_name: str | None = None, years: int = 3
+	company: str | None = None, common_name: str | None = None, years: int = 3, replace: bool = False
 ) -> dict:
 	"""A self-signed sealing certificate, used in the company's Sign Profile (System Manager)."""
-	return certificates.create_test_certificate(company, common_name, years)
+	return certificates.create_test_certificate(company, common_name, years, bool(frappe.parse_json(replace)))
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def upload_certificate(
+	company: str,
+	password: str,
+	file_name: str = "seal.p12",
+	content: str | None = None,
+	kind: str = "CA-issued",
+) -> dict:
+	"""Make an uploaded PKCS#12 file the company's seal (System Manager). The file is multipart
+	`file` or base64 `content`."""
+	file_name, data = uploaded_file(file_name, content)
+	return certificates.upload_certificate(company, file_name, data, password, kind)
+
+
+@frappe.whitelist()
+@with_error_code
+def get_settings() -> dict:
+	"""Everything the Settings page shows (Sign Manager and System Manager)."""
+	return settings_page.overview()
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def save_profile(company: str, values: dict | str) -> dict:
+	return settings_page.save_profile(company, frappe.parse_json(values) or {})
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def save_settings(section: str, values: dict | str) -> dict:
+	return settings_page.save_settings(section, frappe.parse_json(values) or {})
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def enable_doctype(doctype: str) -> dict:
+	return settings_page.enable_doctype(doctype)
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def disable_doctype(doctype: str) -> dict:
+	settings_page.disable_doctype(doctype)
+	return {"doctype": doctype}
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
+def set_default_template(doctype: str, template: str | None = None) -> dict:
+	return settings_page.set_default_template(doctype, template)
+
+
+@frappe.whitelist()
+@with_error_code
+def doctype_choices(query: str = "") -> list:
+	return settings_page.doctype_choices(query)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -231,6 +295,27 @@ def save_template(template: str | None = None, data: dict | str | None = None) -
 	return {"name": doc.name, "modified": str(doc.modified)}
 
 
+@frappe.whitelist()
+@with_error_code
+def list_templates() -> list:
+	"""Templates for the staff Templates page, with when each was last used."""
+	return template_catalog.list_templates()
+
+
+@frappe.whitelist()
+@with_error_code
+def template_print_formats(doctype: str) -> list:
+	"""The Print Formats of a DocType and whether each has signature fields."""
+	return template_catalog.print_formats(doctype)
+
+
+@frappe.whitelist()
+@with_error_code
+def template_doctype_fields(doctype: str) -> list:
+	"""The fields of a DocType that a template's "Set a field" choice may write."""
+	return template_catalog.doctype_fields(doctype)
+
+
 @frappe.whitelist(methods=["POST"])
 @with_error_code
 def upload_pdf(
@@ -245,6 +330,10 @@ def upload_pdf(
 
 
 def uploaded_pdf(file_name: str, content: str | None) -> tuple[str, bytes]:
+	return uploaded_file(file_name, content)
+
+
+def uploaded_file(file_name: str, content: str | None) -> tuple[str, bytes]:
 	upload = frappe.request.files.get("file") if frappe.request and frappe.request.files else None
 	if upload:
 		return upload.filename or file_name, upload.stream.read()
@@ -265,6 +354,27 @@ def remove_sign_fields(doctype: str) -> dict:
 def resolve_recipients(template: str, doctype: str | None = None, name: str | None = None) -> list:
 	"""The template's roles with the recipients found on the document (DESIGN 4.3)."""
 	return resolvers.resolve_recipients(template, doctype, name)
+
+
+@frappe.whitelist()
+@with_error_code
+def sendable_doctypes() -> list:
+	"""The enabled DocTypes the user may send, with their template counts (send wizard)."""
+	return pickers.sendable_doctypes()
+
+
+@frappe.whitelist()
+@with_error_code
+def document_choices(doctype: str, query: str = "", limit: int = 20) -> list:
+	"""Documents of an enabled DocType with party, date and total (send wizard)."""
+	return pickers.document_choices(doctype, query, int(limit))
+
+
+@frappe.whitelist()
+@with_error_code
+def search_people(query: str) -> list:
+	"""Contacts and users matching the text, for the people step."""
+	return pickers.search_people(query)
 
 
 @frappe.whitelist()
