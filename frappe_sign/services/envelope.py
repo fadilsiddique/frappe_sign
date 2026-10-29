@@ -21,7 +21,7 @@ from frappe_sign.pdf.pages import extract_pages
 from frappe_sign.pdf.sanitize import sanitize
 from frappe_sign.pdf.source import render
 from frappe_sign.pdf.types import Anchor, PdfError
-from frappe_sign.services import audit, events, gate, notify, settings
+from frappe_sign.services import audit, events, gate, notify, settings, whatsapp
 from frappe_sign.services.errors import pdf_message
 from frappe_sign.services.resolvers import authorised_signatory
 from frappe_sign.services.template import load_snapshot
@@ -181,6 +181,20 @@ def send(name: str) -> None:
 	)
 
 
+def check_whatsapp(doc: Any, signing: list[Any]) -> None:
+	"""WhatsApp verification needs frappe_whatsapp, the company's profile switch and a mobile number."""
+	if not whatsapp.enabled(doc.company):
+		throw(
+			FieldValidationError,
+			_(
+				"WhatsApp verification is not set up. Install frappe_whatsapp and switch it on in the Sign Profile."
+			),
+		)
+	for row in signing:
+		if not whatsapp.mask_mobile(row.mobile):
+			throw(FieldValidationError, _("Recipient {0} needs a mobile number.").format(row.role_label))
+
+
 def check_sendable(doc: Any) -> None:
 	from_print = is_print_source(doc)
 	signing = [row for row in doc.recipients if row.kind in SIGNING_KINDS]
@@ -212,7 +226,7 @@ def check_sendable(doc: Any) -> None:
 				),
 			)
 	if doc.otp_mode == "WhatsApp":
-		throw(FieldValidationError, _("WhatsApp verification is not available yet. Use Email or Off."))
+		check_whatsapp(doc, signing)
 	if from_print and not (doc.reference_doctype and doc.reference_name):
 		throw(FieldValidationError, _("Choose the document whose Print Format is sent."))
 	if not from_print and not doc.template_version and not doc.source_file:

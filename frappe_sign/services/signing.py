@@ -33,7 +33,7 @@ from frappe_sign.exceptions import (
 )
 from frappe_sign.pdf.sanitize import sanitize
 from frappe_sign.pdf.types import PdfError
-from frappe_sign.services import audit, events, notify, sealing, settings
+from frappe_sign.services import audit, events, notify, sealing, settings, whatsapp
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services.errors import pdf_message
 from frappe_sign.services.pdfs import IMAGE_TYPES, current_pdf_file, filled_pdf
@@ -172,8 +172,6 @@ def request_otp(token: str, channel: str, client: Client | None = None) -> dict[
 	envelope, recipient = access.envelope, access.recipient
 	if envelope.otp_mode == "Off" or channel != envelope.otp_mode:
 		throw(FieldValidationError, _("Verification by {0} is not used for this document.").format(channel))
-	if envelope.otp_mode != "Email":
-		throw(FieldValidationError, _("Only email verification is available."))
 	last_sent = frappe.db.get_value(
 		"Sign Session",
 		{"envelope": envelope.name, "recipient_row": recipient.name, "otp_sent_on": ["is", "set"]},
@@ -201,20 +199,32 @@ def request_otp(token: str, channel: str, client: Client | None = None) -> dict[
 		},
 		update_modified=False,
 	)
-	notify.send_otp(envelope, recipient, code, minutes)
+	sent_to = deliver_otp(envelope, recipient, code, minutes)
 	audit.append(
 		envelope.name,
 		"OTP Sent",
 		recipient_row=recipient.name,
 		actor=recipient.email,
 		client=client,
-		payload={"channel": "email"},
+		payload={"channel": channel.lower()},
 	)
 	return {
-		"sent_to": mask_email(recipient.email),
+		"sent_to": sent_to,
 		"expires_in": minutes * 60,
 		"retry_after": OTP_COOLDOWN_SECONDS,
 	}
+
+
+def deliver_otp(envelope: Any, recipient: Any, code: str, minutes: int) -> str:
+	"""Send the code by the envelope's channel; returns the masked address it went to."""
+	if envelope.otp_mode == "WhatsApp":
+		# Checked first: the link token in by_token (guests may not create WhatsApp Messages).
+		whatsapp.message(recipient.mobile, whatsapp.otp_text(envelope, code, minutes), envelope.name).insert(
+			ignore_permissions=True
+		)
+		return whatsapp.mask_mobile(recipient.mobile)
+	notify.send_otp(envelope, recipient, code, minutes)
+	return mask_email(recipient.email)
 
 
 def verify_otp(token: str, code: str, client: Client | None = None) -> dict[str, Any]:

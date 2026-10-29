@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   otpModeLabel,
+  otpModeOptions,
   requestStatus,
   roleKindLabel,
   signerSourceLabel,
@@ -54,12 +55,18 @@ describe('people words', () => {
   it('names the signing order and the emailed code', () => {
     expect(signingOrderLabel('Sequential')).toBe('Sign in this order')
     expect(signingOrderLabel('Parallel')).toBe('All at once')
-    expect(otpModeLabel('Email')).toBe('On')
+    expect(otpModeLabel('Email')).toBe('Emailed code')
+    expect(otpModeLabel('WhatsApp')).toBe('WhatsApp code')
     expect(otpModeLabel('Off')).toBe('Off')
   })
 
   it('keeps an unknown value as it is', () => {
     expect(roleKindLabel('Witness')).toBe('Witness')
     expect(signerSourceLabel('Script')).toBe('Script')
+  })
+
+  it('offers WhatsApp only when the site can send it', () => {
+    expect(otpModeOptions(false).map((o) => o.value)).toEqual(['Off', 'Email'])
+    expect(otpModeOptions(true).map((o) => o.value)).toEqual(['Off', 'Email', 'WhatsApp'])
   })
 })

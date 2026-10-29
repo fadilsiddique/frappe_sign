@@ -12,7 +12,8 @@ import Palette from '../designer/Palette.vue'
 import PdfDropZone from '../designer/PdfDropZone.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
 import { useDesigner, type FieldType } from '../designer/store'
-import { otpModeLabel, signingOrderLabel } from '../labels'
+import { otpModeOptions, signingOrderLabel } from '../labels'
+import { readBoot } from '@/shared/boot'
 import { call } from 'frappe-ui'
 
 const props = defineProps<{ id: string }>()
@@ -195,8 +196,8 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
           <FormControl
             v-model="store.otpMode"
             type="select"
-            :label="__('Verify with an emailed code')"
-            :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
+            :label="__('Verify the signer with a code')"
+            :options="otpModeOptions(readBoot().whatsapp)"
           />
         </div>
       </aside>

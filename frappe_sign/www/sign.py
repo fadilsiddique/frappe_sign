@@ -5,6 +5,7 @@ from urllib.parse import quote
 import frappe
 from frappe import _
 
+from frappe_sign.services import whatsapp
 from frappe_sign.utils.boot import MANAGER_ROLES, STAFF_ROLES, base_boot, profile_branding
 
 no_cache = 1
@@ -27,4 +28,5 @@ def get_context(context):
 	boot["full_name"] = frappe.utils.get_fullname(frappe.session.user)
 	boot["can_manage"] = bool(MANAGER_ROLES.intersection(frappe.get_roles()))
 	boot["user_image"] = frappe.db.get_value("User", frappe.session.user, "user_image")
+	boot["whatsapp"] = whatsapp.any_enabled()
 	context.boot = {"csrf_token": frappe.sessions.get_csrf_token(), "frappe_sign": boot}

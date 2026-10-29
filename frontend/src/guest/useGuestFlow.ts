@@ -101,7 +101,7 @@ export function useGuestFlow(token: string, client: GuestClient = new GuestClien
 
   async function requestOtp() {
     const result = await run(() =>
-      client.call<{ sent_to: string }>('request_otp', { token, channel: 'Email' }),
+      client.call<{ sent_to: string }>('request_otp', { token, channel: state.summary?.otp_mode ?? 'Email' }),
     )
     if (result) state.otpSentTo = result.sent_to
   }

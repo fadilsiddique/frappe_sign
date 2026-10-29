@@ -9,7 +9,8 @@ import { errorMessage, staff } from '../api'
 import AppPageHeader from '../components/AppPageHeader.vue'
 import EmptyState from '../components/EmptyState.vue'
 import HeaderAction from '../components/HeaderAction.vue'
-import { otpModeLabel, signingOrderLabel } from '../labels'
+import { otpModeOptions, signingOrderLabel } from '../labels'
+import { readBoot } from '@/shared/boot'
 import AfterSigningEditor from '../templates/AfterSigningEditor.vue'
 import { afterFromStored, afterProblem, afterToStored, emptyAfter } from '../templates/afterSigning'
 import PeopleEditor from '../templates/PeopleEditor.vue'
@@ -79,7 +80,7 @@ async function load() {
   doctype.value = doc.reference_doctype
   printFormat.value = doc.print_format ?? ''
   signingOrder.value = doc.signing_order
-  otpMode.value = doc.otp_mode === 'Off' ? 'Off' : 'Email'
+  otpMode.value = doc.otp_mode
   published.value = doc.published_version
   people.value = [...doc.roles]
     .sort((a, b) => a.routing_order - b.routing_order)
@@ -270,8 +271,8 @@ async function publish() {
             <FormControl
               v-model="otpMode"
               type="select"
-              :label="__('Verify with an emailed code')"
-              :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
+              :label="__('Verify the signer with a code')"
+              :options="otpModeOptions(readBoot().whatsapp)"
             />
           </div>
         </section>

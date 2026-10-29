@@ -51,9 +51,16 @@ const SIGNING_ORDER: Record<string, string> = {
   Parallel: 'All at once',
 }
 
-const OTP_MODE: Record<string, string> = { Email: 'On', Off: 'Off' }
+const OTP_MODE: Record<string, string> = { Email: 'Emailed code', WhatsApp: 'WhatsApp code', Off: 'Off' }
 
 export const roleKindLabel = (kind: string): string => __(ROLE_KIND[kind] ?? kind)
 export const signerSourceLabel = (source: string): string => __(SIGNER_SOURCE[source] ?? source)
 export const signingOrderLabel = (order: string): string => __(SIGNING_ORDER[order] ?? order)
 export const otpModeLabel = (mode: string): string => __(OTP_MODE[mode] ?? mode)
+
+// Verification choices; WhatsApp only appears when the site can send it (P3.1).
+export const otpModeOptions = (whatsapp: boolean): Array<{ label: string; value: string }> =>
+  (whatsapp ? ['Off', 'Email', 'WhatsApp'] : ['Off', 'Email']).map((value) => ({
+    label: otpModeLabel(value),
+    value,
+  }))

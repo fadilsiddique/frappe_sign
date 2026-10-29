@@ -13,6 +13,8 @@ export interface Boot {
   user_image: string | null
   // Staff app only: may open Settings (Sign Manager or System Manager).
   can_manage: boolean
+  // Staff app only: frappe_whatsapp is installed and a Sign Profile switched it on.
+  whatsapp: boolean
   lang: string
   dir: 'ltr' | 'rtl'
   branding: Branding
@@ -31,6 +33,7 @@ const DEFAULT_BOOT: Boot = {
   full_name: null,
   user_image: null,
   can_manage: true,
+  whatsapp: false,
   lang: 'en',
   dir: 'ltr',
   branding: { company: null, logo: null, brand_color: null },

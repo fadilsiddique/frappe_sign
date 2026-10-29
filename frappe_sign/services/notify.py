@@ -1,4 +1,4 @@
-"""Email notifications, Notification Log and realtime updates (DESIGN 8.7). WhatsApp arrives in P3.1.
+"""Email notifications, Notification Log and realtime updates (DESIGN 8.7). WhatsApp invitations and codes go through services/whatsapp.py when the company enables it.
 
 Emails use the Email Templates shipped as fixtures ("Frappe Sign ..."); a template a site deleted
 falls back to the built-in text. Signer links carry the plain token, which exists only in memory and
@@ -17,6 +17,7 @@ from frappe.desk.doctype.notification_log.notification_log import make_notificat
 from frappe.email.doctype.email_account.email_account import EmailAccount
 from frappe.utils import escape_html, get_url
 
+from frappe_sign.services import whatsapp
 from frappe_sign.utils.boot import profile_branding
 from frappe_sign.utils.dates import format_local
 
@@ -65,7 +66,30 @@ def try_send_invitation(envelope: Any, recipient: Any, token: str, *, reminder: 
 			),
 		)
 		return False
+	send_whatsapp_invitation(envelope, recipient, token, reminder=reminder)
 	return True
+
+
+def send_whatsapp_invitation(envelope: Any, recipient: Any, token: str, *, reminder: bool) -> None:
+	"""Also message the link when WhatsApp is on for the company and the recipient has a mobile.
+
+	Email stays the primary channel, so a failure here is recorded and reported, never raised.
+	"""
+	if not recipient.mobile or not whatsapp.enabled(envelope.company):
+		return
+	text = whatsapp.invitation_text(envelope, recipient, signing_link(token), reminder=reminder)
+	try:
+		whatsapp.send_text(recipient.mobile, text, envelope.name)
+	except Exception:
+		frappe.log_error(
+			title="Frappe Sign: whatsapp", reference_doctype="Sign Envelope", reference_name=envelope.name
+		)
+		notify_sender(
+			envelope,
+			_("The WhatsApp message to {0} could not be sent. The email was queued.").format(
+				recipient.full_name
+			),
+		)
 
 
 def can_send_email(company: str | None) -> bool:

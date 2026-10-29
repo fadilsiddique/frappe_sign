@@ -11,7 +11,8 @@ import { __ } from '@/shared/translate'
 import { errorMessage, fetchPdf, fileToBase64, STAFF_API, staff } from '../api'
 import AnchorPreview from '../components/AnchorPreview.vue'
 import AppPageHeader from '../components/AppPageHeader.vue'
-import { otpModeLabel, signingOrderLabel } from '../labels'
+import { otpModeOptions, signingOrderLabel } from '../labels'
+import { readBoot } from '@/shared/boot'
 import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
 import { FIELD_TYPES, useDesigner, type FieldType } from '../designer/store'
@@ -444,8 +445,8 @@ function back() {
           <FormControl
             v-model="form.otpMode"
             type="select"
-            :label="__('Verify with an emailed code')"
-            :options="['Off', 'Email'].map((value) => ({ label: otpModeLabel(value), value }))"
+            :label="__('Verify the signer with a code')"
+            :options="otpModeOptions(readBoot().whatsapp)"
           />
         </template>
         <ul

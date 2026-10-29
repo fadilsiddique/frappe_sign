@@ -51,9 +51,9 @@ def jpeg() -> bytes:
 
 
 class SigningCase(SignTestCase):
-	def sent(self, **template):
+	def sent(self, recipients=None, **template):
 		version = publish_template(**template)
-		draft = make_draft(version)
+		draft = make_draft(version, recipients=recipients)
 		self.box_ctx = capture_tokens()
 		self.box = self.box_ctx.__enter__()
 		self.addCleanup(self.box_ctx.__exit__, None, None, None)
