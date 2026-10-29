@@ -6,6 +6,14 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 describe('GuestClient', () => {
+  it('sends the page language so server texts match it', async () => {
+    window.frappe_sign = { lang: 'ar' }
+    const fetchImpl = vi.fn().mockImplementation(async () => jsonResponse(200, { message: {} }))
+    await new GuestClient(fetchImpl).call('open', { token: 't' })
+    expect(JSON.parse(fetchImpl.mock.calls[0][1].body)).toEqual({ token: 't', _lang: 'ar' })
+    delete window.frappe_sign
+  })
+
   it('posts JSON and sends the session header once there is one', async () => {
     const fetchImpl = vi.fn().mockImplementation(async () => jsonResponse(200, { message: { ok: true } }))
     const client = new GuestClient(fetchImpl)

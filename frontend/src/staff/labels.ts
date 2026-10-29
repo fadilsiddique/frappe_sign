@@ -58,6 +58,12 @@ export const signerSourceLabel = (source: string): string => __(SIGNER_SOURCE[so
 export const signingOrderLabel = (order: string): string => __(SIGNING_ORDER[order] ?? order)
 export const otpModeLabel = (mode: string): string => __(OTP_MODE[mode] ?? mode)
 
+// Each language is named in itself, so it reads right whatever language the app shows.
+export const LANGUAGES = [
+  { label: 'English', value: 'en' },
+  { label: 'العربية', value: 'ar' },
+]
+
 // Verification choices; WhatsApp only appears when the site can send it (P3.1).
 export const otpModeOptions = (whatsapp: boolean): Array<{ label: string; value: string }> =>
   (whatsapp ? ['Off', 'Email', 'WhatsApp'] : ['Off', 'Email']).map((value) => ({

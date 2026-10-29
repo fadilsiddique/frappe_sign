@@ -19,6 +19,8 @@ export class SignApiError extends Error {
   }
 }
 
+import { readBoot } from './boot'
+
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>
 
 interface ErrorBody {
@@ -71,7 +73,8 @@ export class GuestClient {
       response = await this.fetchImpl(GUEST_API + method, {
         method: 'POST',
         headers: this.headers(),
-        body: JSON.stringify(args),
+        // _lang makes server texts (consent, errors) match the language the page shows.
+        body: JSON.stringify({ ...args, _lang: readBoot().lang }),
         credentials: 'same-origin',
       })
     } catch {

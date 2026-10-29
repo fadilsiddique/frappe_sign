@@ -110,7 +110,7 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="root" class="w-full">
+  <div ref="root" class="w-full" dir="ltr">
     <div
       v-for="box in boxes"
       :key="box.page"

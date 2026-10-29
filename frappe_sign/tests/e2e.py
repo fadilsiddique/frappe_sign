@@ -20,13 +20,15 @@ def require_test_site() -> None:
 		frappe.throw(frappe._("Frappe Sign e2e fixtures run only on sites with allow_tests set."))
 
 
-def create_guest_envelope(otp_mode: str = "Off") -> dict:
+def create_guest_envelope(otp_mode: str = "Off", language: str | None = None) -> dict:
 	"""A sent envelope (Customer then Company) and the Customer's signing token."""
 	require_test_site()
 	started = now_datetime()
 	with run_as("Administrator"):
 		make_email_account(skip_smtp_check=True)
-		draft = make_draft(publish_template(otp_mode=otp_mode), title="E2E Service Agreement")
+		draft = make_draft(
+			publish_template(otp_mode=otp_mode), title="E2E Service Agreement", language=language
+		)
 		with capture_tokens() as box:
 			send_now(draft.name)
 	customer = next(
@@ -389,3 +391,69 @@ def purge_settings(started: str, expiry: int) -> dict:
 	frappe.db.set_single_value("Sign Settings", "default_expiry_days", expiry)
 	frappe.delete_doc("User", SETTINGS_MANAGER, force=True)
 	return removed
+
+
+# Arabic UI screenshots (P3.5).
+
+
+def set_user_language(user: str, language: str) -> dict:
+	"""Switch a user's language; returns the previous one so the spec can restore it."""
+	require_test_site()
+	previous = frappe.db.get_value("User", user, "language") or ""
+	frappe.db.set_value("User", user, "language", language or None)
+	frappe.clear_cache(user=user)
+	return {"previous": previous}
+
+
+def create_arabic_template() -> dict:
+	"""A published template for the designer screens. Purge it with purge_created(started)."""
+	require_test_site()
+	started = now_datetime()
+	with run_as("Administrator"):
+		version = publish_template()
+		template = frappe.db.get_value("Sign Template Version", version, "template")
+	return {"template": template, "started": str(started)}
+
+
+def render_emails(language: str = "ar") -> dict:
+	"""Every built-in email as full HTML (subject as a heading), for the email screenshots."""
+	require_test_site()
+	from types import SimpleNamespace
+
+	from frappe.translate import print_language
+
+	from frappe_sign.services import notify
+
+	context = {
+		"sender_name": "Layla Hassan",
+		"envelope_title": "Service Agreement",
+		"recipient_name": "Ahmed Khan",
+		"link": "https://sign.example.com/s/token",
+		"expires_on": "2026-11-12 18:00 Asia/Dubai",
+		"message": "",
+		"brand_color": "#0f766e",
+		"button_text_color": "#ffffff",
+		"otp": "482913",
+		"minutes": 10,
+		"reason": "The price changed",
+		"declined_by": "Ahmed Khan",
+		"envelope": "SIGN-2026-00001",
+	}
+	envelope = SimpleNamespace(company=None)
+	pages = {}
+	for name in (
+		notify.INVITATION,
+		notify.REMINDER,
+		notify.OTP,
+		notify.COMPLETED,
+		notify.DECLINED,
+		notify.VOIDED,
+		notify.FAILED,
+	):
+		with print_language(language):
+			subject, body = notify.render(name, context, language)
+			wrapped = notify.wrap(body, envelope)
+		direction = "rtl" if language == "ar" else "ltr"
+		heading = f"<h3 dir='{direction}' style='font-family:sans-serif;margin:8px 12px'>{subject}</h3>"
+		pages[name.removeprefix("Frappe Sign ").lower()] = heading + wrapped
+	return pages

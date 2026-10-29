@@ -2,6 +2,7 @@
 // White header with the company logo and name from the Sign Profile, then the document title.
 import { computed } from 'vue'
 import { readBoot } from '@/shared/boot'
+import LanguageSwitch from '@/shared/components/LanguageSwitch.vue'
 
 // `company` is the request's company, used when the Sign Profile has no display name.
 const props = defineProps<{ title?: string; company?: string | null }>()
@@ -34,6 +35,7 @@ const initial = computed(() => name.value.trim().charAt(0).toUpperCase())
         </p>
         <p v-if="title" class="truncate text-sm text-ink-gray-6">{{ title }}</p>
       </div>
+      <LanguageSwitch />
       <slot />
     </div>
   </header>

@@ -176,7 +176,11 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
           @pick="placing = placing === $event ? null : $event"
         />
       </aside>
-      <main class="min-w-0 flex-1 overflow-y-auto bg-surface-gray-2 p-4">
+      <main
+        class="min-w-0 flex-1 overflow-y-auto bg-surface-gray-2 p-4"
+        tabindex="0"
+        :aria-label="__('Document pages')"
+      >
         <DesignerCanvas v-if="pdf" :source="pdf" :placing="placing" @placed="placing = null" />
         <PdfDropZone v-else @file="upload" />
       </main>

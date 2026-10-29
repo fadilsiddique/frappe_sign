@@ -1,0 +1,951 @@
+(optional),(اختياري)
+", {0} not sent",، تعذّر إرسال {0}
+0 disables reminders,القيمة 0 توقف التذكيرات
+0 turns reminders off.,القيمة 0 توقف التذكيرات.
+0..1 from the left of the visible page box,من 0 إلى 1 من يسار صفحة العرض
+0..1 from the top of the visible page box,من 0 إلى 1 من أعلى صفحة العرض
+1 hour ago,قبل ساعة
+1 minute ago,قبل دقيقة
+1 published,1 منشور
+1 request,طلب واحد
+1 waiting on you,1 بانتظار توقيعك
+1-based. 0 means the position comes from an anchor.,يبدأ العدّ من 1. القيمة 0 تعني أن الموضع يأتي من علامة تثبيت.
+A certificate authority,جهة إصدار الشهادات
+"A company profile holds the seal, the logo and the sender email for its documents.",يحتوي ملف تعريف الشركة على الختم والشعار وبريد المرسِل لمستنداتها.
+A new Sign Envelope starts as a Draft.,يبدأ كل ظرف توقيع جديد كمسودة.
+A person named in a field of the document,شخص مذكور في أحد حقول المستند
+A recipient,مستلم
+A reminder was sent,تم إرسال تذكير
+A reminder was sent to {0},تم إرسال تذكير إلى {0}
+A saved signature belongs to the user who saved it.,التوقيع المحفوظ يخص المستخدم الذي حفظه.
+A specific person,شخص محدد
+"A template says who signs and where. Start from a Print Format, or upload your own PDF.",يحدد القالب من يوقّع وأين. ابدأ من نموذج طباعة أو ارفع ملف PDF خاصاً بك.
+"A template says who signs and where. Start one for a Quotation, or from your own PDF.",يحدد القالب من يوقّع وأين. ابدأ بقالب لعرض سعر أو من ملف PDF خاص بك.
+AATL,AATL
+Accept the electronic records disclosure first.,اقبل إفصاح السجلات الإلكترونية أولاً.
+Action parameters,معاملات الإجراء
+Activity,النشاط
+Actor,المنفِّذ
+Add,إضافة
+Add Quotation or another document to send it for signature.,أضف عرض سعر أو مستنداً آخر لإرساله للتوقيع.
+Add a company,إضافة شركة
+Add a document type,إضافة نوع مستند
+Add a message,إضافة رسالة
+Add a person,إضافة شخص
+Add at least one Signer or Approver role before publishing.,أضف دور موقِّع أو معتمِد واحداً على الأقل قبل النشر.
+Add at least one Signer or Approver.,أضف موقِّعاً أو معتمِداً واحداً على الأقل.
+Add field,إضافة حقل
+Add person,إضافة شخص
+"Adding for {0}. Pick a type, then click the page.",الإضافة لـ {0}. اختر النوع ثم انقر على الصفحة.
+Adobe Reader shows this name in the signature panel.,يعرض Adobe Reader هذا الاسم في لوحة التوقيع.
+After everyone signs,بعد أن يوقّع الجميع
+After signing,بعد التوقيع
+All at once,الجميع معاً
+Already signed,تم التوقيع بالفعل
+An Adobe approved provider (AATL),جهة معتمدة لدى Adobe (AATL)
+Anchor tag,علامة التثبيت
+Any document,أي مستند
+Anyone,أي شخص
+Apply Workflow Action,تطبيق إجراء سير العمل
+Apply a workflow action,تطبيق إجراء سير عمل
+Approve,اعتماد
+Approve this document?,هل تريد اعتماد هذا المستند؟
+Approver,معتمِد
+Approves,يعتمد
+Ask a Sign Manager or System Manager to do this.,اطلب ذلك من مدير التوقيع أو مدير النظام.
+Ask at Send,يُسأل عند الإرسال
+Ask for a verification code first.,اطلب رمز التحقق أولاً.
+Ask someone else to sign,اطلب من شخص آخر التوقيع
+At (UTC),في (UTC)
+Attach the PDF to send.,أرفق ملف PDF المراد إرساله.
+Attach the PKCS#12 (.p12) file and enter its password.,أرفق ملف PKCS#12 ‏(.p12) وأدخل كلمة مروره.
+Audit chain head,رأس سلسلة التدقيق
+Audit head,رأس التدقيق
+Audit head on the certificate: {0},رأس التدقيق في الشهادة: {0}
+Audit trail,سجل التدقيق
+Audit trail broken,سجل التدقيق مكسور
+Authorised signatory,المفوَّض بالتوقيع
+Back,رجوع
+Back to Desk,العودة إلى سطح المكتب
+Becomes a link to Company when ERPNext is installed,يصبح رابطاً إلى الشركة عند تثبيت ERPNext
+Brand color,لون العلامة التجارية
+Branding,الهوية البصرية
+Buttons and fields on the signing page.,الأزرار والحقول في صفحة التوقيع.
+By,بواسطة
+"By continuing, you agree to sign this document electronically. Your electronic signature is legally binding in the same way as a handwritten signature. You can ask the sender for a paper copy. Your IP address, device and the time of each step are recorded.",بمتابعتك فإنك توافق على توقيع هذا المستند إلكترونياً. توقيعك الإلكتروني ملزم قانوناً كالتوقيع بخط اليد. يمكنك أن تطلب من المرسِل نسخة ورقية. يتم تسجيل عنوان IP وجهازك ووقت كل خطوة.
+"By saving, you agree that this is your electronic signature.",بالحفظ فإنك توافق على أن هذا هو توقيعك الإلكتروني.
+CA-issued,صادرة عن جهة اعتماد
+Call Method,استدعاء دالة
+Can delegate,يمكنه التفويض
+Can pass on to someone else,يمكنه تمريره إلى شخص آخر
+Cancel,إلغاء
+Cancelled,ملغى
+Certificate,الشهادة
+Certificate created,تم إنشاء الشهادة
+Certificate details,تفاصيل الشهادة
+Certificate file (.p12 or .pfx),ملف الشهادة (‎.p12 أو ‎.pfx)
+Certificate of Completion,شهادة الإتمام
+Change logo,تغيير الشعار
+Check before sending,راجع قبل الإرسال
+Check before you sign,راجع قبل أن توقّع
+Check that a signed PDF is unchanged and sealed. Nothing you upload is kept.,تحقق من أن ملف PDF الموقّع لم يتغير وأنه مختوم. لا يتم الاحتفاظ بأي شيء ترفعه.
+Checkbox,خانة اختيار
+Choose,اختيار
+Choose CA-issued or AATL.,اختر صادرة عن جهة اعتماد أو AATL.
+Choose a company,اختر شركة
+Choose a template made for {0}.,اختر قالباً مخصصاً لـ {0}.
+Choose an image first.,اختر صورة أولاً.
+Choose documents,اختيار المستندات
+Choose one of the options for {0}.,اختر أحد الخيارات لـ {0}.
+Choose the PKCS#12 (.p12) file.,اختر ملف PKCS#12 ‏(.p12).
+Choose the company.,اختر الشركة.
+Choose the document whose Print Format is sent.,اختر المستند الذي سيُرسل نموذج الطباعة الخاص به.
+Choose the file and enter its password.,اختر الملف وأدخل كلمة مروره.
+Choose which ERPNext documents can be sent for signature. Most teams start with Quotation.,اختر مستندات ERPNext التي يمكن إرسالها للتوقيع. تبدأ معظم الفرق بعرض السعر.
+Chosen when sending,يُختار عند الإرسال
+Clear,مسح
+Clear filters,مسح عوامل التصفية
+Clear search,مسح البحث
+Colour,اللون
+Colour of this role in the designer,لون هذا الدور في المصمم
+Company,الشركة
+Company Stamp,ختم الشركة
+Company name,اسم الشركة
+Company profile,ملف تعريف الشركة
+Company seal,ختم الشركة
+Company seal updated,تم تحديث ختم الشركة
+Company seal valid until {0},ختم الشركة صالح حتى {0}
+Completed,مكتمل
+Completed on,اكتمل في
+Condition is not a valid expression ({0}).,الشرط ليس تعبيراً صحيحاً ({0}).
+Connected: {0},متصل: {0}
+Consent,الموافقة
+Consent text,نص الموافقة
+Consent version,إصدار الموافقة
+Consented,تمت الموافقة
+Copy to all pages,نسخ إلى كل الصفحات
+Could not load this.,تعذّر التحميل.
+Create,إنشاء
+Create Draft,إنشاء مسودة
+Create Mapped Document,إنشاء مستند مرتبط
+Create a Sign Profile for your company and select this certificate on it.,أنشئ ملف تعريف توقيع لشركتك واختر هذه الشهادة فيه.
+Create a draft Sales Order,إنشاء مسودة أمر بيع
+Create a new seal,إنشاء ختم جديد
+Create a seal,إنشاء ختم
+Create test certificate,إنشاء شهادة تجريبية
+Create test seal,إنشاء ختم تجريبي
+Created by {0},أنشأه {0}
+Custom setting from Desk (kept as it is),إعداد مخصص من سطح المكتب (يبقى كما هو)
+Date,التاريخ
+Date Field,حقل التاريخ
+Date Signed,تاريخ التوقيع
+Date field,حقل التاريخ
+Days after the date (negative for before),أيام بعد التاريخ (سالب للأيام قبله)
+Days offset,فارق الأيام
+Decline,رفض
+Decline reason,سبب الرفض
+Decline to sign,رفض التوقيع
+Declined,مرفوض
+Declined: {0},مرفوض: {0}
+Default company-side signer,الموقِّع الافتراضي من جهة الشركة
+Default expiry days,أيام الصلاحية الافتراضية
+Default reminder days,أيام التذكير الافتراضية
+Default template,القالب الافتراضي
+Default template for {0},القالب الافتراضي لـ {0}
+Delegated,مفوَّض
+Delegated to,فُوِّض إلى
+Delete,حذف
+Delete Demo Data,حذف البيانات التجريبية
+Delivered,تم التسليم
+Do nothing,لا شيء
+Doc Field,حقل المستند
+DocType {0} cannot be enabled for signing.,لا يمكن تفعيل نوع المستند {0} للتوقيع.
+DocType {0} cannot have Sign Triggers.,لا يمكن أن تكون لنوع المستند {0} مشغّلات توقيع.
+DocType {0} is listed twice.,نوع المستند {0} مذكور مرتين.
+DocType {0} is not submittable.,نوع المستند {0} غير قابل للاعتماد.
+DocTypes that get the sign status fields and the Send for Signature button,أنواع المستندات التي تحصل على حقول حالة التوقيع وزر إرسال للتوقيع
+Document,مستند
+Document for signature,مستند للتوقيع
+Document type,نوع المستند
+Documents that colleagues send you to sign or approve show here.,تظهر هنا المستندات التي يرسلها إليك زملاؤك للتوقيع أو الاعتماد.
+Documents you sign,مستندات توقّعها
+Documents you signed with Frappe Sign. Each file is sealed and can be checked at any time.,المستندات التي وقّعتها باستخدام Frappe Sign. كل ملف مختوم ويمكن التحقق منه في أي وقت.
+Done,تم
+Download signed PDF,تنزيل ملف PDF الموقّع
+Downloaded,تم التنزيل
+Draft,مسودة
+"Draft, not sent yet",مسودة، لم تُرسل بعد
+"Draft, people not chosen yet",مسودة، لم يتم اختيار الأشخاص بعد
+Draw,رسم
+Draw your signature first.,ارسم توقيعك أولاً.
+Draw your signature here,ارسم توقيعك هنا
+"Drop a PDF here, or choose one",أسقط ملف PDF هنا أو اختر ملفاً
+Drop the signed PDF here,أسقط ملف PDF الموقّع هنا
+Drop your PDF here,أسقط ملف PDF هنا
+Dropdown,قائمة منسدلة
+"Dropdown options, one per line",خيارات القائمة المنسدلة، خيار في كل سطر
+Each recipient needs its own role label.,يحتاج كل مستلم إلى تسمية دور خاصة به.
+Easier in Frappe Sign,أسهل في Frappe Sign
+Edit profile,تعديل ملف التعريف
+Electronic records and signatures,السجلات والتوقيعات الإلكترونية
+Electronic records disclosure shown to signers,إفصاح السجلات الإلكترونية المعروض للموقّعين
+Email,البريد الإلكتروني
+Email account,حساب البريد الإلكتروني
+Email address,عنوان البريد الإلكتروني
+Email field,حقل بريد إلكتروني
+Email me a code,أرسل لي رمزاً بالبريد
+Email template,قالب البريد الإلكتروني
+Emailed code,رمز عبر البريد
+Emailed code lasts (minutes),مدة صلاحية الرمز المرسل بالبريد (بالدقائق)
+Empty for ad-hoc envelopes,فارغ للظروف الفورية
+Enabled DocTypes,أنواع المستندات المفعّلة
+Ends {0},ينتهي {0}
+Enter a name and email for {0}.,أدخل اسماً وبريداً إلكترونياً لـ {0}.
+Enter someone else's email address.,أدخل عنوان بريد شخص آخر.
+"Enter the color as #RRGGBB, for example #0f766e.",أدخل اللون بالصيغة ‎#RRGGBB، مثل ‎#0f766e.
+Enter the name and email address of the person who will sign.,أدخل اسم الشخص الذي سيوقّع وعنوان بريده الإلكتروني.
+Enter the name to show on the certificate.,أدخل الاسم المراد عرضه على الشهادة.
+Envelope,ظرف
+Envelope status changes only through Frappe Sign actions such as Send or Void.,تتغير حالة الظرف فقط عبر إجراءات Frappe Sign مثل الإرسال أو الإلغاء.
+Event details,تفاصيل الحدث
+Every person has a field to fill.,لكل شخص حقل ليعبّئه.
+Every person needs a name and an email address.,يحتاج كل شخص إلى اسم وعنوان بريد إلكتروني.
+Every person needs a role name.,يحتاج كل شخص إلى اسم دور.
+Everyone has signed this document.,وقّع الجميع على هذا المستند.
+Everyone has signed. Everyone will get the signed PDF by email shortly.,وقّع الجميع. سيصلهم ملف PDF الموقّع بالبريد قريباً.
+Everyone has signed. Sealing the PDF.,وقّع الجميع. جارٍ ختم ملف PDF.
+Everyone has signed; the envelope is being sealed.,وقّع الجميع، ويجري ختم الظرف.
+Everyone signed,وقّع الجميع
+Everyone will get the signed PDF by email once all signers are done.,سيصل ملف PDF الموقّع إلى الجميع بالبريد بعد أن ينتهي كل الموقّعين.
+Expired,منتهي الصلاحية
+Expired on {0},انتهت الصلاحية في {0}
+Expires on,تنتهي الصلاحية في
+Expires {0}.,تنتهي الصلاحية {0}.
+Expiring soon,ينتهي قريباً
+Expiry days,أيام الصلاحية
+Field,حقل
+Field Filled,تمت تعبئة حقل
+Field key,مفتاح الحقل
+Field key {0} is used twice.,مفتاح الحقل {0} مستخدم مرتين.
+Field of the document,حقل من المستند
+Field path on the source document,مسار الحقل في المستند المصدر
+"Field path such as customer_name, or a Jinja expression",مسار حقل مثل customer_name أو تعبير Jinja
+Field type,نوع الحقل
+"Field {0} belongs to {1}, which is not a Signer here.",الحقل {0} يخص {1} وهو ليس موقِّعاً هنا.
+Field {0} cannot be typed into.,لا يمكن الكتابة في الحقل {0}.
+Field {0} does not take a signature or file.,الحقل {0} لا يقبل توقيعاً أو ملفاً.
+Field {0} is not yours to fill.,الحقل {0} ليس لك لتعبئته.
+"Field {0} is on page {1}, but the PDF has {2} pages.",الحقل {0} في الصفحة {1} لكن ملف PDF فيه {2} صفحة.
+"Field {0} is placed by an anchor, which needs a Print Format source.",الحقل {0} يوضع بعلامة تثبيت وهذا يحتاج إلى مصدر من نموذج طباعة.
+Field {0}: a Dropdown needs options.,الحقل {0}: القائمة المنسدلة تحتاج إلى خيارات.
+Field {0}: font size must be above 0.,الحقل {0}: يجب أن يكون حجم الخط أكبر من 0.
+"Field {0}: page 0 means the position comes from an anchor, so set an anchor tag.",الحقل {0}: الصفحة 0 تعني أن الموضع يأتي من علامة تثبيت، لذا حدّد علامة تثبيت.
+Field {0}: page cannot be negative.,الحقل {0}: لا يمكن أن تكون الصفحة سالبة.
+Field {0}: role {1} is an {2} and cannot have fields.,الحقل {0}: الدور {1} من نوع {2} ولا يمكن أن تكون له حقول.
+Field {0}: role {1} is not in the roles table.,الحقل {0}: الدور {1} غير موجود في جدول الأدوار.
+Field {0}: validation regex is not valid ({1}).,الحقل {0}: التعبير النمطي للتحقق غير صحيح ({1}).
+"Field {0}: x, y, width and height must place the field inside the page (0 to 1), with a width and height above 0.",الحقل {0}: يجب أن تضع القيم x وy والعرض والارتفاع الحقل داخل الصفحة (من 0 إلى 1) على أن يكون العرض والارتفاع أكبر من 0.
+Fields on the document,حقول من المستند
+File {0} was not found.,لم يتم العثور على الملف {0}.
+Files and hashes,الملفات والبصمات
+Fill in every required field first.,عبّئ كل الحقول المطلوبة أولاً.
+Filled from the document,عُبّئ من المستند
+Filled on,وقت التعبئة
+Filter,تصفية
+Final sealed PDF,ملف PDF النهائي المختوم
+Fingerprint (SHA-256),البصمة (SHA-256)
+Finish and sign,إنهاء والتوقيع
+"Finish setting up, then send your first request.",أكمل الإعداد ثم أرسل أول طلب لك.
+First template,أول قالب
+Fixed User,مستخدم ثابت
+Fixed user,مستخدم ثابت
+Font size,حجم الخط
+For example Approve,مثال: اعتماد
+For example Customer or Company,مثال: العميل أو الشركة
+For example contact_email,مثال: contact_email
+For you to sign,بانتظار توقيعك
+"For {0}. Pick a type, then click the page.",لـ {0}. اختر النوع ثم انقر على الصفحة.
+Found on the document,موجود في المستند
+Frappe Sign,Frappe Sign
+Frappe Sign could not finish {0}: {1},تعذّر على Frappe Sign إكمال {0}: {1}
+Frappe Sign e2e fixtures run only on sites with allow_tests set.,تعمل تجهيزات Frappe Sign الشاملة فقط على المواقع التي فعّلت allow_tests.
+Frappe Sign trigger {0} failed: {1},فشل مشغّل Frappe Sign ‏{0}: {1}
+From,من
+"From {0}, sent by {1}",من {0}، أرسله {1}
+Full name,الاسم الكامل
+Gets a copy,يتلقى نسخة
+Give a reason for voiding.,اذكر سبب الإلغاء.
+Give the template a title.,أعطِ القالب عنواناً.
+Goes up on resend; the link of an older version stops working (D10),يزداد عند إعادة الإرسال؛ ويتوقف رابط الإصدار الأقدم (D10)
+Has signature fields,يحتوي على حقول توقيع
+Hash,البصمة
+Hash chain,سلسلة البصمات
+Hash chain head at completion,رأس سلسلة البصمات عند الإتمام
+Hash of the uploaded PDF,بصمة ملف PDF المرفوع
+Height,الارتفاع
+Hide audit details,إخفاء تفاصيل التدقيق
+Home,الرئيسية
+I agree to sign electronically.,أوافق على التوقيع إلكترونياً.
+IP,IP
+IP address,عنوان IP
+Ignored when signing order is Parallel,يُتجاهل عندما يكون ترتيب التوقيع متوازياً
+Increases each time the consent text changes,يزداد في كل مرة يتغير فيها نص الموافقة
+Initials,الأحرف الأولى
+Intermediate SHA-256,SHA-256 للنسخة الوسيطة
+Intermediate file,الملف الوسيط
+Invitation,دعوة
+Invitations and signed copies go out from an outgoing email account.,تصدر الدعوات والنسخ الموقّعة من حساب بريد صادر.
+Is active,نشط
+Issued by,صادرة عن
+Issuer,الجهة المصدِرة
+Key,المفتاح
+Kind,النوع
+Largest upload (MB),أكبر حجم للرفع (ميغابايت)
+Last seen on,آخر ظهور في
+Leave empty to use the standard text. A blank line starts a new paragraph.,اتركه فارغاً لاستخدام النص القياسي. السطر الفارغ يبدأ فقرة جديدة.
+Leave without saving?,المغادرة دون حفظ؟
+Legal footer,تذييل قانوني
+Letter head,ترويسة الخطاب
+Line at the bottom of the certificate page,سطر في أسفل صفحة الشهادة
+Link not valid,الرابط غير صالح
+Load more,تحميل المزيد
+Loading the document,جارٍ تحميل المستند
+Log out,تسجيل الخروج
+Logo,الشعار
+Logo of {0},شعار {0}
+Look in All for every request.,اطّلع على «الكل» لعرض كل الطلبات.
+"Make a template first, or upload a PDF.",أنشئ قالباً أولاً أو ارفع ملف PDF.
+"Makes a self-signed certificate and uses it in the company's Sign Profile. It seals documents and shows any later change, but Adobe Reader shows its identity as unknown. For a green tick, upload a certificate from a trusted provider instead.",ينشئ شهادة موقّعة ذاتياً ويستخدمها في ملف توقيع الشركة. تختم المستندات وتُظهر أي تغيير لاحق، لكن Adobe Reader يعرض هويتها «غير معروفة». للحصول على العلامة الخضراء ارفع شهادة من جهة موثوقة بدلاً منها.
+Max pages,أقصى عدد للصفحات
+Max upload (MB),أقصى حجم للرفع (ميغابايت)
+Message,رسالة
+Message to signers,رسالة إلى الموقّعين
+Messaging,المراسلة
+Missing: add an outgoing email account,ناقص: أضف حساب بريد صادر
+Missing: documents cannot be sealed,ناقص: لا يمكن ختم المستندات
+Mode,الوضع
+More,المزيد
+More actions,إجراءات أخرى
+Most pages in a document,أكبر عدد صفحات في مستند
+My signed documents,مستنداتي الموقّعة
+Name,الاسم
+Name of the Sign Envelope Recipient row,اسم صف مستلم ظرف التوقيع
+Name of the role,اسم الدور
+Name on the certificate,الاسم على الشهادة
+New link,رابط جديد
+New link sent,تم إرسال رابط جديد
+New request,طلب جديد
+New template,قالب جديد
+Next,التالي
+Next seal retry,محاولة الختم التالية
+Next: {0},التالي: {0}
+"Next: {0} and {1}, at the same time",التالي: {0} و{1} في الوقت نفسه
+"Next: {0}, not opened yet",التالي: {0}، لم يفتح بعد
+"Next: {0}, opened it {1}",التالي: {0}، فتحه {1}
+"Next: {0}, {1} and {2} more, at the same time",التالي: {0} و{1} و{2} آخرون في الوقت نفسه
+No Letterhead,بلا ترويسة
+No company yet,لا توجد شركة بعد
+No default template,لا يوجد قالب افتراضي
+No document type is turned on for signing,لا يوجد نوع مستند مفعّل للتوقيع
+No document type matches.,لا يوجد نوع مستند مطابق.
+No document type yet,لا يوجد نوع مستند بعد
+No documents found,لم يتم العثور على مستندات
+No email address found for {0} on {1} {2}.,لم يتم العثور على بريد إلكتروني لـ {0} في {1} {2}.
+No published template,لا يوجد قالب منشور
+No published templates,لا توجد قوالب منشورة
+No requests match,لا توجد طلبات مطابقة
+No requests yet,لا توجد طلبات بعد
+No signature field found. The template's own fields are used.,لم يتم العثور على حقل توقيع. تُستخدم حقول القالب نفسه.
+No signature fields yet. Add sign_field() to this Print Format; the anchor guide in the Admin guide shows how.,لا توجد حقول توقيع بعد. أضف sign_field() إلى نموذج الطباعة هذا؛ ويوضح دليل علامات التثبيت في دليل المسؤول الطريقة.
+"No signer has the role {0}, so its fields stay empty.",لا يوجد موقّع بالدور {0}، لذا تبقى حقوله فارغة.
+No template,بلا قالب
+No templates yet,لا توجد قوالب بعد
+Nobody can sign it after this. Everyone who was waiting will see that it was voided.,لن يتمكن أحد من التوقيع بعد هذا. وسيرى كل من كان ينتظر أنه أُلغي.
+Nobody finished before it expired,لم ينته أحد قبل انتهاء الصلاحية
+Not found on the document. Enter it here.,غير موجود في المستند. أدخله هنا.
+Not opened yet,لم يُفتح بعد
+Not published,غير منشور
+Not sent yet,لم يُرسل بعد
+Not sent: {0},لم يُرسل: {0}
+Not used yet,غير مستخدم بعد
+Not your turn yet,ليس دورك بعد
+Nothing here,لا شيء هنا
+Nothing waiting,لا شيء بانتظارك
+OTP Sent,أُرسل رمز التحقق
+OTP Verified,تم التحقق من الرمز
+OTP attempts,محاولات الرمز
+OTP expires on,ينتهي الرمز في
+OTP hash,بصمة الرمز
+OTP mode,وضع الرمز
+OTP sent on,وقت إرسال الرمز
+OTP validity (minutes),صلاحية الرمز (بالدقائق)
+Off,متوقف
+One web address per line. A timestamp proves when a document was sealed. Leave empty to use the built-in servers.,عنوان ويب واحد في كل سطر. يثبت الختم الزمني وقت ختم المستند. اتركه فارغاً لاستخدام الخوادم المدمجة.
+Only a Draft can be sent.,لا يمكن إرسال سوى المسودة.
+Only a Sign Manager can retry sealing.,فقط مدير التوقيع يمكنه إعادة محاولة الختم.
+Only a System Manager can change these settings.,فقط مدير النظام يمكنه تغيير هذه الإعدادات.
+Only a System Manager can enable DocTypes for signing: {0}.,فقط مدير النظام يمكنه تفعيل أنواع المستندات للتوقيع: {0}.
+Only a System Manager can remove the signature fields.,فقط مدير النظام يمكنه إزالة حقول التوقيع.
+Only a failed seal can be retried.,لا يمكن إعادة محاولة سوى الختم الفاشل.
+Open designer,فتح المصمم
+Open it in Frappe Sign,افتحه في Frappe Sign
+"Opened, not signed yet",فُتح ولم يُوقَّع بعد
+Opening document...,جارٍ فتح المستند...
+Opening...,جارٍ الفتح...
+Opens in Desk,يفتح في سطح المكتب
+Optional. Evaluated with frappe.safe_eval; doc is the source document.,اختياري. يُقيَّم باستخدام frappe.safe_eval؛ والمتغير doc هو المستند المصدر.
+"Options, one per line",الخيارات، خيار في كل سطر
+Original PDF,ملف PDF الأصلي
+Original PDF SHA-256,SHA-256 لملف PDF الأصلي
+Original SHA-256,SHA-256 الأصلي
+Original file,الملف الأصلي
+Overrides Sign Settings when set,يتجاوز إعدادات التوقيع عند تحديده
+Own PDF,ملف PDF خاص
+PDF SHA-256 at signing,SHA-256 لملف PDF عند التوقيع
+PDF file,ملف PDF
+PDF frozen at send,ملف PDF مجمّد عند الإرسال
+PDF uploaded,تم رفع ملف PDF
+PKCS#11 or CSC endpoint (later release),نقطة نهاية PKCS#11 أو CSC
+PKCS#12 File,ملف PKCS#12
+PKCS#12 file,ملف PKCS#12
+PKCS#12 password,كلمة مرور PKCS#12
+Page metrics,مقاييس الصفحات
+Page sizes and rotation of the frozen PDF,أحجام الصفحات واتجاهها في ملف PDF المجمّد
+Page {0},صفحة {0}
+"Page {0}: x {1}, y {2}, w {3}, h {4}",صفحة {0}: x ‏{1}، y ‏{2}، العرض {3}، الارتفاع {4}
+Parallel,متوازٍ
+Party Contact,جهة الاتصال بالطرف
+Party type,نوع الطرف
+Pass to someone else,تمرير إلى شخص آخر
+Passed on,تم تمريره
+Passed to someone else,تم تمريره إلى شخص آخر
+Password of the file,كلمة مرور الملف
+Pattern (regex),النمط (تعبير نمطي)
+Payload,الحمولة
+People,الأشخاص
+People can send these documents for signature from their form. Most teams start with Quotation.,يمكن للأشخاص إرسال هذه المستندات للتوقيع من نماذجها. تبدأ معظم الفرق بعرض السعر.
+"People, all at once",الأشخاص، جميعاً معاً
+"People, in signing order",الأشخاص، بترتيب التوقيع
+Pick a Print Format to preview it.,اختر نموذج طباعة لمعاينته.
+Pick a document to see the printed page with the signature boxes on it.,اختر مستنداً لترى الصفحة المطبوعة وعليها مربعات التوقيع.
+Pick the Print Format.,اختر نموذج الطباعة.
+Pick the brand color,اختر لون العلامة التجارية
+Pick the field to set.,اختر الحقل المراد تعيينه.
+Pick the type of document.,اختر نوع المستند.
+Placed by an anchor,موضوع بعلامة تثبيت
+Post sign action,إجراء بعد التوقيع
+Post sign config,إعدادات الإجراء بعد التوقيع
+Post-Sign Action,إجراء بعد التوقيع
+Post-sign action {0} is not registered.,الإجراء بعد التوقيع {0} غير مسجّل.
+Prefill from field,تعبئة مسبقة من حقل
+Prefill path,مسار التعبئة المسبقة
+Prefilled and locked,معبّأ مسبقاً ومقفل
+Preview,معاينة
+Preview and edit,معاينة وتعديل
+Previous hash,البصمة السابقة
+"Primary signer's party, for dashboards",طرف الموقّع الرئيسي، للوحات المعلومات
+Print Format,نموذج الطباعة
+Print Format error,خطأ في نموذج الطباعة
+"Print Format {0} is for {1}, not {2}.",نموذج الطباعة {0} مخصص لـ {1} وليس لـ {2}.
+Print format,نموذج الطباعة
+Printed on the certificate and on emails,يُطبع على الشهادة وفي الرسائل الإلكترونية
+Private PDF rendered when this recipient finished,ملف PDF خاص تم إنشاؤه عندما أنهى هذا المستلم
+Private file,ملف خاص
+Private file. Default image for Company Stamp fields.,ملف خاص. الصورة الافتراضية لحقول ختم الشركة.
+Publish,نشر
+Publish a Frappe Sign template for {0} first.,انشر قالب Frappe Sign لـ {0} أولاً.
+Publish a Frappe Sign template for {0} first. Templates are made in {1}.,انشر قالب Frappe Sign لـ {0} أولاً. تُنشأ القوالب في {1}.
+Publish a template for {0} first.,انشر قالباً لـ {0} أولاً.
+Publish the template before making it the default.,انشر القالب قبل جعله افتراضياً.
+Published,منشور
+Published by,نشره
+Published on,تاريخ النشر
+Published version,الإصدار المنشور
+Published version {0},الإصدار المنشور {0}
+Published: {0},منشور: {0}
+Queued,في الانتظار
+Quotation for signature,عرض سعر للتوقيع
+"RFC 3161 timestamp servers, one URL per line, tried in order",خوادم الختم الزمني RFC 3161، عنوان في كل سطر، تُجرَّب بالترتيب
+Read only,للقراءة فقط
+Read only (prefilled),للقراءة فقط (معبّأ مسبقاً)
+"Read the document, then approve it.",اقرأ المستند ثم اعتمده.
+Reason,السبب
+Reason: {0},السبب: {0}
+Recipient row,صف المستلم
+Recipient {0} needs a mobile number.,يحتاج المستلم {0} إلى رقم جوال.
+Recipient {0} needs a name and a valid email address.,يحتاج المستلم {0} إلى اسم وعنوان بريد إلكتروني صحيح.
+Recipients come from each document. Documents without an email for a signer are skipped and listed in your notifications.,يأتي المستلمون من كل مستند. تُتخطى المستندات التي لا يتوفر فيها بريد إلكتروني لأحد الموقّعين وتُدرج في إشعاراتك.
+Redo,إعادة
+Reload the page to try again.,أعد تحميل الصفحة للمحاولة من جديد.
+Remind,تذكير
+Remind every (days),تذكير كل (أيام)
+Reminded,تم التذكير
+Reminder days,أيام التذكير
+Reminder sent,تم إرسال التذكير
+Remote,عن بُعد
+Remote config,إعداد التوقيع عن بُعد
+Remote signing keys are not available yet. Use a PKCS#12 file.,مفاتيح التوقيع عن بُعد غير متاحة بعد. استخدم ملف PKCS#12.
+Remove,إزالة
+Remove person,إزالة الشخص
+Remove {0},إزالة {0}
+Rendered from the reference document at send. Copied from a Print Format template.,يُنشأ من المستند المرجعي عند الإرسال. منسوخ من قالب نموذج طباعة.
+Replace PDF,استبدال ملف PDF
+Replace certificate,استبدال الشهادة
+Request,طلب
+Request details,تفاصيل الطلب
+Request lasts (days),مدة الطلب (بالأيام)
+Request preview,معاينة الطلب
+Request voided,تم إلغاء الطلب
+Requests,الطلبات
+Requests you send show here until everyone has signed.,تظهر هنا الطلبات التي ترسلها حتى يوقّع الجميع.
+Required,مطلوب
+Retry seal,إعادة محاولة الختم
+Review and finish,مراجعة وإنهاء
+Review and sign,مراجعة وتوقيع
+Role,الدور
+Role label,تسمية الدور
+Role {0} is listed twice.,الدور {0} مذكور مرتين.
+Role {0}: set the source field.,الدور {0}: حدّد حقل المصدر.
+Routing order,ترتيب التوجيه
+Row name of the new recipient,اسم صف المستلم الجديد
+SHA-256,SHA-256
+Save,حفظ
+Save signature,حفظ التوقيع
+Saved,تم الحفظ
+Saving,جارٍ الحفظ
+Scan or open the link to verify this document:,امسح الرمز أو افتح الرابط للتحقق من هذا المستند:
+Seal attempts,محاولات الختم
+Seal failed,فشل الختم
+Sealed,مختوم
+Sealing,جارٍ الختم
+Sealing certificate,شهادة الختم
+Sealing failed after {0} attempts: {1},فشل الختم بعد {0} محاولات: {1}
+Sealing queued,الختم في قائمة الانتظار
+Sealing state,حالة الختم
+Search,بحث
+Search by number or name,ابحث بالرقم أو الاسم
+Search requests,البحث في الطلبات
+"Search, for example Quotation",ابحث، مثل عرض سعر
+See all sent,عرض كل المُرسل
+See each result,عرض كل نتيجة
+Select a field to edit it.,اختر حقلاً لتعديله.
+Select at least one document.,اختر مستنداً واحداً على الأقل.
+Self-signed,موقّعة ذاتياً
+Send,إرسال
+Send a new code,إرسال رمز جديد
+Send a new link,إرسال رابط جديد
+Send a request to yourself and sign it on your phone. It takes two minutes.,أرسل طلباً إلى نفسك ووقّعه على هاتفك. يستغرق ذلك دقيقتين.
+Send a test,إرسال تجربة
+Send again,إرسال مرة أخرى
+Send at most {0} documents at a time.,أرسل {0} مستنداً كحد أقصى في المرة الواحدة.
+Send emails from,إرسال الرسائل من
+Send error,خطأ في الإرسال
+Send failed,فشل الإرسال
+Send for Signature,إرسال للتوقيع
+Send for signature: {0} of {1} {2} sent,إرسال للتوقيع: أُرسل {0} من {1} {2}
+Send link,إرسال الرابط
+"Send one from a Quotation in Desk, or upload a PDF here.",أرسل واحداً من عرض سعر في سطح المكتب أو ارفع ملف PDF هنا.
+Send state,حالة الإرسال
+Send to them,أرسله إليهم
+Send {0} documents for signature,إرسال {0} مستنداً للتوقيع
+Sender email account,حساب بريد المرسِل
+Sending,جارٍ الإرسال
+Sending failed unexpectedly. The details are in the Error Log.,فشل الإرسال بشكل غير متوقع. التفاصيل في سجل الأخطاء.
+Sending for signature,جارٍ الإرسال للتوقيع
+Sending {0},جارٍ إرسال {0}
+Sending {0} for signature,جارٍ إرسال {0} للتوقيع
+Sent,أُرسل
+Sent by,أرسله
+Sent by {0},أرسله {0}
+Sent on,تاريخ الإرسال
+Sent with Frappe Sign,أُرسل بواسطة Frappe Sign
+Sent {0},أُرسل {0}
+Sent {0} by {1},أُرسل {0} بواسطة {1}
+Sequence,التسلسل
+Sequence must start at 1.,يجب أن يبدأ التسلسل من 1.
+Session hash,بصمة الجلسة
+Set Field Value,تعيين قيمة حقل
+Set a field,تعيين حقل
+Set a sealing certificate on the Sign Profile of {0}.,عيّن شهادة ختم في ملف توقيع الشركة {0}.
+Set the DocType for a Print Format template.,حدّد نوع المستند لقالب نموذج الطباعة.
+Set the method in the template's post-sign config.,حدّد الدالة في إعدادات القالب لما بعد التوقيع.
+Set the workflow action in the template's post-sign config.,حدّد إجراء سير العمل في إعدادات القالب لما بعد التوقيع.
+Set the workflow state to watch.,حدّد حالة سير العمل المراد مراقبتها.
+Set up an outgoing Email Account before sending.,أعدّ حساب بريد صادر قبل الإرسال.
+Set up email,إعداد البريد
+Set up signing,إعداد التوقيع
+Set when the field was placed by sign_field(),يُحدَّد عند وضع الحقل بواسطة sign_field()
+Settings,الإعدادات
+Setup and figures,الإعداد والأرقام
+Show,عرض
+Show audit details,عرض تفاصيل التدقيق
+Shown at the top of the signing page and emails.,يظهر في أعلى صفحة التوقيع والرسائل.
+Shown in the email to each person,يظهر في الرسالة المرسلة إلى كل شخص
+Shown to signers,يظهر للموقّعين
+Sign,توقيع
+Sign Bulk Run,دفعة إرسال التوقيع
+Sign Bulk Run Item,بند دفعة إرسال التوقيع
+Sign Capture,التقاط التوقيع
+Sign Certificate,شهادة التوقيع
+Sign Certificate {0} has no PKCS#12 file or password.,شهادة التوقيع {0} ليس لها ملف PKCS#12 أو كلمة مرور.
+Sign Enabled DocType,نوع مستند مفعّل للتوقيع
+Sign Envelope,ظرف التوقيع
+Sign Envelope Field,حقل ظرف التوقيع
+Sign Envelope Recipient,مستلم ظرف التوقيع
+Sign Envelope {0} is being sent and cannot be edited.,ظرف التوقيع {0} قيد الإرسال ولا يمكن تعديله.
+Sign Envelope {0} is {1} and cannot become {2}.,ظرف التوقيع {0} حالته {1} ولا يمكن أن يصبح {2}.
+Sign Envelope {0} is {1}.,ظرف التوقيع {0} حالته {1}.
+Sign Envelope {0} is {1}. Only Draft envelopes can be deleted.,ظرف التوقيع {0} حالته {1}. لا يمكن حذف إلا الظروف المسودة.
+Sign Envelope {0} is {1}. Only Draft envelopes can be edited.,ظرف التوقيع {0} حالته {1}. لا يمكن تعديل إلا الظروف المسودة.
+Sign Event,حدث التوقيع
+Sign Manager,مدير التوقيع
+Sign Profile,ملف توقيع الشركة
+"Sign Profile {0} already has a certificate and keeps it. To use the new one, select it on the profile.",ملف توقيع الشركة {0} لديه شهادة بالفعل ويحتفظ بها. لاستخدام الجديدة اخترها في ملف التعريف.
+Sign Profile {0} now seals with this certificate.,ملف توقيع الشركة {0} يختم الآن بهذه الشهادة.
+Sign Profile {0} was created with this certificate.,تم إنشاء ملف توقيع الشركة {0} بهذه الشهادة.
+Sign Saved Signature,توقيع محفوظ
+Sign Session,جلسة التوقيع
+Sign Settings,إعدادات التوقيع
+Sign Template,قالب التوقيع
+Sign Template Field,حقل قالب التوقيع
+Sign Template Role,دور قالب التوقيع
+Sign Template Version,إصدار قالب التوقيع
+Sign Trigger,مشغّل التوقيع
+Sign Trigger Log,سجل مشغّل التوقيع
+Sign User,مستخدم التوقيع
+Sign in this order,وقّعوا بهذا الترتيب
+Sign with your finger or mouse,وقّع بإصبعك أو بالفأرة
+Signature,التوقيع
+Signature request,طلب توقيع
+Signature: {0},التوقيع: {0}
+Signatures,التوقيعات
+Signed,تم التوقيع
+Signed PDF,ملف PDF الموقّع
+Signed SHA-256,SHA-256 للموقّع
+Signed by {0},وقّعه {0}
+Signed file,الملف الموقّع
+Signed on,تاريخ التوقيع
+Signed with Frappe Sign,وُقّع بواسطة Frappe Sign
+Signed {0},وقّعه {0}
+Signer,موقِّع
+Signer 1,الموقِّع 1
+Signer source,مصدر الموقِّع
+Signer {0},الموقِّع {0}
+Signers,الموقِّعون
+Signing,التوقيع
+Signing order,ترتيب التوقيع
+Signing progress,تقدم التوقيع
+Signs,يوقّع
+Signs as number,يوقّع كرقم
+Signs for the company,يوقّع عن الشركة
+Snapshot,لقطة
+Someone,شخص ما
+Someone declined,رفض أحدهم
+Someone else will sign in your place. You can close this page.,سيوقّع شخص آخر بدلاً منك. يمكنك إغلاق هذه الصفحة.
+Something went wrong,حدث خطأ ما
+Something went wrong. Try again.,حدث خطأ ما. حاول مرة أخرى.
+Source Changed,تغيّر المصدر
+Source PDF,ملف PDF المصدر
+Source SHA-256,SHA-256 للمصدر
+Source changed,تغيّر المصدر
+Source document,المستند المصدر
+Source field,حقل المصدر
+Source type,نوع المصدر
+Stamp image,صورة الختم
+Steps,الخطوات
+Stop sending {0},إيقاف إرسال {0}
+Stop sending {0} for signature? Its signature fields and past requests stay.,هل تريد إيقاف إرسال {0} للتوقيع؟ تبقى حقول التوقيع والطلبات السابقة.
+Storage,التخزين
+Submit the document,اعتماد المستند
+TSA URL {0} is not a valid http or https URL.,عنوان خادم الختم الزمني {0} ليس رابط http أو https صحيحاً.
+TSA URLs,عناوين خوادم الختم الزمني
+Take {0} off the enabled DocTypes in Sign Settings first.,أزل {0} من أنواع المستندات المفعّلة في إعدادات التوقيع أولاً.
+Takes effect only when frappe_whatsapp is installed,يعمل فقط عند تثبيت frappe_whatsapp
+Tell the sender why,أخبر المرسِل بالسبب
+Tell the sender why you decline.,أخبر المرسِل بسبب رفضك.
+Template,القالب
+Template title,عنوان القالب
+Template version,إصدار القالب
+Template {0} has no published version.,القالب {0} ليس له إصدار منشور.
+"Template {0} is for {1}, not {2}.",القالب {0} مخصص لـ {1} وليس لـ {2}.
+"Template, roles and fields at publish time",القالب والأدوار والحقول وقت النشر
+Templates,القوالب
+Test seal created,تم إنشاء الختم التجريبي
+Thank you for signing,شكراً لتوقيعك
+The PDF could not be processed: {0},تعذّرت معالجة ملف PDF: {0}
+The PDF has too many pages. {0},ملف PDF فيه صفحات كثيرة جداً. {0}
+The PDF is password protected. Remove the password and upload it again.,ملف PDF محمي بكلمة مرور. أزل كلمة المرور وارفعه مرة أخرى.
+The PDF is too large. {0},ملف PDF كبير جداً. {0}
+The PKCS#12 file has no certificate.,ملف PKCS#12 لا يحتوي على شهادة.
+"The PKCS#12 file has no private key, so it cannot seal documents.",ملف PKCS#12 لا يحتوي على مفتاح خاص، لذا لا يمكنه ختم المستندات.
+The Print Format could not be rendered as a PDF: {0},تعذّر تحويل نموذج الطباعة إلى ملف PDF: {0}
+The Print Format has no sign_field() for {0} ({1}). Add it to the Print Format or make the field optional.,نموذج الطباعة لا يحتوي على sign_field() للدور {0} ({1}). أضفه إلى نموذج الطباعة أو اجعل الحقل اختيارياً.
+The WhatsApp message to {0} could not be sent. The email was queued.,تعذّر إرسال رسالة واتساب إلى {0}. تم وضع البريد الإلكتروني في قائمة الانتظار.
+The audit trail is intact,سجل التدقيق سليم
+The audit trail was changed,تم تغيير سجل التدقيق
+The certificate has expired: {0}.,انتهت صلاحية الشهادة: {0}.
+The certificate is not valid yet: {0}.,الشهادة غير صالحة بعد: {0}.
+The code is not right.,الرمز غير صحيح.
+"The completed PDF, including this certificate, is sealed with a PAdES signature.",ملف PDF المكتمل، بما فيه هذه الشهادة، مختوم بتوقيع PAdES.
+The condition is false.,الشرط غير متحقق.
+The customer or supplier on the document,العميل أو المورّد في المستند
+The disclosure changed. Read it again.,تغيّر الإفصاح. اقرأه مرة أخرى.
+The document is not ready yet.,المستند ليس جاهزاً بعد.
+The employee on the document,الموظف في المستند
+The file could not be read.,تعذّرت قراءة الملف.
+The file is larger than 10 MB.,حجم الملف أكبر من 10 ميغابايت.
+The file is larger than 25 MB.,حجم الملف أكبر من 25 ميغابايت.
+The file is not a readable PDF.,الملف ليس PDF يمكن قراءته.
+The file is not a readable image.,الملف ليس صورة يمكن قراءتها.
+The file is too large.,الملف كبير جداً.
+The follow-up action ran,تم تنفيذ الإجراء اللاحق
+The image is larger than 2 MB.,حجم الصورة أكبر من 2 ميغابايت.
+The image is too large.,الصورة كبيرة جداً.
+The invitation to {0} could not be emailed. Check the Email Account and resend.,تعذّر إرسال الدعوة إلى {0} بالبريد. تحقق من حساب البريد وأعد الإرسال.
+The name of the role must match the name used in sign_field() in the Print Format. Spaces count as underscores.,يجب أن يطابق اسم الدور الاسم المستخدم في sign_field() في نموذج الطباعة. تُعامل المسافات كشرطات سفلية.
+The old link stops working. Check the email address if it was wrong.,سيتوقف الرابط القديم عن العمل. تحقق من عنوان البريد إن كان خاطئاً.
+"The password is wrong, or the file is not a PKCS#12 (.p12) file.",كلمة المرور خاطئة أو أن الملف ليس بصيغة PKCS#12 ‏(.p12).
+The preview has expired. Load it again.,انتهت صلاحية المعاينة. حمّلها مرة أخرى.
+The request expired,انتهت صلاحية الطلب
+The request was created,تم إنشاء الطلب
+The request was sent,تم إرسال الطلب
+The request was voided,تم إلغاء الطلب
+The sample envelope was not ready to seal.,لم يكن الظرف التجريبي جاهزاً للختم.
+The seal certificate {0} ends on {1}. Get a new one before then.,تنتهي صلاحية شهادة الختم {0} في {1}. احصل على شهادة جديدة قبل ذلك.
+The seal certificate {0} has ended. New documents cannot be sealed.,انتهت صلاحية شهادة الختم {0}. لا يمكن ختم مستندات جديدة.
+The seal proves the signed PDF was not changed after signing. A test seal is fine to start.,يثبت الختم أن ملف PDF الموقّع لم يتغير بعد التوقيع. ولا بأس بختم تجريبي للبدء.
+The sender cancelled this document. You do not need to sign it.,ألغى المرسِل هذا المستند. لا حاجة لأن توقّعه.
+The signed PDF was sealed,تم ختم ملف PDF الموقّع
+The site default,القيمة الافتراضية للموقع
+The source document changed,تغيّر المستند المصدر
+The source document changed after the PDF was frozen,تغيّر المستند المصدر بعد تجميد ملف PDF
+The template PDF changed after it was published. Publish the template again.,تغيّر ملف PDF للقالب بعد نشره. انشر القالب مرة أخرى.
+The trigger is disabled.,المشغّل معطّل.
+Their user (email),المستخدم الخاص بهم (البريد الإلكتروني)
+There is no published template for {0} yet. Make one in Templates first.,لا يوجد قالب منشور لـ {0} بعد. أنشئ واحداً في القوالب أولاً.
+There is no {0} PDF for {1} yet.,لا يوجد ملف PDF من نوع {0} لـ {1} بعد.
+This Print Format uses the {0} generator. Fields from sign_field() are tested only with wkhtmltopdf and chrome; check their places.,يستخدم نموذج الطباعة هذا المولّد {0}. تُختبر حقول sign_field() فقط مع wkhtmltopdf وchrome؛ تحقق من أماكنها.
+This code has expired. Ask for a new one.,انتهت صلاحية هذا الرمز. اطلب رمزاً جديداً.
+This document cannot be passed on to someone else.,لا يمكن تمرير هذا المستند إلى شخص آخر.
+This document is not waiting for your signature.,هذا المستند لا ينتظر توقيعك.
+This document is {0}.,هذا المستند {0}.
+This document was declined. The sender has been told.,تم رفض هذا المستند. وتم إبلاغ المرسِل.
+This envelope is already being sent.,هذا الظرف قيد الإرسال بالفعل.
+This is not a valid document name.,هذا ليس اسم مستند صالحاً.
+This link has expired or was replaced by a newer one. Ask the sender for a new link.,انتهت صلاحية هذا الرابط أو استُبدل برابط أحدث. اطلب من المرسِل رابطاً جديداً.
+This recipient is not waiting to sign.,هذا المستلم لا ينتظر التوقيع.
+This signing link is not valid. Ask the sender for a new one.,رابط التوقيع هذا غير صالح. اطلب من المرسِل رابطاً جديداً.
+Timestamp servers,خوادم الختم الزمني
+Timestamping,الختم الزمني
+Title,العنوان
+To,إلى
+To do,المهام
+"To open {0}, enter the code we email you.",لفتح {0} أدخل الرمز الذي أرسلناه إلى بريدك.
+Token expires on,تاريخ انتهاء الرمز
+Token hash,بصمة الرمز
+Token version,إصدار الرمز
+Too many attempts. Wait a minute and try again.,محاولات كثيرة جداً. انتظر دقيقة وحاول مرة أخرى.
+Too many wrong codes. Ask for a new one.,رموز خاطئة كثيرة جداً. اطلب رمزاً جديداً.
+Trigger,المشغّل
+Try again,حاول مرة أخرى
+"Try other words, or clear the filters.",جرّب كلمات أخرى أو امسح عوامل التصفية.
+"Turn on a type, such as Quotation, in Sign Settings. Then come back to make its template.",فعّل نوعاً مثل عرض السعر في إعدادات التوقيع ثم عد لإنشاء قالبه.
+Type,النوع
+Type of document,نوع المستند
+Type the workflow action.,اكتب إجراء سير العمل.
+Type your name first.,اكتب اسمك أولاً.
+Undo,تراجع
+Unknown fields: {0}.,حقول غير معروفة: {0}.
+Unknown profile fields: {0}.,حقول ملف التعريف غير معروفة: {0}.
+Unknown settings section {0}.,قسم الإعدادات {0} غير معروف.
+Unsaved,غير محفوظ
+Upload,رفع
+Upload a certificate,رفع شهادة
+Upload certificate,رفع الشهادة
+Upload logo,رفع الشعار
+Upload the .p12 file of your sealing certificate and enter its password. No certificate yet? Click Create test certificate.,ارفع ملف ‎.p12 لشهادة الختم وأدخل كلمة مروره. ليس لديك شهادة بعد؟ انقر على إنشاء شهادة تجريبية.
+Upload the PDF again.,ارفع ملف PDF مرة أخرى.
+Upload the PDF before publishing.,ارفع ملف PDF قبل النشر.
+Upload the PDF or enter the envelope ID.,ارفع ملف PDF أو أدخل رقم الظرف.
+Uploaded PDF,ملف PDF مرفوع
+"Uploaded PDF to send, for envelopes without a template. Private.",ملف PDF مرفوع للإرسال، للظروف التي بلا قالب. خاص.
+Use a PNG or JPEG image.,استخدم صورة PNG أو JPEG.
+Use the .p12 file from your certificate provider. It replaces the current seal of {0}.,استخدم ملف ‎.p12 من مزوّد الشهادة. سيحل محل ختم {0} الحالي.
+"Use today, or today+7 for a day in the future.",استخدم today أو today+7 لتاريخ في المستقبل.
+Used {0},استُخدم {0}
+User,المستخدم
+User agent,وكيل المستخدم
+User or recipient email,المستخدم أو بريد المستلم
+Using the site email account: {0},يُستخدم حساب بريد الموقع: {0}
+Valid for (years),مدة الصلاحية (بالسنوات)
+Valid from,صالح من
+Valid to,صالح إلى
+Validation regex,التعبير النمطي للتحقق
+Validity must be 1 to {0} years.,يجب أن تكون الصلاحية من سنة إلى {0} سنوات.
+Value,القيمة
+Verification by {0} is not used for this document.,التحقق عبر {0} غير مستخدم في هذا المستند.
+Verification code,رمز التحقق
+Verified,تم التحقق
+Verified on,تاريخ التحقق
+Verify,تحقق
+Verify a signed document,التحقق من مستند موقّع
+Verify the signer with a code,تحقق من الموقّع برمز
+Verify your email,تحقق من بريدك الإلكتروني
+Version must start at 1.,يجب أن يبدأ الإصدار من 1.
+Version {0} does not belong to this template.,الإصدار {0} لا يخص هذا القالب.
+Viewed,تمت المشاهدة
+Viewed on,تاريخ المشاهدة
+Void reason,سبب الإلغاء
+Void request,إلغاء الطلب
+Void this request?,هل تريد إلغاء هذا الطلب؟
+Voided,ملغى
+Voided by the sender,ألغاه المرسِل
+Wait {0} seconds before asking for a new code.,انتظر {0} ثانية قبل طلب رمز جديد.
+Waiting,بالانتظار
+Waiting for {0} to sign first.,بانتظار أن يوقّع {0} أولاً.
+Waiting for {0} to sign first. We will email you when it is your turn.,بانتظار أن يوقّع {0} أولاً. سنراسلك عندما يحين دورك.
+Waiting on customers and suppliers,بانتظار العملاء والموردين
+Waiting on others,بانتظار الآخرين
+Waiting on your team,بانتظار فريقك
+Waits for the people before,ينتظر الأشخاص السابقين
+Watch Field,حقل المراقبة
+Watch field,حقل المراقبة
+We sent a 6-digit code to {0}.,أرسلنا رمزاً من 6 أرقام إلى {0}.
+What they do,ماذا يفعلون
+WhatsApp code,رمز واتساب
+WhatsApp enabled,واتساب مفعّل
+WhatsApp verification is not set up. Install frappe_whatsapp and switch it on in the Sign Profile.,التحقق عبر واتساب غير معدّ. ثبّت frappe_whatsapp وفعّله في ملف توقيع الشركة.
+Where is the document?,أين المستند؟
+Who is it?,من هو؟
+Who signs,من يوقّع
+Why are you voiding it?,لماذا تلغيه؟
+Words signers agree to,كلمات يوافق عليها الموقّعون
+Workflow action,إجراء سير العمل
+Workflow state,حالة سير العمل
+Wrong code,الرمز خاطئ
+X,X
+Y,Y
+You approve,أنت تعتمد
+You are all caught up,لقد أنجزت كل شيء
+You are asked to approve this document.,طُلب منك اعتماد هذا المستند.
+You are asked to sign this document.,طُلب منك توقيع هذا المستند.
+You cannot download this document.,لا يمكنك تنزيل هذا المستند.
+You cannot use a file uploaded by someone else.,لا يمكنك استخدام ملف رفعه شخص آخر.
+You have already responded to this document.,لقد رددت على هذا المستند بالفعل.
+You have already responded.,لقد رددت بالفعل.
+You have not signed any documents yet.,لم توقّع أي مستند بعد.
+You need the Sign User or Sign Manager role to open Frappe Sign.,تحتاج إلى دور مستخدم التوقيع أو مدير التوقيع لفتح Frappe Sign.
+You place the fields on the next steps.,ستضع الحقول في الخطوات التالية.
+You sign,أنت توقّع
+You signed {0},وقّعت {0}
+Your code for {0}: {1}. It is valid for {2} minutes.,رمزك لـ {0}: {1}. صالح لمدة {2} دقيقة.
+Your logo and color appear on the signing page and in emails.,يظهر شعارك ولونك في صفحة التوقيع وفي الرسائل.
+Your name,اسمك
+Your signature and the date are added to the document. You cannot change them afterwards.,يُضاف توقيعك والتاريخ إلى المستند. ولا يمكنك تغييرهما بعد ذلك.
+Your signing session has ended. Open the link again.,انتهت جلسة التوقيع. افتح الرابط مرة أخرى.
+"[{page, width, height, rotation}] in points","‏[{page, width, height, rotation}] بالنقاط"
+amber,كهرماني
+another signer,موقّع آخر
+blue,أزرق
+cancelled,ملغى
+customer_name or {{ doc.grand_total }},customer_name أو {{ doc.grand_total }}
+deleted,محذوف
+gray,رمادي
+green,أخضر
+just now,الآن
+or click to choose a file,أو انقر لاختيار ملف
+or click to choose a file. Then place the signature boxes on its pages.,أو انقر لاختيار ملف. ثم ضع مربعات التوقيع على صفحاته.
+page {0},صفحة {0}
+"pick the Print Format, name the people who sign and preview the page.",اختر نموذج الطباعة وسمِّ الموقّعين وعاين الصفحة.
+red,أحمر
+required,مطلوب
+row {0},الصف {0}
+"sign_field(): sizes are in mm, above 0 and at most {0}.",sign_field(): الأحجام بالمليمتر وأكبر من 0 وبحد أقصى {0}.
+sign_field(): {0},sign_field(): {0}
+signed by everyone; the sealed PDF is attached.,وقّع عليه الجميع؛ وملف PDF المختوم مرفق.
+signed by {0} on {1},وقّعه {0} في {1}
+this site,هذا الموقع
+waiting for {0},بانتظار {0}
+yesterday,أمس
+{0} (self-signed),{0} (موقّعة ذاتياً)
+"{0} asked you to approve, {1}",طلب منك {0} الاعتماد، {1}
+"{0} asked you to sign, {1}",طلب منك {0} التوقيع، {1}
+{0} can now be sent for signature,يمكن الآن إرسال {0} للتوقيع
+{0} changed after {1} was sent. Void and resend it so the signers see the current version.,تغيّر {0} بعد إرسال {1}. ألغِ الطلب وأعد إرساله ليرى الموقّعون النسخة الحالية.
+{0} days ago,قبل {0} أيام
+{0} declined,رفض {0}
+"{0} fields selected. Use the arrow keys to move them, Delete to remove them.",تم تحديد {0} حقل. استخدم مفاتيح الأسهم لتحريكها وDelete لحذفها.
+{0} has no field to fill on this document.,ليس لـ {0} حقل لتعبئته في هذا المستند.
+{0} has no field {1}.,لا يوجد في {0} الحقل {1}.
+{0} has not signed.,لم يوقّع {0}.
+{0} have not signed.,لم يوقّع {0}.
+{0} hours ago,قبل {0} ساعات
+{0} is already on the list.,{0} موجود في القائمة بالفعل.
+{0} is already open for this document.,{0} مفتوح بالفعل لهذا المستند.
+{0} is complete and sealed,{0} مكتمل ومختوم
+{0} is not a capture method.,{0} ليست طريقة التقاط.
+{0} is not a date field.,{0} ليس حقل تاريخ.
+{0} is not a valid email address.,{0} ليس عنوان بريد إلكتروني صحيحاً.
+{0} is not enabled for signing.,{0} غير مفعّل للتوقيع.
+{0} is not in the expected format.,{0} ليس بالصيغة المتوقعة.
+{0} is not on the list.,{0} غير موجود في القائمة.
+{0} is too long.,{0} طويل جداً.
+{0} left,تبقّى {0}
+{0} minutes ago,قبل {0} دقائق
+{0} must be a SHA-256 hex digest.,يجب أن يكون {0} بصمة SHA-256 بالنظام السداسي عشري.
+{0} must be a number.,يجب أن يكون {0} رقماً.
+{0} must be a private file.,يجب أن يكون {0} ملفاً خاصاً.
+{0} must be an email address.,يجب أن يكون {0} عنوان بريد إلكتروني.
+{0} must be at least 1.,يجب ألا يقل {0} عن 1.
+{0} of {1},{0} من {1}
+{0} of {1} documents,{0} من {1} مستندات
+{0} of {1} documents sent for signature,أُرسل {0} من {1} مستنداً للتوقيع
+{0} of {1} done,أُنجز {0} من {1}
+{0} opened the document,فتح {0} المستند
+{0} passed it to someone else,مرّره {0} إلى شخص آخر
+{0} published,نشر {0}
+{0} requests,{0} طلبات
+{0} signed,وقّع {0}
+{0} signed {1},وقّع {0} ‏{1}
+{0} waiting on you,{0} بانتظار توقيعك
+{0} was created as a draft: add the email of {1} and send it.,تم إنشاء {0} كمسودة: أضف بريد {1} ثم أرسله.
+{0} was declined,تم رفض {0}
+{0} {1} is insert-only and cannot be changed.,{0} ‏{1} للإضافة فقط ولا يمكن تغييره.
+{0} {1} is insert-only and cannot be deleted.,{0} ‏{1} للإضافة فقط ولا يمكن حذفه.
+{0} {1} no longer exists.,{0} ‏{1} لم يعد موجوداً.
+{0} {1} was amended as {2}.,تم تعديل {0} ‏{1} ليصبح {2}.
+{0} {1} was {2}.,{0} ‏{1} تم {2}.
+"{0}, valid until {1}",{0}، صالح حتى {1}
+{0}: created {1} {2} after signing.,{0}: أُنشئ {1} ‏{2} بعد التوقيع.
+{0}: declined,{0}: رفض
+{0}: not opened yet,{0}: لم يفتح بعد
+"{0}: opened, not signed",{0}: فتح ولم يوقّع
+"{0}: set by Frappe Sign, cannot be changed directly.",{0}: يحدده Frappe Sign ولا يمكن تغييره مباشرة.
+{0}: signed,{0}: وقّع
+{0}: the post-sign action {1} failed. The signature stands. {2},{0}: فشل الإجراء {1} بعد التوقيع. التوقيع قائم. {2}
+{0}: {1} is not a field of {2}.,{0}: ‏{1} ليس حقلاً في {2}.
+Document pages,صفحات المستند
+To sign,للتوقيع
+Open,مفتوحة
+Closed,مغلقة
+All,الكل
+Drafts,المسودات
+Documents,المستندات
+Advanced,متقدمة
+Details,التفاصيل
+Text,نص
+Number,رقم
+Full Name,الاسم الكامل
+Attachment,مرفق
+From a template,من قالب
+"A template you made, ready to send.",قالب أنشأته وجاهز للإرسال.
+Add the fields yourself on the pages.,ضع الحقول بنفسك على الصفحات.
+From an ERPNext document,من مستند ERPNext
+"A Quotation, an order or a contract, printed with its Print Format.",عرض سعر أو أمر أو عقد، يُطبع بنموذج الطباعة الخاص به.
+Upload a PDF,رفع ملف PDF
+For an ERPNext document (Print Format),لمستند ERPNext (نموذج طباعة)
+Your own PDF,ملف PDF خاص بك
+Upload a PDF and place the signature boxes on its pages.,ارفع ملف PDF وضع مربعات التوقيع على صفحاته.
+"A Quotation or an order, printed with its Print Format. The signature boxes come from the format.",عرض سعر أو أمر، يُطبع بنموذج الطباعة الخاص به. وتأتي مربعات التوقيع من النموذج.
+Language of the emails and the signing page,لغة الرسائل وصفحة التوقيع
+The language of the emails and the signing page,لغة الرسائل وصفحة التوقيع

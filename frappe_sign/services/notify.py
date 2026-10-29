@@ -15,19 +15,26 @@ import frappe
 from frappe import _
 from frappe.desk.doctype.notification_log.notification_log import make_notification_logs
 from frappe.email.doctype.email_account.email_account import EmailAccount
+from frappe.translate import print_language
 from frappe.utils import escape_html, get_url
+from frappe.utils.jinja_globals import is_rtl
 
 from frappe_sign.services import whatsapp
+from frappe_sign.services.email_texts import (
+	COMPLETED,
+	DECLINED,
+	FAILED,
+	FALLBACK,
+	INVITATION,
+	OTP,
+	REMINDER,
+	VOIDED,
+	arabic_name,
+)
 from frappe_sign.utils.boot import profile_branding
 from frappe_sign.utils.dates import format_local
+from frappe_sign.utils.languages import is_arabic
 
-INVITATION = "Frappe Sign Invitation"
-REMINDER = "Frappe Sign Reminder"
-OTP = "Frappe Sign OTP"
-COMPLETED = "Frappe Sign Completed"
-DECLINED = "Frappe Sign Declined"
-VOIDED = "Frappe Sign Voided"
-FAILED = "Frappe Sign Failed"
 REALTIME_EVENT = "frappe_sign_envelope"
 DEFAULT_BRAND = "#111827"
 HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -202,7 +209,11 @@ def wrap(message: str, envelope: Any) -> str:
 		else ""
 	)
 	title = f'<span style="font-size:16px;font-weight:600;color:#111827">{name}</span>' if name else ""
+	rtl = is_rtl()
 	return SHELL.format(
+		dir="rtl" if rtl else "ltr",
+		align="right" if rtl else "left",
+		gap_side="right" if rtl else "left",
 		mark=mark,
 		gap=" " if mark and title else "",
 		title=title,
@@ -229,8 +240,10 @@ def send(
 	attachments: list[dict[str, Any]] | None = None,
 	now: bool = False,
 ) -> None:
-	subject, message = render(template, context)
-	message = wrap(message, envelope)
+	language = getattr(envelope, "language", None)
+	with print_language(language or frappe.local.lang):
+		subject, message = render(template, context, language)
+		message = wrap(message, envelope)
 	reference_doctype, reference_name = reference_of(envelope)
 	frappe.sendmail(
 		recipients=recipients,
@@ -244,7 +257,10 @@ def send(
 	)
 
 
-def render(template: str, context: dict[str, Any]) -> tuple[str, str]:
+def render(template: str, context: dict[str, Any], language: str | None = None) -> tuple[str, str]:
+	"""Subject and body. An Arabic envelope gets the Arabic version of a built-in template."""
+	if template in FALLBACK and is_arabic(language):
+		template = arabic_name(template)
 	if frappe.db.exists("Email Template", template):
 		email = frappe.get_doc("Email Template", template).get_formatted_email(context)
 		return email["subject"], email["message"]
@@ -318,59 +334,13 @@ SHELL = (
 	'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" '
 	'style="background:#f3f4f6;padding:24px 12px"><tr><td align="center">'
 	'<table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" '
-	'style="max-width:560px;width:100%;background:#ffffff;border-radius:8px;'
-	'font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111827">'
+	'dir="{dir}" style="max-width:560px;width:100%;background:#ffffff;border-radius:8px;text-align:{align};'
+	'font-family:Helvetica,Tahoma,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111827">'
 	'<tr><td style="padding:20px 28px;border-bottom:1px solid #e5e7eb">'
 	'<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>'
-	'<td style="vertical-align:middle">{mark}</td><td style="vertical-align:middle;padding-left:10px">'
+	'<td style="vertical-align:middle">{mark}</td><td style="vertical-align:middle;padding-{gap_side}:10px">'
 	"{title}</td></tr></table></td></tr>"
 	'<tr><td style="padding:28px">{body}</td></tr>'
 	'<tr><td style="padding:16px 28px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280">'
 	"{footer}</td></tr></table></td></tr></table>"
 )
-
-BUTTON = (
-	'<p style="margin:24px 0"><a href="{{{{ link }}}}" style="display:inline-block;'
-	"background:{{{{ brand_color }}}};color:{{{{ button_text_color }}}};padding:12px 24px;"
-	'border-radius:6px;text-decoration:none;font-weight:600">{label}</a></p>'
-)
-
-FALLBACK = {
-	INVITATION: (
-		"{{ sender_name }} sent you {{ envelope_title }} to sign",
-		"<p>Hello {{ recipient_name }},</p><p>{{ sender_name }} asks you to review and sign "
-		"<b>{{ envelope_title }}</b>.</p>{% if message %}<p>{{ message }}</p>{% endif %}"
-		+ BUTTON.format(label="Review and sign")
-		+ "<p>The link expires on {{ expires_on }}.</p>",
-	),
-	REMINDER: (
-		"Reminder: {{ envelope_title }} is waiting for your signature",
-		"<p>Hello {{ recipient_name }},</p><p><b>{{ envelope_title }}</b> is waiting for your "
-		"signature.</p>"
-		+ BUTTON.format(label="Review and sign")
-		+ "<p>The link expires on {{ expires_on }}.</p>",
-	),
-	OTP: (
-		"Your code for {{ envelope_title }}: {{ otp }}",
-		"<p>Hello {{ recipient_name }},</p><p>Your verification code is <b>{{ otp }}</b>. It is valid "
-		"for {{ minutes }} minutes. Do not share it.</p>",
-	),
-	COMPLETED: (
-		"Completed: {{ envelope_title }}",
-		"<p><b>{{ envelope_title }}</b> has been signed by everyone. The sealed PDF is attached.</p>",
-	),
-	DECLINED: (
-		"Declined: {{ envelope_title }}",
-		"<p>{{ declined_by }} declined <b>{{ envelope_title }}</b>.</p><p>Reason: {{ reason }}</p>",
-	),
-	VOIDED: (
-		"Cancelled: {{ envelope_title }}",
-		"<p>{{ sender_name }} cancelled <b>{{ envelope_title }}</b>. You do not need to sign it.</p>"
-		"{% if reason %}<p>Reason: {{ reason }}</p>{% endif %}",
-	),
-	FAILED: (
-		"Action needed: {{ envelope_title }}",
-		"<p>Frappe Sign could not finish <b>{{ envelope_title }}</b> ({{ envelope }}).</p>"
-		"<p>{{ reason }}</p>",
-	),
-}

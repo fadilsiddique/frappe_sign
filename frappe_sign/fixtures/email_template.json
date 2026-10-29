@@ -54,5 +54,61 @@
   "use_html": 1,
   "response_html": "<p>Frappe Sign could not finish <b>{{ envelope_title }}</b> ({{ envelope }}).</p><p>{{ reason }}</p>",
   "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Invitation (Arabic)",
+  "subject": "أرسل لك {{ sender_name }} المستند {{ envelope_title }} للتوقيع",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>مرحباً <bdi>{{ recipient_name }}</bdi>،</p><p>يطلب منك <bdi>{{ sender_name }}</bdi> مراجعة المستند <b><bdi>{{ envelope_title }}</bdi></b> وتوقيعه.</p>{% if message %}<p>{{ message }}</p>{% endif %}<p style=\"margin:24px 0\"><a href=\"{{ link }}\" style=\"display:inline-block;background:{{ brand_color }};color:{{ button_text_color }};padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600\">مراجعة وتوقيع</a></p><p>ينتهي الرابط في <bdi dir=\"ltr\">{{ expires_on }}</bdi>.</p></div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Reminder (Arabic)",
+  "subject": "تذكير: المستند {{ envelope_title }} بانتظار توقيعك",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>مرحباً <bdi>{{ recipient_name }}</bdi>،</p><p>المستند <b><bdi>{{ envelope_title }}</bdi></b> بانتظار توقيعك.</p><p style=\"margin:24px 0\"><a href=\"{{ link }}\" style=\"display:inline-block;background:{{ brand_color }};color:{{ button_text_color }};padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600\">مراجعة وتوقيع</a></p><p>ينتهي الرابط في <bdi dir=\"ltr\">{{ expires_on }}</bdi>.</p></div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign OTP (Arabic)",
+  "subject": "رمزك للمستند {{ envelope_title }}: {{ otp }}",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>مرحباً <bdi>{{ recipient_name }}</bdi>،</p><p>رمز التحقق الخاص بك هو <b><bdi dir=\"ltr\">{{ otp }}</bdi></b>. صالح لمدة {{ minutes }} دقيقة. لا تشاركه مع أحد.</p></div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Completed (Arabic)",
+  "subject": "اكتمل: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>وقّع الجميع على المستند <b><bdi>{{ envelope_title }}</bdi></b>. ملف PDF المختوم مرفق.</p></div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Declined (Arabic)",
+  "subject": "مرفوض: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>رفض <bdi>{{ declined_by }}</bdi> المستند <b><bdi>{{ envelope_title }}</bdi></b>.</p><p>السبب: <bdi>{{ reason }}</bdi></p></div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Voided (Arabic)",
+  "subject": "أُلغي: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>ألغى <bdi>{{ sender_name }}</bdi> المستند <b><bdi>{{ envelope_title }}</bdi></b>. لا حاجة لأن توقّعه.</p>{% if reason %}<p>السبب: <bdi>{{ reason }}</bdi></p>{% endif %}</div>",
+  "response": null
+ },
+ {
+  "doctype": "Email Template",
+  "name": "Frappe Sign Failed (Arabic)",
+  "subject": "مطلوب إجراء: {{ envelope_title }}",
+  "use_html": 1,
+  "response_html": "<div dir=\"rtl\" style=\"text-align:right;font-family:Tahoma,Arial,sans-serif\"><p>تعذّر على Frappe Sign إكمال <b><bdi>{{ envelope_title }}</bdi></b> (<bdi dir=\"ltr\">{{ envelope }}</bdi>).</p><p><bdi>{{ reason }}</bdi></p></div>",
+  "response": null
  }
 ]

@@ -28,6 +28,7 @@
   "signing_section",
   "signing_order",
   "otp_mode",
+  "language",
   "column_break_signing",
   "message",
   "recipients_section",
@@ -200,6 +201,13 @@
    "label": "OTP mode",
    "options": "Off\nEmail\nWhatsApp",
    "reqd": 1
+  },
+  {
+   "description": "The language of the emails and the signing page",
+   "fieldname": "language",
+   "fieldtype": "Link",
+   "label": "Language",
+   "options": "Language"
   },
   {
    "fieldname": "column_break_signing",

@@ -53,7 +53,18 @@ class TestShellContext(IntegrationTestCase):
 		self.assertTrue(context.boot["csrf_token"])
 		self.assertEqual(
 			set(context.boot["frappe_sign"]),
-			{"user", "full_name", "user_image", "can_manage", "lang", "dir", "branding", "messages"},
+			{
+				"user",
+				"full_name",
+				"user_image",
+				"can_manage",
+				"whatsapp",
+				"lang",
+				"dir",
+				"branding",
+				"messages",
+				"languages",
+			},
 		)
 		self.assertTrue(context.boot["frappe_sign"]["can_manage"])
 		self.assertEqual(context.boot["frappe_sign"]["dir"], "ltr")

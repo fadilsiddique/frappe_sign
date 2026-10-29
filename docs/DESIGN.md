@@ -595,6 +595,9 @@ The public `/sign-verify` page is a server-rendered page, not part of the SPA: a
 ### 7.5 Cross-cutting
 
 - Strings through `__()` with Frappe translations; Arabic UI with `dir="rtl"` and Tailwind logical properties (`ms-`, `me-`, `ps-`, `pe-`).
+- **Arabic (P3.5).** `translations/ar.csv` holds every string of the app (Python, Vue, Desk script, DocType labels); `tests/unit/test_translations.py` fails when a string is missing, a placeholder is lost, or a label kept in a constant is untranslated. `utils/boot.py` sends the file's strings to the SPAs as `messages`. The staff app follows the user's language. The guest page follows, in this order: the signer's `?_lang=` or `preferred_language` cookie (the English/Arabic switch in the header sets it), the envelope's `language`, the browser. Guest API calls send the page language as `_lang`, so server texts (consent, errors) match the page.
+- **Envelope language.** `Sign Envelope.language` (`en` or `ar`) defaults to the sender's language and can be chosen in the send wizard. It selects the Arabic Email Templates ("<name> (Arabic)", fixtures plus built-in fallbacks in `services/email_texts.py`) and the signing page language. Emails put Latin names, dates and codes in `<bdi>` so Arabic sentences do not reorder them.
+- **Direction.** PDF pages, thumbnails and the designer canvas stay `dir="ltr"` (pages do not mirror); arrows, send and undo icons mirror in RTL (`shared/style.css`).
 - Keyboard reachable fields, ARIA labels on canvas fields, WCAG AA contrast in light and dark.
 - API client in `shared/api.ts` maps the backend's stable error `code` values to UI states.
 

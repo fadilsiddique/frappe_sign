@@ -28,6 +28,7 @@ from frappe_sign.services.template import load_snapshot
 from frappe_sign.utils.dates import after, is_past
 from frappe_sign.utils.files import new_private_file, read_file, read_file_url
 from frappe_sign.utils.hashing import derive_token, sha256_hex
+from frappe_sign.utils.languages import shipped_language, user_language
 
 DRAFT, SENT, IN_PROGRESS = "Draft", "Sent", "In Progress"
 COMPLETED, DECLINED, VOIDED, EXPIRED = "Completed", "Declined", "Voided", "Expired"
@@ -114,6 +115,7 @@ def create_draft(payload: dict[str, Any]) -> Any:
 			"fields": payload.get("fields") or [],
 		}
 	values["title"] = values["title"] or _("Document for signature")
+	values["language"] = shipped_language(payload.get("language") or user_language())
 	doc = frappe.get_doc(values).insert()
 	attach_source(doc)
 	audit.append(doc.name, "Created", payload={"template_version": version} if version else None)

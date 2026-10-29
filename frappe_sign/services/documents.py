@@ -48,11 +48,12 @@ def send_from_document(
 	message: str | None = None,
 	print_format: str | None = None,
 	letter_head: str | None = None,
+	language: str | None = None,
 ) -> str:
 	"""Create an envelope for the document from the template and send it. Returns its name."""
 	source = frappe.get_doc(doctype, name)
 	source.check_permission("print")
-	draft = create_from_document(source, template, recipients, message, print_format, letter_head)
+	draft = create_from_document(source, template, recipients, message, print_format, letter_head, language)
 	envelope_service.send(draft.name)
 	return draft.name
 
@@ -64,6 +65,7 @@ def create_from_document(
 	message: str | None = None,
 	print_format: str | None = None,
 	letter_head: str | None = None,
+	language: str | None = None,
 ) -> Any:
 	values = frappe.db.get_value(
 		"Sign Template",
@@ -91,6 +93,7 @@ def create_from_document(
 			"party": party,
 			"print_format": print_format,
 			"letter_head": letter_head,
+			"language": language,
 			"recipients": recipients,
 		}
 	)

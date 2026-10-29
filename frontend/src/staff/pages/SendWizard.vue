@@ -11,7 +11,7 @@ import { __ } from '@/shared/translate'
 import { errorMessage, fetchPdf, fileToBase64, STAFF_API, staff } from '../api'
 import AnchorPreview from '../components/AnchorPreview.vue'
 import AppPageHeader from '../components/AppPageHeader.vue'
-import { otpModeOptions, signingOrderLabel } from '../labels'
+import { LANGUAGES, otpModeOptions, signingOrderLabel } from '../labels'
 import { readBoot } from '@/shared/boot'
 import DesignerCanvas from '../designer/DesignerCanvas.vue'
 import RolesPanel from '../designer/RolesPanel.vue'
@@ -39,7 +39,13 @@ const sourceFile = ref('')
 const pdf = shallowRef<ArrayBuffer | null>(null)
 const placing = ref<FieldType | null>(null)
 const busy = ref(false)
-const form = reactive({ title: '', message: '', signingOrder: 'Sequential', otpMode: 'Off' })
+const form = reactive({
+  title: '',
+  message: '',
+  signingOrder: 'Sequential',
+  otpMode: 'Off',
+  language: readBoot().lang.startsWith('ar') ? 'ar' : 'en',
+})
 const recipients = ref<Recipient[]>([])
 
 const steps = computed<Step[]>(() => {
@@ -211,6 +217,7 @@ async function send() {
     const payload: Record<string, unknown> = {
       title: form.title,
       message: form.message,
+      language: form.language,
       recipients: recipients.value,
     }
     if (mode.value === 'template') payload.template_version = templateVersion.value
@@ -247,6 +254,7 @@ async function sendDocument() {
       template: doc.template,
       recipients: recipients.value,
       message: form.message,
+      language: form.language,
       print_format: doc.printFormat || null,
       letter_head: doc.letterHead || null,
     })
@@ -435,6 +443,13 @@ function back() {
             :placeholder="__('Shown in the email to each person')"
           />
         </div>
+        <FormControl
+          v-model="form.language"
+          type="select"
+          :label="__('Language of the emails and the signing page')"
+          :options="LANGUAGES"
+          data-testid="envelope-language"
+        />
         <template v-if="mode === 'upload'">
           <FormControl
             v-model="form.signingOrder"

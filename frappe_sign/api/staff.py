@@ -169,6 +169,7 @@ def get_envelope(envelope: str) -> dict:
 				"reference_name",
 				"signing_order",
 				"otp_mode",
+				"language",
 				"original_sha256",
 				"signed_sha256",
 				"audit_head",
@@ -400,6 +401,7 @@ def send_from_document(
 	message: str | None = None,
 	print_format: str | None = None,
 	letter_head: str | None = None,
+	language: str | None = None,
 ) -> dict:
 	"""Desk send dialog: create the envelope from the template and send it."""
 	envelope = documents.send_from_document(
@@ -410,6 +412,7 @@ def send_from_document(
 		message=message,
 		print_format=print_format,
 		letter_head=letter_head,
+		language=language,
 	)
 	return {"name": envelope, "send_state": "Queued"}
 

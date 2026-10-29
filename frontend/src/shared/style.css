@@ -25,3 +25,13 @@ body,
 .text-ink-blue-7.bg-surface-blue-2 {
   color: var(--ink-blue-8);
 }
+
+/* Arabic text: the system's Arabic faces read better than Inter's fallback glyphs. */
+html[lang^='ar'] body {
+  font-family: 'Segoe UI', Tahoma, 'SF Arabic', 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+/* Icons that point somewhere or turn a way mirror in right to left (chevrons carry rtl:rotate-180). */
+[dir='rtl'] :is(.lucide-arrow-left, .lucide-arrow-right, .lucide-send, .lucide-undo-2, .lucide-redo-2) {
+  transform: scaleX(-1);
+}

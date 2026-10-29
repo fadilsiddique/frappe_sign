@@ -3,20 +3,33 @@
 import frappe
 from frappe.utils.jinja_globals import is_rtl
 
+from frappe_sign.utils.languages import SHIPPED, base_language
+
 STAFF_ROLES = frozenset({"Sign Manager", "Sign User", "System Manager"})
 MANAGER_ROLES = frozenset({"Sign Manager", "System Manager"})
 EMPTY_BRANDING = {"company": None, "logo": None, "brand_color": None}
 
 
 def base_boot(user: str | None, branding: dict | None = None) -> dict:
-	"""Language, direction and branding. `messages` (translations) is filled with the Arabic UI (P3.5)."""
+	"""Language, direction, branding and the app's translations for `frappe.local.lang`."""
+	language = frappe.local.lang or "en"
 	return {
 		"user": user,
-		"lang": frappe.local.lang or "en",
+		"lang": language,
 		"dir": "rtl" if is_rtl() else "ltr",
 		"branding": branding or dict(EMPTY_BRANDING),
-		"messages": {},
+		"messages": app_messages(language),
+		"languages": list(SHIPPED),
 	}
+
+
+def app_messages(language: str) -> dict[str, str]:
+	"""frappe_sign's own translations for the SPAs' __(). English needs none: the source is English."""
+	if base_language(language) == "en":
+		return {}
+	from frappe.translate import get_translations_from_apps
+
+	return get_translations_from_apps(language, ["frappe_sign"])
 
 
 def profile_branding(company: str | None) -> dict:

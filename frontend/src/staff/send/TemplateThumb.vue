@@ -26,7 +26,10 @@ onBeforeUnmount(() => void destroy?.())
 </script>
 
 <template>
-  <div class="grid aspect-[3/4] w-full place-items-center overflow-hidden rounded bg-surface-gray-2">
+  <div
+    dir="ltr"
+    class="grid aspect-[3/4] w-full place-items-center overflow-hidden rounded bg-surface-gray-2"
+  >
     <span v-if="failed" class="lucide-file-text size-8 text-ink-gray-4" aria-hidden="true" />
     <canvas v-show="!failed" ref="canvas" class="h-full w-full object-cover object-top" aria-hidden="true" />
   </div>
