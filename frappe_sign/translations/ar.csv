@@ -949,3 +949,15 @@ Upload a PDF and place the signature boxes on its pages.,ارفع ملف PDF و�
 "A Quotation or an order, printed with its Print Format. The signature boxes come from the format.",عرض سعر أو أمر، يُطبع بنموذج الطباعة الخاص به. وتأتي مربعات التوقيع من النموذج.
 Language of the emails and the signing page,لغة الرسائل وصفحة التوقيع
 The language of the emails and the signing page,لغة الرسائل وصفحة التوقيع
+Read the certificate,قراءة الشهادة
+Certificate read: {0},تمت قراءة الشهادة: {0}
+PIN,الرمز السري (PIN)
+Access token,رمز الوصول
+The token PIN (PKCS#11) or the credential PIN (CSC),الرمز السري للجهاز (PKCS#11) أو للاعتماد (CSC)
+CSC only: the OAuth access token of the service,لخدمة CSC فقط: رمز وصول OAuth الخاص بالخدمة
+No PIN is set: only a token that needs none can sign.,لم يُحدَّد رمز سري: لا يمكن التوقيع إلا بجهاز لا يحتاجه.
+Only a remote certificate is read from a token or service.,لا تُقرأ من الجهاز أو الخدمة إلا الشهادة عن بُعد.
+Could not read the certificate: {0},تعذّرت قراءة الشهادة: {0}
+Sign Certificate {0}: {1},شهادة التوقيع {0}: {1}
+This PKCS#11 library is not in the site's list of allowed libraries.,مكتبة PKCS#11 هذه ليست في قائمة المكتبات المسموح بها للموقع.
+"PKCS#11: {""type"": ""pkcs11"", ""module_path"": ""/usr/lib/softhsm/libsofthsm2.so"", ""token_label"": ""..."", ""key_label"": ""...""}. CSC: {""type"": ""csc"", ""service_url"": ""https://..."", ""credential_id"": ""...""}","لـ PKCS#11: {""type"": ""pkcs11"", ""module_path"": ""/usr/lib/softhsm/libsofthsm2.so"", ""token_label"": ""..."", ""key_label"": ""...""}. ولـ CSC: {""type"": ""csc"", ""service_url"": ""https://..."", ""credential_id"": ""...""}"

@@ -11,6 +11,7 @@ from frappe_sign.crypto import pkcs12
 from frappe_sign.exceptions import CertificateError
 from frappe_sign.utils.files import read_file
 from frappe_sign.utils.integrity import require_private_files
+from frappe_sign.utils.remote_config import RemoteConfigError, parse_config
 
 
 class SignCertificate(Document):
@@ -25,10 +26,17 @@ class SignCertificate(Document):
 
 	def validate(self):
 		if self.storage == "Remote":
-			frappe.throw(
-				_("Remote signing keys are not available yet. Use a PKCS#12 file."), CertificateError
-			)
+			self.check_remote_config()
+			return
 		self.read_pkcs12()
+
+	def check_remote_config(self):
+		try:
+			parse_config(self.remote_config)
+		except RemoteConfigError as error:
+			frappe.throw(str(error), CertificateError)
+		if not self.remote_pin:
+			frappe.msgprint(_("No PIN is set: only a token that needs none can sign."), indicator="orange")
 
 	def read_pkcs12(self):
 		password = self.plain_password()

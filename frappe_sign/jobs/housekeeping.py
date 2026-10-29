@@ -4,7 +4,7 @@ import frappe
 
 from frappe_sign.services import schedule
 
-STEPS = ("warn_certificate_expiry", "purge_sessions", "run_date_triggers")
+STEPS = ("refresh_remote_certificates", "warn_certificate_expiry", "purge_sessions", "run_date_triggers")
 
 
 def run() -> None:

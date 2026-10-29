@@ -7,14 +7,21 @@ self-signed seal as "identity unknown"; production sites upload a CA-issued or A
 
 from __future__ import annotations
 
+import hashlib
+from typing import Any
+
 import frappe
 from frappe import _
 from frappe.utils import get_datetime, now_datetime
+from frappe.utils.password import get_decrypted_password
 
+from frappe_sign.crypto.remote import RemoteSigner
 from frappe_sign.crypto.selfsigned import MAX_YEARS, make_self_signed
+from frappe_sign.crypto.signer import SignerError
 from frappe_sign.exceptions import CertificateError, throw
 from frappe_sign.services import notify
 from frappe_sign.utils.files import new_private_file
+from frappe_sign.utils.remote_config import PKCS11, RemoteConfigError, parse_config
 
 
 def create_test_certificate(
@@ -117,3 +124,52 @@ def seal_details(certificate: str | None) -> dict[str, object]:
 		"valid_to": str(valid_to.date()) if valid_to else None,
 		"expired": bool(valid_to) and get_datetime(valid_to) <= now_datetime(),
 	}
+
+
+# Remote keys (PKCS#11 token or CSC service), P3.6
+
+
+def remote_signer(certificate: str) -> RemoteSigner:
+	"""The RemoteSigner of a Sign Certificate with storage Remote. The PIN and token are decrypted
+	here and only here."""
+	try:
+		config = parse_config(frappe.db.get_value("Sign Certificate", certificate, "remote_config"))
+	except RemoteConfigError as error:
+		throw(CertificateError, _("Sign Certificate {0}: {1}").format(certificate, str(error)))
+	require_allowed_module(config)
+	return RemoteSigner(
+		config,
+		pin=get_decrypted_password("Sign Certificate", certificate, "remote_pin", raise_exception=False),
+		token=get_decrypted_password("Sign Certificate", certificate, "remote_token", raise_exception=False),
+	)
+
+
+def require_allowed_module(config: dict[str, Any]) -> None:
+	"""A site may list the PKCS#11 libraries it permits in site_config (frappe_sign_pkcs11_modules).
+	Without the list any library path the System Manager enters is loaded into the worker."""
+	allowed = frappe.conf.get("frappe_sign_pkcs11_modules")
+	if config["type"] == PKCS11 and allowed and config["module_path"] not in allowed:
+		throw(CertificateError, _("This PKCS#11 library is not in the site's list of allowed libraries."))
+
+
+def refresh_remote(certificate: str) -> dict[str, str | None]:
+	"""Read the signing certificate from the token or service and store its details, so the
+	expiry warnings and the settings page know when the seal ends (System Manager)."""
+	frappe.only_for("System Manager")
+	doc = frappe.get_doc("Sign Certificate", certificate)
+	if doc.storage != "Remote":
+		throw(CertificateError, _("Only a remote certificate is read from a token or service."))
+	try:
+		chain = remote_signer(certificate).chain()
+	except SignerError as error:
+		throw(CertificateError, _("Could not read the certificate: {0}").format(str(error)))
+	leaf = chain[0]
+	details = {
+		"subject": leaf.subject.human_friendly,
+		"issuer": leaf.issuer.human_friendly,
+		"valid_from": leaf.not_valid_before.replace(tzinfo=None),
+		"valid_to": leaf.not_valid_after.replace(tzinfo=None),
+		"fingerprint_sha256": hashlib.sha256(leaf.dump()).hexdigest().upper(),
+	}
+	doc.db_set(details)
+	return {key: str(value) for key, value in details.items()}

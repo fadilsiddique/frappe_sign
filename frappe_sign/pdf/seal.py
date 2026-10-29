@@ -61,7 +61,25 @@ def seal_pdf(
 			if not tsa_urls:
 				raise SealError("A TSA URL is required to seal")
 			timestamper = FallbackTimeStamper(tsa_urls)
-		pyhanko_signer = signer.pyhanko_signer()
+		output = asyncio.run(sign(pdf, signer, timestamper, validation_context, reason, location, contact))
+	except SealError:
+		raise
+	except SEAL_ERRORS as error:
+		raise SealError(f"Sealing failed: {error}") from error
+	return bytes(output.getbuffer())
+
+
+async def sign(
+	pdf: bytes,
+	signer: Signer,
+	timestamper: TimeStamper,
+	validation_context: ValidationContext | None,
+	reason: str,
+	location: str,
+	contact: str,
+) -> io.BytesIO:
+	"""Sign inside the event loop, so a remote signer keeps its session open only while it signs."""
+	async with signer.open() as pyhanko_signer:
 		context = validation_context or online_validation_context(pyhanko_signer)
 		metadata = signers.PdfSignatureMetadata(
 			field_name=SEAL_FIELD,
@@ -76,12 +94,8 @@ def seal_pdf(
 		)
 		writer = IncrementalPdfFileWriter(io.BytesIO(pdf), strict=False)
 		pdf_signer = signers.PdfSigner(metadata, signer=pyhanko_signer, timestamper=timestamper)
-		output = asyncio.run(pdf_signer.async_sign_pdf(writer, in_place=False))
-	except SealError:
-		raise
-	except SEAL_ERRORS as error:
-		raise SealError(f"Sealing failed: {error}") from error
-	return bytes(output.getbuffer())
+		sealed: io.BytesIO = await pdf_signer.async_sign_pdf(writer, in_place=False)
+		return sealed
 
 
 def online_validation_context(pyhanko_signer: signers.Signer) -> ValidationContext:

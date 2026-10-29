@@ -457,14 +457,17 @@ Company-side signers (fixed users and the authorised signatory) use the same `/s
 
 ```python
 class Signer(Protocol):
-    def pyhanko_signer(self) -> "pyhanko.sign.signers.Signer": ...
+    def open(self) -> AbstractAsyncContextManager["pyhanko.sign.signers.Signer"]: ...  # inside the seal's event loop
+    def chain(self) -> list["asn1crypto.x509.Certificate"]: ...                         # signing cert first
 
-class Pkcs12Signer:  # Phase 1
+class Pkcs12Signer:  # Phase 1, crypto/signer.py
     def __init__(self, p12: bytes, password: bytes) -> None: ...
 
-class RemoteSigner:  # Phase 3: PKCS#11 or CSC
-    def __init__(self, config: dict) -> None: ...
+class RemoteSigner:  # Phase 3, crypto/remote.py: PKCS#11 token or CSC service
+    def __init__(self, config: dict, pin: str | None = None, token: str | None = None) -> None: ...
 ```
+
+- **RemoteSigner (P3.6).** A Sign Certificate with storage `Remote` holds a JSON config (`utils/remote_config.py` validates it; unknown keys are refused so a PIN pasted there is noticed) and two Password fields, `remote_pin` and `remote_token`. `{"type": "pkcs11", "module_path", "token_label" or "slot_no", "key_label", "cert_label"}` opens a token session only while the seal signs (SoftHSM in tests and CI). `{"type": "csc", "service_url" (https, or loopback for tests), "credential_id", "api_version"}` uses `credentials/info`, `credentials/authorize` with the PIN and `signatures/signHash`. A site may list the PKCS#11 libraries it permits in `site_config.json` as `frappe_sign_pkcs11_modules`; without the list any library path a System Manager enters is loaded into the seal worker. "Read the certificate" (System Manager) and the daily job fill subject, validity and fingerprint from the token or service, so expiry warnings work for remote keys too. The key never reaches the app: only digests go out and signatures come back.
 
 - `crypto/tsa.py`: tries each URL in `Sign Settings.tsa_urls` in order with a 10 s timeout, and uses the first granted response. When the list is empty it uses the public DigiCert and Sectigo TSAs (`DEFAULT_TSA_URLS`).
 - `crypto/pkcs12.py` parses the certificate for the Sign Certificate controller. `Pkcs12Signer` checks again before each seal that the key is present and the certificate is valid now, and raises `SignerError` otherwise.

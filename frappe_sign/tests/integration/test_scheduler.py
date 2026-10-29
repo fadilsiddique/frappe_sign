@@ -240,10 +240,11 @@ class TestDateTriggers(DispatcherCase):
 	def test_housekeeping_job_runs_every_step(self):
 		with (
 			no_commits(),
+			patch.object(schedule, "refresh_remote_certificates") as remote,
 			patch.object(schedule, "warn_certificate_expiry") as warn,
 			patch.object(schedule, "purge_sessions") as purge,
 			patch.object(schedule, "run_date_triggers") as dates,
 		):
 			housekeeping.run()
-		for step in (warn, purge, dates):
+		for step in (remote, warn, purge, dates):
 			step.assert_called_once()

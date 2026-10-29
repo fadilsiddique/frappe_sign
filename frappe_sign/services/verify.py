@@ -121,7 +121,7 @@ def trust_context(envelope: str | None) -> ValidationContext:
 		company = frappe.db.get_value("Sign Envelope", envelope, "company")
 		try:
 			signer = sealing.sealing_signer(company)
-			roots = [cert for cert in signer.pyhanko_signer().cert_registry if cert.self_signed]
+			roots = [cert for cert in signer.chain() if cert.self_signed]
 		except Exception:
 			# Verification still reports integrity when the certificate is gone or unreadable.
 			frappe.log_error(

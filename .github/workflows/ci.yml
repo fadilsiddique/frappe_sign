@@ -132,10 +132,13 @@ jobs:
           restore-keys: pip-${{ runner.os }}-${{ matrix.frappe_ref }}-
 
       # wkhtmltopdf (patched Qt build, as Frappe recommends) for the Print Format and anchor tests.
-      - name: Install MariaDB client and wkhtmltopdf
+      # SoftHSM2 is the PKCS#11 token for the RemoteSigner tests (P3.6).
+      - name: Install MariaDB client, SoftHSM and wkhtmltopdf
         run: |
           sudo apt-get update
-          sudo apt-get install -y mariadb-client
+          sudo apt-get install -y mariadb-client softhsm2
+          ls /usr/lib/softhsm/libsofthsm2.so
+          which softhsm2-util
           wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
           sudo apt-get install -y ./wkhtmltox_0.12.6.1-3.jammy_amd64.deb
           wkhtmltopdf --version
@@ -193,3 +196,5 @@ jobs:
           bench --site "$SITE" run-tests --app frappe_sign
         env:
           TYPE: server
+          # A missing SoftHSM fails the PKCS#11 tests instead of skipping them.
+          FRAPPE_SIGN_REQUIRE_SOFTHSM: '1'

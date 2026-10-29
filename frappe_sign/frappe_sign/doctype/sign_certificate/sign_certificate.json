@@ -13,6 +13,8 @@
   "p12_file",
   "p12_password",
   "remote_config",
+  "remote_pin",
+  "remote_token",
   "details_section",
   "subject",
   "issuer",
@@ -73,10 +75,24 @@
   },
   {
    "depends_on": "eval:doc.storage==\"Remote\"",
-   "description": "PKCS#11 or CSC endpoint (later release)",
+   "description": "PKCS#11: {\"type\": \"pkcs11\", \"module_path\": \"/usr/lib/softhsm/libsofthsm2.so\", \"token_label\": \"...\", \"key_label\": \"...\"}. CSC: {\"type\": \"csc\", \"service_url\": \"https://...\", \"credential_id\": \"...\"}",
    "fieldname": "remote_config",
    "fieldtype": "JSON",
    "label": "Remote config"
+  },
+  {
+   "depends_on": "eval:doc.storage==\"Remote\"",
+   "description": "The token PIN (PKCS#11) or the credential PIN (CSC)",
+   "fieldname": "remote_pin",
+   "fieldtype": "Password",
+   "label": "PIN"
+  },
+  {
+   "depends_on": "eval:doc.storage==\"Remote\"",
+   "description": "CSC only: the OAuth access token of the service",
+   "fieldname": "remote_token",
+   "fieldtype": "Password",
+   "label": "Access token"
   },
   {
    "fieldname": "details_section",

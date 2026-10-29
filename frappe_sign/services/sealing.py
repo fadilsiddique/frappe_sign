@@ -28,7 +28,7 @@ from frappe_sign.pdf.certificate import (
 )
 from frappe_sign.pdf.seal import seal_pdf
 from frappe_sign.pdf.text import default_fonts
-from frappe_sign.services import audit, events, notify, settings
+from frappe_sign.services import audit, certificates, events, notify, settings
 from frappe_sign.services import envelope as envelope_service
 from frappe_sign.services.pdfs import IMAGE_TYPES, filled_pdf
 from frappe_sign.utils.dates import after, format_local, format_utc
@@ -184,6 +184,8 @@ def sealing_signer(company: str | None) -> Signer:
 			CertificateError,
 			_("Set a sealing certificate on the Sign Profile of {0}.").format(profile or _("this site")),
 		)
+	if frappe.db.get_value("Sign Certificate", certificate, "storage") == "Remote":
+		return certificates.remote_signer(certificate)
 	p12_file = frappe.db.get_value("Sign Certificate", certificate, "p12_file")
 	password = get_decrypted_password("Sign Certificate", certificate, "p12_password", raise_exception=False)
 	if not p12_file or not password:

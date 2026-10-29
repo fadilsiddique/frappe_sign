@@ -45,6 +45,9 @@ repos:
           - "qrcode>=8.0,<9.0"
           - "types-reportlab"
           - "pillow"
+          - "python-pkcs11>=0.7.0,<1.0.0"
+          - "aiohttp>=3.9.0,<4.0.0"
+          - "tzlocal>=5.0,<6.0"
 
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.182.1

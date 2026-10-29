@@ -216,6 +216,13 @@ def my_signing_link(envelope: str) -> dict:
 
 @frappe.whitelist(methods=["POST"])
 @with_error_code
+def check_remote_certificate(certificate: str) -> dict:
+	"""Read a remote certificate from its token or service and store its details (System Manager)."""
+	return certificates.refresh_remote(certificate)
+
+
+@frappe.whitelist(methods=["POST"])
+@with_error_code
 def create_test_certificate(
 	company: str | None = None, common_name: str | None = None, years: int = 3, replace: bool = False
 ) -> dict:

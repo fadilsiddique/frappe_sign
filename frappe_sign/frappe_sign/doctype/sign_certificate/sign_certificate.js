@@ -3,6 +3,21 @@
 
 frappe.ui.form.on("Sign Certificate", {
 	refresh(frm) {
+		if (!frm.is_new() && frm.doc.storage === "Remote") {
+			frm.add_custom_button(__("Read the certificate"), async () => {
+				const response = await frappe.call({
+					method: "frappe_sign.api.staff.check_remote_certificate",
+					args: { certificate: frm.doc.name },
+					type: "POST",
+					freeze: true,
+				});
+				frappe.show_alert({
+					message: __("Certificate read: {0}", [response.message.subject]),
+					indicator: "green",
+				});
+				frm.reload_doc();
+			});
+		}
 		if (!frm.is_new()) return;
 		frm.set_intro(
 			__(

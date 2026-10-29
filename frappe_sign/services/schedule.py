@@ -13,8 +13,8 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cint, getdate, now_datetime
 
+from frappe_sign.services import certificates, notify, settings, trigger
 from frappe_sign.services import envelope as envelope_service
-from frappe_sign.services import notify, settings, trigger
 from frappe_sign.utils.dates import utc_now
 
 # Days before a seal certificate ends at which Sign Managers are warned; 0 is "has ended".
@@ -82,6 +82,23 @@ def warn_certificate_expiry() -> list[str]:
 			notify.notify_user(user, text)
 		warned.append(certificate.name)
 	return warned
+
+
+def refresh_remote_certificates() -> list[str]:
+	"""Re-read the end date of every remote certificate (token or service), so the warnings below
+	see a renewal. One unreachable HSM must not hide the others; each failure is logged."""
+	read = []
+	for name in frappe.get_all("Sign Certificate", filters={"storage": "Remote"}, pluck="name"):
+		try:
+			certificates.refresh_remote(name)
+			read.append(name)
+		except Exception:
+			frappe.log_error(
+				title="Frappe Sign: remote certificate",
+				reference_doctype="Sign Certificate",
+				reference_name=name,
+			)
+	return read
 
 
 def warning_band(valid_to: datetime) -> int | None:
