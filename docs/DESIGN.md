@@ -260,6 +260,8 @@ Field types that need a note:
 
 **Sign Trigger Log**: `trigger`, `reference_doctype`, `reference_name`, `status` (Queued, Created, Sent, Skipped, Failed), `envelope`, `error` (Code).
 
+**Sign Bulk Run** (child **Sign Bulk Run Item**): one row per list-view bulk send. `reference_doctype`, `template`, `status` (Queued, Running, Done), `total`, `sent`, `failed`, and `items` with `document`, `status` (Queued, Sent, Failed), `envelope` and `error`. A Sign User creates and reads their own runs; managers see all. `documents.queue_bulk_send` (at most 100 documents) inserts the run and queues `jobs.bulk.run` on the long queue. The job commits after each document and publishes `frappe_sign_bulk` realtime (`run`, `status`, `done`, `total`, `sent`, `failed`) to the user, who sees a progress bar in the list view and a Notification Log linking to the run at the end.
+
 A trigger runs in `jobs.triggers.run` as the trigger's owner (a Sign Manager or System Manager), not as the user who saved the document: that user may have no Sign role, and only the managers may create Sign Trigger Logs. So the owner must be able to read and print the documents the trigger covers. The run writes a Queued log and commits, then sets Created, Sent or Skipped (with the reason: disabled, condition false, document gone, an envelope from the same template still open). In `Send` mode the envelope is sent only when every Signer and Approver has a name and email; otherwise it stays a Draft and the owner is notified. A failure sets the log to Failed with the traceback, writes the Error Log and comments on the source document. Triggers cannot target child, single or Frappe Sign DocTypes.
 
 **Sign Saved Signature** (owner only): `user`, `kind` (Signature, Initials), `image`.

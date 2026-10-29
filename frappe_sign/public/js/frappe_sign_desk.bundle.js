@@ -53,7 +53,9 @@ frappe.provide("frappe.ui.form");
 			try {
 				const names = await call("waiting_on", { envelope: frm.doc.sign_envelope });
 				if (names.length)
-					waiting = ` · ${__("waiting for {0}", [frappe.utils.escape_html(names.join(", "))])}`;
+					waiting = ` · ${__("waiting for {0}", [
+						frappe.utils.escape_html(names.join(", ")),
+					])}`;
 			} catch (error) {
 				// The plain headline stays; a failed lookup must not break the form.
 			}
@@ -130,7 +132,13 @@ frappe.provide("frappe.ui.form");
 							in_list_view: 1,
 							columns: 3,
 						},
-						{ fieldname: "kind", label: __("Kind"), fieldtype: "Data", read_only: 1, hidden: 1 },
+						{
+							fieldname: "kind",
+							label: __("Kind"),
+							fieldtype: "Data",
+							read_only: 1,
+							hidden: 1,
+						},
 						{
 							fieldname: "full_name",
 							label: __("Name"),
@@ -329,13 +337,40 @@ frappe.provide("frappe.ui.form");
 				);
 				dialog.hide();
 				list_view.clear_checked_items();
-				frappe.show_alert({
-					message: __("{0} documents queued for signature", [result.queued]),
-					indicator: "green",
-				});
+				watch_bulk_run(result.run);
 			},
 		});
 		dialog.show();
+	}
+
+	// Progress of a bulk send: the job publishes after each document (jobs/bulk.py).
+	function watch_bulk_run(run) {
+		const title = __("Sending for signature");
+		frappe.show_progress(title, 0, 100, __("Queued"), true);
+		frappe.realtime.on("frappe_sign_bulk", function handler(progress) {
+			if (progress.run !== run) return;
+			if (progress.status !== "Done") {
+				const message = __("{0} of {1} documents", [progress.done, progress.total]);
+				frappe.show_progress(title, progress.done, progress.total, message, true);
+				return;
+			}
+			frappe.realtime.off("frappe_sign_bulk", handler);
+			frappe.hide_progress();
+			const failed = progress.failed ? __(", {0} not sent", [progress.failed]) : "";
+			frappe.msgprint({
+				title,
+				indicator: progress.failed ? "orange" : "green",
+				message:
+					__("{0} of {1} documents sent for signature", [
+						progress.sent,
+						progress.total,
+					]) +
+					failed +
+					`. <a href="/app/sign-bulk-run/${encodeURIComponent(run)}">${__(
+						"See each result"
+					)}</a>`,
+			});
+		});
 	}
 
 	// Sign Certificate list and new form: "Create test certificate" (ADMIN_GUIDE step 2).

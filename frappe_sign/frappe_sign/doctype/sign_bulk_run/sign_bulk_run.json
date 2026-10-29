@@ -1,0 +1,120 @@
+{
+ "actions": [],
+ "autoname": "format:BULK-{YYYY}-{#####}",
+ "creation": "2026-10-29 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "template",
+  "status",
+  "column_break_main",
+  "total",
+  "sent",
+  "failed",
+  "items_section",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "DocType",
+   "options": "DocType",
+   "read_only": 1,
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "Sign Template",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Queued\nRunning\nDone",
+   "default": "Queued",
+   "read_only": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Int",
+   "label": "Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sent",
+   "fieldtype": "Int",
+   "label": "Sent",
+   "read_only": 1
+  },
+  {
+   "fieldname": "failed",
+   "fieldtype": "Int",
+   "label": "Failed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "Documents"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Documents",
+   "options": "Sign Bulk Run Item",
+   "read_only": 1
+  }
+ ],
+ "in_create": 0,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-29 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Sign",
+ "name": "Sign Bulk Run",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Sign Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Sign User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -2,7 +2,7 @@
 
 The Desk dialog lists the published templates for the DocType, fills recipients from the resolvers
 (services/resolvers.py) and sends with one call. The print view passes the Print Format and
-Letter Head it shows. A bulk send from the list view runs in jobs.bulk.run, one envelope per
+Letter Head it shows. A bulk send from the list view is a Sign Bulk Run worked by jobs.bulk.run, one envelope per
 document, with recipients taken from the resolvers only.
 """
 
@@ -108,8 +108,8 @@ def send_resolved(doctype: str, name: str, template: str) -> str:
 	return send_from_document(doctype, name, template, rows)
 
 
-def queue_bulk_send(doctype: str, names: list[str], template: str) -> int:
-	"""Check access and queue jobs.bulk.run for the selected documents."""
+def queue_bulk_send(doctype: str, names: list[str], template: str) -> dict[str, Any]:
+	"""Check access, record a Sign Bulk Run and queue jobs.bulk.run for it."""
 	frappe.has_permission("Sign Envelope", "create", throw=True)
 	frappe.has_permission("Sign Template", "read", doc=template, throw=True)
 	names = list(dict.fromkeys(names or []))
@@ -117,25 +117,76 @@ def queue_bulk_send(doctype: str, names: list[str], template: str) -> int:
 		throw(FieldValidationError, _("Select at least one document."))
 	if len(names) > BULK_LIMIT:
 		throw(FieldValidationError, _("Send at most {0} documents at a time.").format(BULK_LIMIT))
+	run = frappe.get_doc(
+		{
+			"doctype": "Sign Bulk Run",
+			"reference_doctype": doctype,
+			"template": template,
+			"total": len(names),
+			"items": [{"document": name, "status": "Queued"} for name in names],
+		}
+	).insert()
 	frappe.enqueue(
 		BULK_JOB,
 		queue="long",
 		timeout=3600,
 		enqueue_after_commit=True,
-		doctype=doctype,
-		names=names,
-		template=template,
+		run=run.name,
 	)
-	return len(names)
+	return {"queued": len(names), "run": run.name}
 
 
-def report_bulk(doctype: str, sent: list[str], failed: dict[str, str]) -> None:
-	"""Tell the user who started a bulk send what happened; failures are in the Error Log."""
+def start_bulk(run: str) -> Any | None:
+	"""The run to work on, marked Running, or None when it was already taken or finished."""
+	doc = frappe.get_doc("Sign Bulk Run", run)
+	if doc.status != "Queued":
+		return None
+	doc.db_set("status", "Running")
+	return doc
+
+
+def record_bulk_item(run: Any, item: Any, envelope: str | None, error: str | None) -> dict[str, Any]:
+	"""Store one document's result and the run's counters; returns the progress message."""
+	status = "Failed" if error else "Sent"
+	frappe.db.set_value(
+		"Sign Bulk Run Item",
+		item.name,
+		{"status": status, "envelope": envelope, "error": error},
+		update_modified=False,
+	)
+	counts = {"sent": run.sent + (status == "Sent"), "failed": run.failed + (status == "Failed")}
+	run.db_set(counts, update_modified=False)
+	run.sent, run.failed = counts["sent"], counts["failed"]
+	return progress(run, "Running")
+
+
+def progress(run: Any, status: str) -> dict[str, Any]:
+	return {
+		"run": run.name,
+		"status": status,
+		"done": run.sent + run.failed,
+		"total": run.total,
+		"sent": run.sent,
+		"failed": run.failed,
+	}
+
+
+def finish_bulk(run: Any) -> dict[str, Any]:
+	run.db_set("status", "Done", update_modified=False)
+	failed = {
+		item.document: item.error for item in frappe.get_doc("Sign Bulk Run", run.name).items if item.error
+	}
+	report_bulk(run, failed)
+	return progress(run, "Done")
+
+
+def report_bulk(run: Any, failed: dict[str, str]) -> None:
+	"""Tell the user who started a bulk send what happened; every result is on the run."""
 	subject = _("Send for signature: {0} of {1} {2} sent").format(
-		len(sent), len(sent) + len(failed), _(doctype)
+		run.sent, run.total, _(run.reference_doctype)
 	)
 	if failed:
 		subject += ". " + _("Not sent: {0}").format(
 			", ".join(f"{name} ({reason})" for name, reason in failed.items())
 		)
-	notify.notify_user(frappe.session.user, subject[:1000], doctype)
+	notify.notify_user(run.owner, subject[:1000], "Sign Bulk Run", run.name)

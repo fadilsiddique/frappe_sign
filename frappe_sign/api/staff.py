@@ -417,8 +417,8 @@ def send_from_document(
 @frappe.whitelist(methods=["POST"])
 @with_error_code
 def bulk_send(doctype: str, names: list | str, template: str) -> dict:
-	"""List view: one envelope per selected document, queued (jobs.bulk.run)."""
-	return {"queued": documents.queue_bulk_send(doctype, frappe.parse_json(names) or [], template)}
+	"""List view: one envelope per selected document, queued as a Sign Bulk Run (jobs.bulk.run)."""
+	return documents.queue_bulk_send(doctype, frappe.parse_json(names) or [], template)
 
 
 @frappe.whitelist(methods=["POST"])

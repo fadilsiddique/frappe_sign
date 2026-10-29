@@ -75,9 +75,8 @@ class TestSendFromDocument(ERPNextTestCase):
 
 	def test_bulk_send_queues_one_job(self):
 		with self.capture_enqueue() as calls:
-			self.assertEqual(
-				documents.queue_bulk_send("Quotation", [self.quotation.name] * 2, self.template), 1
-			)
+			result = documents.queue_bulk_send("Quotation", [self.quotation.name] * 2, self.template)
+		self.assertEqual(result["queued"], 1)
 		self.assertEqual(calls[0]["method"], "frappe_sign.jobs.bulk.run")
 		self.assertEqual(calls[0]["queue"], "long")
 
@@ -85,15 +84,19 @@ class TestSendFromDocument(ERPNextTestCase):
 		silent = make_quotation(
 			items=1, customer=make_customer("Silent Trading LLC", email=None).name, submit=True
 		)
+		with self.capture_enqueue():
+			run = documents.queue_bulk_send("Quotation", [self.quotation.name, silent.name], self.template)[
+				"run"
+			]
 		with no_commits(), patch("frappe.enqueue"):
-			bulk.run("Quotation", [self.quotation.name, silent.name], self.template)
+			bulk.run(run)
 		sent = frappe.get_all("Sign Envelope", filters={"reference_name": self.quotation.name}, pluck="name")
 		self.assertEqual(len(sent), 1)
 		self.assertFalse(frappe.db.exists("Sign Envelope", {"reference_name": silent.name}))
 		self.assertTrue(
 			frappe.db.exists("Error Log", {"reference_name": silent.name, "method": "Frappe Sign: bulk send"})
 		)
-		note = frappe.get_last_doc("Notification Log", filters={"document_type": "Quotation"})
+		note = frappe.get_last_doc("Notification Log", filters={"document_type": "Sign Bulk Run"})
 		self.assertIn("1 of 2", note.subject)
 		self.assertIn(silent.name, note.subject)
 
