@@ -3,7 +3,7 @@
 import { Button, Tooltip } from 'frappe-ui'
 import { computed, ref } from 'vue'
 import { __ } from '@/shared/translate'
-import { activityLines, type ActivityEvent } from './activity'
+import { activityLines, EVENT_LOOK, type ActivityEvent } from './activity'
 
 // `chainOk` stays undefined when the caller does not know; Vue would cast a missing Boolean to false.
 const props = withDefaults(
@@ -18,6 +18,7 @@ const props = withDefaults(
 
 const showAudit = ref(false)
 const lines = computed(() => activityLines(props.events, props.people))
+const look = (event: string) => EVENT_LOOK[event] ?? { icon: 'lucide-circle', tone: 'closed' }
 </script>
 
 <template>
@@ -45,10 +46,25 @@ const lines = computed(() => activityLines(props.events, props.people))
         @click="showAudit = !showAudit"
       />
     </div>
-    <ul v-if="!showAudit" class="flex flex-col gap-1.5" data-testid="activity">
-      <li v-for="line in lines" :key="line.seq" class="flex gap-3 text-sm">
-        <span class="flex-1 text-ink-gray-9">{{ line.text }}</span>
-        <span class="w-28 shrink-0 text-end text-ink-gray-6">{{ line.ago }}</span>
+    <ul v-if="!showAudit" class="flex flex-col" data-testid="activity">
+      <li v-for="(line, index) in lines" :key="line.seq" class="relative flex gap-3 pb-3.5 text-sm">
+        <span
+          v-if="index < lines.length - 1"
+          class="absolute start-[11px] top-6 bottom-0 w-px bg-outline-gray-2"
+          aria-hidden="true"
+        />
+        <span
+          class="relative grid size-6 shrink-0 place-items-center rounded-full"
+          :style="{
+            background: `var(--sign-${look(line.event).tone}-soft)`,
+            color: `var(--sign-${look(line.event).tone})`,
+          }"
+          aria-hidden="true"
+        >
+          <span :class="look(line.event).icon" class="size-3.5" />
+        </span>
+        <span class="flex-1 pt-0.5 text-ink-gray-9">{{ line.text }}</span>
+        <span class="sign-tabular w-24 shrink-0 pt-0.5 text-end text-ink-gray-6">{{ line.ago }}</span>
       </li>
     </ul>
     <template v-else>

@@ -25,7 +25,7 @@ export function senderLine(sender: SenderStatus): { text: string; tone: Tone } {
 // The icon carries the color; the words stay dark gray so they pass contrast.
 export const toneClass: Record<Tone, string> = {
   ok: 'text-ink-green-3',
-  warn: 'text-ink-amber-3',
+  warn: 'text-[var(--sign-waiting)]',
   bad: 'text-ink-red-4',
 }
 

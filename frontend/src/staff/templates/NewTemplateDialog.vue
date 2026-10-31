@@ -29,11 +29,11 @@ const KINDS = [
         v-for="kind in KINDS"
         :key="kind.key"
         type="button"
-        class="flex flex-col items-start gap-3 rounded-lg border border-outline-gray-2 p-4 text-start transition-colors hover:bg-surface-gray-1 focus-visible:outline-2 focus-visible:outline-outline-gray-4"
+        class="flex flex-col items-start gap-3 rounded-[12px] border border-outline-gray-2 p-5 text-start transition hover:-translate-y-0.5 hover:border-[var(--sign-accent-500)] hover:bg-[var(--sign-accent-50)]/50 hover:shadow-md focus-visible:focus-ring"
         :data-testid="`kind-${kind.key}`"
         @click="emit('pick', kind.key)"
       >
-        <span class="grid size-9 place-items-center rounded-md bg-surface-gray-2 text-ink-gray-7">
+        <span class="grid size-10 place-items-center rounded-[12px] bg-[var(--sign-accent-50)] text-[var(--sign-accent-600)]">
           <span :class="kind.icon" class="size-5" aria-hidden="true" />
         </span>
         <span class="text-base font-medium text-ink-gray-9">{{ __(kind.title) }}</span>

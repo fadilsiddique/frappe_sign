@@ -23,8 +23,8 @@ function toggle(step: StepView) {
 }
 
 function dot(step: StepView): string {
-  if (step.done) return 'bg-green-500 text-white ring-green-500'
-  if (step.key === current.value) return 'bg-surface-gray-9 text-white ring-gray-900'
+  if (step.done) return 'bg-[var(--sign-signed)] text-white ring-[var(--sign-signed)]'
+  if (step.key === current.value) return 'bg-[var(--sign-accent-600)] text-white ring-[var(--sign-accent-600)]'
   return 'bg-surface-base text-ink-gray-6 ring-gray-300'
 }
 </script>
@@ -32,7 +32,7 @@ function dot(step: StepView): string {
 <template>
   <section
     aria-labelledby="setup-title"
-    class="flex flex-col gap-1 rounded-lg border border-outline-gray-1 bg-surface-base p-4"
+    class="flex flex-col gap-1 sign-card p-4"
     data-testid="setup-panel"
   >
     <div class="flex items-baseline gap-2 pb-2">
@@ -47,7 +47,7 @@ function dot(step: StepView): string {
           v-if="index < views.length - 1"
           aria-hidden="true"
           class="absolute start-[11px] top-8 -bottom-2 w-0.5"
-          :class="step.done ? 'bg-green-500' : 'bg-surface-gray-3'"
+          :class="step.done ? 'bg-[var(--sign-signed)]' : 'bg-surface-gray-3'"
         />
         <button
           type="button"

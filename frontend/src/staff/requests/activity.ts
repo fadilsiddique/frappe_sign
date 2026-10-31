@@ -15,6 +15,7 @@ export interface ActivityEvent {
 
 export interface ActivityLine {
   seq: number
+  event: string
   text: string
   ago: string
 }
@@ -77,8 +78,26 @@ export function activityLines(
     .filter((event) => KEY_EVENTS.has(event.event))
     .map((event) => ({
       seq: event.seq,
+      event: event.event,
       text: sentence(event.event, event.recipient_row ? (names.get(event.recipient_row) ?? null) : null),
       ago: timeAgo(event.ago_seconds),
     }))
     .sort((a, b) => b.seq - a.seq)
+}
+
+// Icon and tone for an event's dot in the timeline.
+export const EVENT_LOOK: Record<string, { icon: string; tone: string }> = {
+  Created: { icon: 'lucide-file-plus', tone: 'closed' },
+  Sent: { icon: 'lucide-send', tone: 'viewed' },
+  Viewed: { icon: 'lucide-eye', tone: 'viewed' },
+  Signed: { icon: 'lucide-check', tone: 'signed' },
+  Declined: { icon: 'lucide-x', tone: 'declined' },
+  Delegated: { icon: 'lucide-forward', tone: 'closed' },
+  Reminded: { icon: 'lucide-bell', tone: 'waiting' },
+  Voided: { icon: 'lucide-ban', tone: 'closed' },
+  Expired: { icon: 'lucide-clock', tone: 'waiting' },
+  Sealed: { icon: 'lucide-shield-check', tone: 'signed' },
+  Completed: { icon: 'lucide-circle-check', tone: 'signed' },
+  'Post-Sign Action': { icon: 'lucide-zap', tone: 'closed' },
+  'Source Changed': { icon: 'lucide-file-diff', tone: 'waiting' },
 }

@@ -15,13 +15,12 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { key: 'home', label: 'Home', icon: 'lucide-house', route: '/', activeFor: ['Home'] },
-  // Home's "For you to sign" panel until a page of its own exists (U.3).
   {
     key: 'to-sign',
     label: 'To sign',
     icon: 'lucide-pen-line',
-    route: { path: '/', hash: '#to-sign' },
-    activeFor: [],
+    route: '/to-sign',
+    activeFor: ['ToSign'],
   },
   {
     key: 'sent',

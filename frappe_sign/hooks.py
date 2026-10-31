@@ -4,6 +4,7 @@ app_publisher = "Upscape Technologies"
 app_description = "E-signatures for Frappe and ERPNext v16"
 app_email = "info@upscapetech.com"
 app_license = "mit"
+app_logo_url = "/assets/frappe_sign/images/logo.png"
 
 # ERPNext is optional (D4). ERPNext code lives in frappe_sign/erpnext/ and is loaded only when
 # "erpnext" is in frappe.get_installed_apps().
@@ -13,6 +14,17 @@ fixtures = [
 	{"dt": "Role", "filters": [["role_name", "in", ["Sign Manager", "Sign User"]]]},
 	# Email texts used by services/notify.py; it falls back to the same text if one is deleted.
 	{"dt": "Email Template", "filters": [["name", "like", "Frappe Sign %"]]},
+]
+
+# The tile on the Frappe desktop (apps screen). The logo is a rounded tile like the other apps' tiles.
+add_to_apps_screen = [
+	{
+		"name": "frappe_sign",
+		"logo": "/assets/frappe_sign/icons/desktop_icons/solid/signatures.svg",
+		"title": "Frappe Sign",
+		"route": "/sign",
+		"has_permission": "frappe_sign.utils.boot.has_app_permission",
+	}
 ]
 
 # Desk: Send for Signature on enabled DocTypes' forms, print view and list view (DESIGN 4.1).

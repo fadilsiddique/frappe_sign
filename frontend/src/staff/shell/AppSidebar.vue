@@ -10,6 +10,7 @@ import { stepsLeft } from '../home/setupSteps'
 import type { Dashboard, SetupStatus } from '../home/types'
 import { DESK_URL, isActive, visibleNavItems } from './nav'
 
+const APP_LOGO = '/assets/frappe_sign/images/logo.png'
 const route = useRoute()
 const boot = readBoot()
 const items = visibleNavItems(boot.can_manage)
@@ -44,13 +45,13 @@ const userMenu = [{ label: __('Log out'), icon: 'lucide-log-out', onClick: logOu
 </script>
 
 <template>
-  <!-- Direction B (UX_PLAN "Chosen direction"): a white sidebar beside a gray page, the active row in gray. -->
+  <!-- A white sidebar beside a tinted page; the active row takes the accent. -->
   <Sidebar :collapsible="false" class="border-e border-outline-gray-1 !bg-surface-base" data-testid="sidebar">
     <div class="px-2">
       <SidebarHeader
         :title="__('Frappe Sign')"
         :subtitle="boot.branding.company ?? undefined"
-        :logo="boot.branding.logo ?? undefined"
+        :logo="boot.branding.logo ?? APP_LOGO"
       />
     </div>
     <div class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pt-1">
@@ -63,7 +64,7 @@ const userMenu = [{ label: __('Log out'), icon: 'lucide-log-out', onClick: logOu
         :href="item.href"
         :active="isActive(item, route.name)"
         :suffix="suffixes[item.key]?.()"
-        class="data-[state=active]:!bg-surface-gray-3 data-[state=active]:!shadow-none"
+        class="data-[state=active]:!bg-[var(--sign-accent-50)] data-[state=active]:!text-[var(--sign-accent-700)] data-[state=active]:!shadow-none"
         :data-testid="`nav-${item.key}`"
       />
     </div>

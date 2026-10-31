@@ -4,6 +4,7 @@ export const STAFF_BASE = '/sign'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', name: 'Home', component: () => import('./pages/Home.vue') },
+  { path: '/to-sign', name: 'ToSign', component: () => import('./pages/ToSign.vue') },
   { path: '/requests', name: 'Requests', component: () => import('./pages/Requests.vue') },
   {
     path: '/requests/:id',

@@ -177,7 +177,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
         />
       </aside>
       <main
-        class="min-w-0 flex-1 overflow-y-auto bg-surface-gray-2 p-4"
+        class="min-w-0 flex-1 overflow-y-auto bg-[var(--sign-page)] p-4"
         tabindex="0"
         :aria-label="__('Document pages')"
       >

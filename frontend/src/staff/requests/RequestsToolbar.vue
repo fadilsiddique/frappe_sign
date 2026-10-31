@@ -61,10 +61,10 @@ function clear() {
           v-for="pill in PILLS"
           :key="pill.tab"
           type="button"
-          class="inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-sm focus-visible:focus-ring"
+          class="inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium transition-colors focus-visible:focus-ring"
           :class="
             tab === pill.tab
-              ? 'bg-surface-gray-9 text-white'
+              ? 'bg-[var(--sign-accent-600)] text-white shadow-sm'
               : 'text-ink-gray-7 ring-1 ring-inset ring-outline-gray-2 hover:bg-surface-gray-2'
           "
           :aria-pressed="tab === pill.tab"
@@ -72,7 +72,7 @@ function clear() {
           @click="tab = pill.tab"
         >
           {{ __(pill.label) }}
-          <span v-if="counts" class="opacity-80" :data-testid="`count-${pill.tab}`">{{
+          <span v-if="counts" class="sign-tabular opacity-80" :data-testid="`count-${pill.tab}`">{{
             counts[pill.tab]
           }}</span>
         </button>

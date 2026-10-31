@@ -4,7 +4,7 @@
 import { computed } from 'vue'
 import { __ } from '@/shared/translate'
 import EmptyState from '../components/EmptyState.vue'
-import OrderDots from '../components/OrderDots.vue'
+import ProgressBar from '../components/ProgressBar.vue'
 import { shortDate } from '../format'
 import { nextLine } from './lines'
 import type { WaitingRow } from './types'
@@ -29,7 +29,7 @@ function expiry(row: WaitingRow): string {
 <template>
   <section
     aria-labelledby="waiting-title"
-    class="flex flex-col rounded-lg border border-outline-gray-1 bg-surface-base"
+    class="flex flex-col sign-card"
     data-testid="waiting"
   >
     <div class="flex items-center gap-2 px-4 pb-2.5 pt-3.5">
@@ -55,7 +55,7 @@ function expiry(row: WaitingRow): string {
     />
     <div v-for="group in groups" :key="group.key" class="flex flex-col" :data-group="group.key">
       <h3
-        class="flex gap-2 border-t border-outline-gray-1 bg-surface-gray-1 px-4 py-2 text-sm font-medium text-ink-gray-8"
+        class="flex items-center gap-2 border-t border-outline-gray-1 bg-surface-gray-1 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink-gray-7"
       >
         {{ group.label }}<span class="font-normal text-ink-gray-6">{{ group.rows.length }}</span>
       </h3>
@@ -63,20 +63,19 @@ function expiry(row: WaitingRow): string {
         v-for="row in group.rows"
         :key="row.name"
         :to="`/requests/${row.name}`"
-        class="flex items-center gap-3.5 border-t border-outline-gray-1 px-4 py-3 hover:bg-surface-gray-1 focus-visible:focus-ring"
+        class="flex items-center gap-3.5 border-t border-outline-gray-1 px-4 py-3 hover:bg-[var(--sign-accent-50)]/60 focus-visible:focus-ring"
         data-testid="waiting-row"
       >
         <span class="flex min-w-0 flex-1 flex-col gap-0.5">
           <span class="truncate text-base font-medium text-ink-gray-9">{{ row.title }}</span>
           <span class="truncate text-sm text-ink-gray-6">{{ nextLine(row) }}</span>
         </span>
-        <span class="hidden w-36 shrink-0 items-center gap-2 sm:flex">
-          <OrderDots :people="row.people" />
-          <span class="text-sm text-ink-gray-7">{{ __('{0} of {1}', [row.signed, row.total]) }}</span>
+        <span class="hidden w-32 shrink-0 sm:block">
+          <ProgressBar :people="row.people" :signed="row.signed" :total="row.total" />
         </span>
         <span
           class="w-24 shrink-0 text-end text-sm"
-          :class="row.expiring_soon ? 'font-medium text-ink-amber-6' : 'text-ink-gray-6'"
+          :class="row.expiring_soon ? 'font-medium text-[var(--sign-waiting)]' : 'text-ink-gray-6'"
           >{{ expiry(row) }}</span
         >
         <span

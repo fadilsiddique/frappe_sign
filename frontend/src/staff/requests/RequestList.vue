@@ -3,6 +3,7 @@
 // Lanes: the progress and expiry columns have fixed widths so they line up from row to row.
 import { computed } from 'vue'
 import { __ } from '@/shared/translate'
+import ProgressBar from '../components/ProgressBar.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import { shortDate } from '../format'
 import { GROUPS, requestLine } from './lines'
@@ -39,7 +40,7 @@ function move(event: KeyboardEvent, step: number) {
   <div
     role="listbox"
     :aria-label="__('Requests')"
-    class="flex flex-col bg-surface-base"
+    class="flex flex-col gap-4 p-3 sm:p-4"
     data-testid="request-list"
     @keydown.down="move($event, 1)"
     @keydown.up="move($event, -1)"
@@ -47,24 +48,24 @@ function move(event: KeyboardEvent, step: number) {
     <div
       v-for="group in groups"
       :key="group.key"
-      class="flex flex-col"
+      class="sign-card flex flex-col overflow-hidden"
       role="group"
       :aria-label="__(group.label)"
       :data-group="group.key"
     >
       <h3
         aria-hidden="true"
-        class="flex gap-2 border-b border-outline-gray-1 bg-surface-gray-1 px-4 py-2 text-sm font-medium text-ink-gray-8 sm:px-5"
+        class="flex items-center gap-2 border-b border-outline-gray-1 bg-surface-gray-1 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink-gray-7 sm:px-5"
       >
-        {{ __(group.label) }}<span class="font-normal text-ink-gray-6">{{ group.rows.length }}</span>
+        {{ __(group.label) }}<span class="sign-tabular rounded-full bg-surface-base px-1.5 font-medium text-ink-gray-7 ring-1 ring-inset ring-outline-gray-2">{{ group.rows.length }}</span>
       </h3>
       <button
         v-for="row in group.rows"
         :key="row.name"
         type="button"
         role="option"
-        class="relative flex items-center gap-3 border-b border-outline-gray-1 px-4 py-3 text-start hover:bg-surface-gray-1 focus-visible:focus-ring sm:px-5"
-        :class="selected === row.name ? 'bg-surface-gray-2' : ''"
+        class="relative flex items-center gap-3 border-b border-outline-gray-1 px-4 py-3.5 text-start transition-colors last:border-b-0 hover:bg-[var(--sign-accent-50)]/60 focus-visible:focus-ring sm:px-5"
+        :class="selected === row.name ? 'bg-[var(--sign-accent-50)]' : ''"
         :aria-selected="selected === row.name"
         :data-row="row.name"
         data-testid="request-row"
@@ -72,24 +73,25 @@ function move(event: KeyboardEvent, step: number) {
       >
         <span
           v-if="selected === row.name"
-          class="absolute inset-y-0 start-0 w-[3px] bg-surface-gray-9"
+          class="absolute inset-y-0 start-0 w-[3px] bg-[var(--sign-accent-600)]"
           aria-hidden="true"
         />
         <span class="flex min-w-0 flex-1 flex-col gap-0.5">
           <span class="truncate text-base font-medium text-ink-gray-9">{{ row.title }}</span>
           <span class="truncate text-sm text-ink-gray-6">{{ requestLine(row) }}</span>
         </span>
-        <span class="flex w-[76px] shrink-0 flex-col items-end gap-0.5" data-testid="lane-progress">
+        <span class="flex w-[112px] shrink-0 flex-col items-stretch gap-1" data-testid="lane-progress">
           <span v-if="row.group === 'draft'" class="text-sm text-ink-gray-6">{{ __('Draft') }}</span>
           <StatusBadge
             v-else-if="row.group === 'closed'"
+            class="self-start"
             :status="row.status"
             :sealing="row.sealing_state ?? undefined"
           />
-          <span v-else class="text-sm text-ink-gray-8">{{ __('{0} of {1}', [row.signed, row.total]) }}</span>
+          <ProgressBar v-else :people="row.people" :signed="row.signed" :total="row.total" />
           <span
             class="text-xs"
-            :class="row.expiring_soon ? 'font-medium text-ink-amber-6' : 'text-ink-gray-6'"
+            :class="row.expiring_soon ? 'font-medium text-[var(--sign-waiting)]' : 'text-ink-gray-6'"
             >{{ expiry(row) }}</span
           >
         </span>

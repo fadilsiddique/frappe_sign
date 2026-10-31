@@ -31,9 +31,9 @@ const index = computed(() => props.steps.indexOf(props.current))
           class="grid size-6 place-items-center rounded-full text-xs font-semibold"
           :class="
             position < index
-              ? 'bg-surface-gray-7 text-ink-white'
+              ? 'bg-[var(--sign-signed)] text-white'
               : name === current
-                ? 'bg-surface-gray-7 text-ink-white'
+                ? 'bg-[var(--sign-accent-600)] text-white shadow-[0_0_0_4px_var(--sign-accent-100)]'
                 : 'bg-surface-gray-3 text-ink-gray-6'
           "
         >
@@ -46,7 +46,7 @@ const index = computed(() => props.steps.indexOf(props.current))
       </button>
       <span
         v-if="position < steps.length - 1"
-        class="h-px w-6 bg-outline-gray-2 sm:w-10"
+        class="h-0.5 w-6 rounded-full bg-outline-gray-2 sm:w-10"
         aria-hidden="true"
       />
     </li>

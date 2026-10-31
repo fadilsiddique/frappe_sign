@@ -8,6 +8,7 @@ import type { PageMetric } from '@/shared/coords'
 import { __ } from '@/shared/translate'
 import { errorMessage, fetchPdf } from '../api'
 import AppPageHeader from '../components/AppPageHeader.vue'
+import ProgressBar from '../components/ProgressBar.vue'
 import ResourceState from '../components/ResourceState.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import { shortDate } from '../format'
@@ -106,7 +107,7 @@ onBeforeUnmount(() => window.clearInterval(timer))
       data-testid="envelope-detail"
     >
       <aside
-        class="flex flex-col gap-5 rounded-lg border border-outline-gray-1 bg-surface-base p-5 lg:sticky lg:top-5 lg:order-2"
+        class="sign-card flex flex-col gap-5 p-5 lg:sticky lg:top-5 lg:order-2"
         :aria-label="__('Request details')"
       >
         <div class="flex flex-col gap-1.5">
@@ -118,7 +119,7 @@ onBeforeUnmount(() => window.clearInterval(timer))
             />
             <span class="text-sm text-ink-gray-6">{{ sentLine }}</span>
           </span>
-          <h2 class="text-xl font-semibold text-ink-gray-9 lg:sr-only" data-testid="detail-title">
+          <h2 class="text-xl font-semibold tracking-tight text-ink-gray-9 lg:sr-only" data-testid="detail-title">
             {{ envelope.title }}
           </h2>
           <a
@@ -131,6 +132,17 @@ onBeforeUnmount(() => window.clearInterval(timer))
           <p v-if="envelope.void_reason" class="text-sm text-ink-gray-7">
             {{ __('Reason: {0}', [String(envelope.void_reason)]) }}
           </p>
+        </div>
+
+        <div
+          v-if="data.recipients.length && ['Sent', 'In Progress', 'Completed'].includes(String(envelope.status))"
+          class="rounded-lg bg-[var(--sign-page)] p-3"
+        >
+          <ProgressBar
+            :people="data.recipients.filter((person) => person.kind !== 'CC')"
+            :signed="data.recipients.filter((person) => person.status === 'Signed').length"
+            :total="data.recipients.filter((person) => person.kind !== 'CC').length"
+          />
         </div>
 
         <div v-if="primary || menu.length" class="flex items-center gap-2">
@@ -175,7 +187,7 @@ onBeforeUnmount(() => window.clearInterval(timer))
       </aside>
 
       <section
-        class="min-w-0 rounded-lg bg-surface-gray-2 p-3 lg:order-1 lg:p-5"
+        class="min-w-0 rounded-[12px] bg-[var(--sign-closed-soft)]/60 p-3 ring-1 ring-inset ring-[var(--sign-card-border)] lg:order-1 lg:p-5"
         :aria-label="__('Document')"
         data-testid="detail-pdf"
       >

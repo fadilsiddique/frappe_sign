@@ -46,6 +46,11 @@ def profile_branding(company: str | None) -> dict:
 	return {"company": company, "logo": values.logo, "brand_color": values.brand_color}
 
 
+def has_app_permission() -> bool:
+	"""add_to_apps_screen hook: the Frappe Sign tile shows for people who may use the staff app."""
+	return bool(STAFF_ROLES & set(frappe.get_roles()))
+
+
 def desk_boot(bootinfo) -> None:
 	"""boot_session hook: what public/js/frappe_sign_desk.bundle.js needs to add its buttons (DESIGN 4.1)."""
 	if frappe.session.user == "Guest":

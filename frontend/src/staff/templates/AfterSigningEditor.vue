@@ -55,6 +55,6 @@ function change(patch: Partial<AfterState>) {
       :placeholder="__('For example Approve')"
       @change="change({ workflowAction: ($event.target as HTMLInputElement).value })"
     />
-    <p v-if="problem" class="text-sm text-ink-amber-3" role="alert">{{ problem }}</p>
+    <p v-if="problem" class="text-sm text-[var(--sign-waiting)]" role="alert">{{ problem }}</p>
   </div>
 </template>

@@ -998,3 +998,15 @@ Something needs a look.,هناك ما يحتاج إلى نظرة.
 Something needs fixing now.,هناك ما يحتاج إلى إصلاح الآن.
 Check again,افحص مرة أخرى
 "The preview could not be drawn. Reload the page; if it stays blank, contact your administrator.","تعذر عرض المعاينة. أعد تحميل الصفحة، وإذا بقيت فارغة فتواصل مع المسؤول."
+{0} of {1} signed,وقّع {0} من {1}
+signed,وقّع
+opened,فتح المستند
+declined,رفض
+not opened yet,لم يفتح بعد
+waiting for their turn,بانتظار دوره
+passed on,حوّل المستند
+Name your template,سمِّ القالب
+"Pick a name your team will recognise, such as ""Lease agreement"". You can rename it later.","اختر اسماً يعرفه فريقك، مثل ""عقد إيجار"". يمكنك تغييره لاحقاً."
+Lease agreement,عقد إيجار
+Continue,متابعة
+Check,مراجعة

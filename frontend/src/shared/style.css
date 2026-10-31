@@ -12,6 +12,62 @@ body,
   --sign-brand-soft: rgb(15 118 110 / 0.08);
 }
 
+/* Staff app accent (UX_PLAN "Color"). Indigo: 600 on white is 6.3:1. */
+:root {
+  --sign-accent-50: #eef2ff;
+  --sign-accent-100: #e0e7ff;
+  --sign-accent-500: #6366f1;
+  --sign-accent-600: #4f46e5;
+  --sign-accent-700: #4338ca;
+  --sign-page: #f6f7fb;
+  --sign-card-border: #e6e8f0;
+  --sign-card-shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  /* Request and signer states. Each pair is text on a soft tint (AA at 13px). */
+  --sign-waiting: #b45309;
+  --sign-waiting-soft: #fef3c7;
+  --sign-viewed: #1d4ed8;
+  --sign-viewed-soft: #dbeafe;
+  --sign-signed: #047857;
+  --sign-signed-soft: #d1fae5;
+  --sign-declined: #b91c1c;
+  --sign-declined-soft: #fee2e2;
+  --sign-closed: #475569;
+  --sign-closed-soft: #e2e8f0;
+}
+
+/* Cards and panels: white over the tinted page. */
+.sign-card {
+  background: var(--surface-base, #fff);
+  border: 1px solid var(--sign-card-border);
+  border-radius: 12px;
+  box-shadow: var(--sign-card-shadow);
+}
+
+.sign-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The main button takes the accent. frappe-ui draws a solid gray button near black. */
+:root {
+  --sign-primary: var(--sign-accent-600);
+  --sign-primary-hover: var(--sign-accent-700);
+}
+/* The signer page uses the company brand color instead (guest/main.ts sets data-app). */
+html[data-app='guest'] {
+  --sign-primary: var(--sign-brand);
+  --sign-primary-hover: color-mix(in srgb, var(--sign-brand) 85%, black);
+}
+button.bg-surface-gray-10:not(:disabled),
+a.bg-surface-gray-10 {
+  background-color: var(--sign-primary);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.18);
+}
+button.bg-surface-gray-10:not(:disabled):hover,
+a.bg-surface-gray-10:hover,
+button.bg-surface-gray-10:not(:disabled):active {
+  background-color: var(--sign-primary-hover);
+}
+
 /* WCAG AA (U.13): frappe-ui's muted gray is too light for small text on the nav and its counts. */
 .text-xs-medium.text-ink-gray-5 {
   color: var(--ink-gray-7);
@@ -34,4 +90,21 @@ html[lang^='ar'] body {
 /* Icons that point somewhere or turn a way mirror in right to left (chevrons carry rtl:rotate-180). */
 [dir='rtl'] :is(.lucide-arrow-left, .lucide-arrow-right, .lucide-send, .lucide-undo-2, .lucide-redo-2) {
   transform: scaleX(-1);
+}
+
+/* Dialogs: a blurred, tinted backdrop and a larger, softer panel. Every frappe-ui Dialog and
+   dialog.prompt shares these classes, so the staff app's dialogs look the same. */
+.dialog-overlay {
+  background: rgb(17 24 39 / 0.45);
+  backdrop-filter: blur(3px);
+}
+.dialog-content {
+  border-radius: 16px;
+  border: 1px solid var(--sign-card-border);
+  box-shadow: 0 24px 48px -12px rgb(16 24 40 / 0.25);
+}
+.dialog-content header h1,
+.dialog-content header h2,
+.dialog-content header [class*='text-2xl'] {
+  letter-spacing: -0.01em;
 }

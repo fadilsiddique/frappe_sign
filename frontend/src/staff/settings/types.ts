@@ -83,6 +83,6 @@ export interface HealthReport {
 export const HEALTH_ICON: Record<HealthStatus, { icon: string; color: string; label: string }> = {
   ok: { icon: 'lucide-circle-check', color: 'text-ink-green-3', label: 'Fine' },
   info: { icon: 'lucide-info', color: 'text-ink-gray-6', label: 'For your information' },
-  warn: { icon: 'lucide-triangle-alert', color: 'text-ink-amber-3', label: 'Needs a look' },
+  warn: { icon: 'lucide-triangle-alert', color: 'text-[var(--sign-waiting)]', label: 'Needs a look' },
   fail: { icon: 'lucide-circle-x', color: 'text-ink-red-4', label: 'Needs fixing' },
 }

@@ -11,16 +11,18 @@ import HeaderAction from '../components/HeaderAction.vue'
 import ResourceState from '../components/ResourceState.vue'
 import TemplateThumb from '../send/TemplateThumb.vue'
 import NewTemplateDialog from '../templates/NewTemplateDialog.vue'
+import TemplateTitleDialog from '../templates/TemplateTitleDialog.vue'
 import { editRoute, isPrintFormat, lastUsedLine, typeLine } from '../templates/lines'
 import type { TemplateCardRow } from '../templates/types'
 
 const router = useRouter()
 const creating = ref(false)
+const naming = ref(false)
+const saving = ref(false)
 const templates = createResource({ url: `${STAFF_API}list_templates`, auto: true })
 
-async function create() {
-  const title = window.prompt(__('Template title'))
-  if (!title) return
+async function create(title: string) {
+  saving.value = true
   try {
     const result = await staff<{ name: string }>('save_template', {
       data: {
@@ -31,16 +33,19 @@ async function create() {
         ],
       },
     })
+    naming.value = false
     await router.push(`/templates/${result.name}/design`)
   } catch (error) {
     toast.error(errorMessage(error))
+  } finally {
+    saving.value = false
   }
 }
 
 function pick(kind: 'print-format' | 'pdf') {
   creating.value = false
   if (kind === 'print-format') void router.push('/templates/new/print-format')
-  else void create()
+  else naming.value = true
 }
 </script>
 
@@ -56,6 +61,7 @@ function pick(kind: 'print-format' | 'pdf') {
     </template>
   </AppPageHeader>
   <NewTemplateDialog v-model="creating" @pick="pick" />
+  <TemplateTitleDialog v-model="naming" :loading="saving" @create="create" />
   <div class="p-4 sm:p-5" data-testid="templates">
     <ResourceState :resource="templates">
       <template #empty>
@@ -69,7 +75,7 @@ function pick(kind: 'print-format' | 'pdf') {
         <li v-for="row in (templates.data ?? []) as TemplateCardRow[]" :key="row.name">
           <RouterLink
             :to="editRoute(row)"
-            class="flex h-full flex-col gap-3 rounded-lg bg-surface-base p-2 transition-colors hover:bg-surface-gray-1 focus-visible:outline-2 focus-visible:outline-outline-gray-4"
+            class="sign-card flex h-full flex-col gap-3 p-2.5 transition hover:-translate-y-0.5 hover:border-[var(--sign-accent-500)] hover:shadow-md focus-visible:focus-ring"
             :data-testid="`template-${row.name}`"
           >
             <TemplateThumb :pdf-url="isPrintFormat(row) ? null : row.pdf_file" />

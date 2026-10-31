@@ -11,6 +11,11 @@ import type { Dashboard, SetupStatus, WaitingRow } from './types'
 const props = defineProps<{ dashboard: Dashboard; setup: SetupStatus | null }>()
 const emit = defineEmits<{ changed: [] }>()
 
+const figures = computed(() => [
+  { key: 'completed', label: __('Completed'), icon: 'lucide-circle-check', tone: 'signed', value: props.dashboard.month.completed },
+  { key: 'waiting', label: __('Waiting'), icon: 'lucide-hourglass', tone: 'waiting', value: props.dashboard.month.waiting },
+  { key: 'declined', label: __('Declined'), icon: 'lucide-circle-x', tone: 'declined', value: props.dashboard.month.declined },
+])
 const expiring = computed(() => props.dashboard.waiting.filter((row) => row.expiring_soon))
 const seal = computed(() => props.setup?.steps.find((step) => step.key === 'seal')?.facts ?? null)
 const reminding = ref<string | null>(null)
@@ -32,22 +37,32 @@ async function remind(row: WaitingRow) {
 <template>
   <section
     aria-labelledby="month-title"
-    class="flex flex-col gap-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4"
+    class="flex flex-col gap-3 sign-card p-4"
     data-testid="month"
   >
     <h2 id="month-title" class="text-lg font-semibold text-ink-gray-9">{{ monthName() }}</h2>
-    <dl class="grid grid-cols-3 gap-2">
-      <div>
-        <dt class="text-sm text-ink-gray-6">{{ __('Completed') }}</dt>
-        <dd class="text-3xl font-semibold text-ink-gray-9">{{ dashboard.month.completed }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-gray-6">{{ __('Waiting') }}</dt>
-        <dd class="text-3xl font-semibold text-ink-gray-9">{{ dashboard.month.waiting }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-gray-6">{{ __('Declined') }}</dt>
-        <dd class="text-3xl font-semibold text-ink-gray-9">{{ dashboard.month.declined }}</dd>
+    <dl class="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-1.5">
+      <div
+        v-for="figure in figures"
+        :key="figure.key"
+        class="flex min-w-0 flex-col gap-2 rounded-[12px] px-2.5 py-3"
+        :style="{ background: `var(--sign-${figure.tone}-soft)` }"
+      >
+        <span
+          class="grid size-7 place-items-center rounded-full bg-white/70"
+          :style="{ color: `var(--sign-${figure.tone})` }"
+          aria-hidden="true"
+        >
+          <span :class="figure.icon" class="size-4" />
+        </span>
+        <div class="flex min-w-0 flex-col">
+          <dd class="sign-tabular order-2 text-3xl font-semibold leading-tight tracking-tight text-ink-gray-9">
+            {{ figure.value }}
+          </dd>
+          <dt class="order-1 truncate text-sm font-medium" :style="{ color: `var(--sign-${figure.tone})` }">
+            {{ figure.label }}
+          </dt>
+        </div>
       </div>
     </dl>
   </section>
@@ -55,13 +70,13 @@ async function remind(row: WaitingRow) {
   <section
     v-if="expiring.length"
     aria-labelledby="expiring-title"
-    class="flex flex-col gap-3 rounded-lg border border-outline-gray-1 bg-surface-base p-4"
+    class="flex flex-col gap-3 sign-card p-4"
     data-testid="expiring"
   >
     <h2 id="expiring-title" class="text-lg font-semibold text-ink-gray-9">{{ __('Expiring soon') }}</h2>
     <div v-for="row in expiring" :key="row.name" class="flex items-start gap-2.5">
       <span
-        class="grid size-6 shrink-0 place-items-center rounded-full bg-surface-amber-2 text-ink-amber-6"
+        class="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--sign-waiting-soft)] text-[var(--sign-waiting)]"
         aria-hidden="true"
       >
         <span class="lucide-clock size-3.5" />

@@ -66,7 +66,7 @@ async function draw() {
     <p v-if="error" class="text-sm text-ink-red-4" role="alert">{{ error }}</p>
     <ul
       v-if="warnings.length"
-      class="flex flex-col gap-1 text-sm text-ink-amber-3"
+      class="flex flex-col gap-1 text-sm text-[var(--sign-waiting)]"
       data-testid="preview-warnings"
     >
       <li v-for="warning in warnings" :key="warning">{{ warning }}</li>

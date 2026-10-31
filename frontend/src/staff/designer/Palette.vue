@@ -46,7 +46,7 @@ const GROUPS: Array<{ title: string; types: Array<{ type: FieldType; icon: strin
         class="flex h-8 items-center gap-2 rounded px-2 text-start text-base focus-visible:outline-2 focus-visible:outline-outline-gray-4"
         :class="
           placing === item.type
-            ? 'bg-surface-gray-4 font-medium text-ink-gray-9'
+            ? 'bg-[var(--sign-accent-50)] font-medium text-[var(--sign-accent-700)] ring-1 ring-inset ring-[var(--sign-accent-100)]'
             : 'text-ink-gray-8 hover:bg-surface-gray-2'
         "
         :aria-pressed="placing === item.type"

@@ -48,8 +48,8 @@ The register is product clarity, not marketing. Frappe Sign should feel like Fra
 
 - **Shell (D18):** frappe-ui `Sidebar` with the app name and the company logo at the top. Below it: Home, To sign, Sent, Templates, Settings, then "Back to Desk" at the bottom. A user menu sits at the bottom. On phones, `MobileShell` and `MobileNav`.
 - **Type:** frappe-ui scale. Page titles 20px semibold, body 14px, secondary text 13px gray-6 or darker. Nothing under 12px except badges.
-- **Color:** neutral surfaces. Color only for status badges and role colors. On the guest page only, the company brand color comes from the Sign Profile.
-- **Surfaces:** fewer boxed cards. Lists are full-width rows with dividers. Use a card only where the content is a separate object, such as a template thumbnail.
+- **Color (changed 2026-10-31, modern SaaS look):** the staff app has its own indigo accent for the primary button, active navigation, links and focus. Status colors (waiting amber, viewed blue, signed green, declined red, voided and expired slate) are used in badges, progress bars and timelines. Surfaces stay light and calm. On the guest page, the company brand color still comes from the Sign Profile.
+- **Surfaces (changed 2026-10-31):** lists and panels sit on white cards with a soft border and radius over a tinted page. Rows keep fixed lanes. Dividers separate rows inside a card.
 - **Icons:** lucide icons through frappe-ui, never emoji.
 - **States:** every list and page gets an empty state that says what to do next, a `Skeleton` while loading, and an inline error with a retry. Use toasts instead of `msgprint` in the staff app.
 - **Lanes:** in every list, the avatar, status and action columns have fixed widths and line up from row to row.
@@ -241,6 +241,6 @@ Each screen task is done only when all of these hold:
 1. The UI calls an envelope a "Signature request" ("Request" for short). DocType names stay (D13).
 2. Setup and Print Format template creation move into the staff app. Desk keeps its forms for admins and the "Send for Signature" button.
 3. The app shell is a frappe-ui `Sidebar`, like CRM and Helpdesk.
-4. The company brand color appears on the guest page and in emails only. The staff app stays neutral.
+4. The company brand color appears on the guest page and in emails. The staff app has its own indigo accent (changed 2026-10-31).
 5. `/sign/envelopes` becomes `/sign/requests`, with a redirect from the old path.
 6. U.1 direction (confirmed 2026-10-25): Direction B "Guided desk" for the staff app, Direction A "Quiet list" for the guest page. See "Chosen direction".

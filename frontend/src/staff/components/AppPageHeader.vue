@@ -22,7 +22,7 @@ const isMobile = useIsMobile()
     </div>
   </template>
   <PageHeader v-else>
-    <h1 class="truncate text-3xl font-semibold text-ink-gray-9">{{ title }}</h1>
+    <h1 class="truncate text-3xl font-semibold tracking-tight text-ink-gray-9">{{ title }}</h1>
     <div v-if="$slots.actions || $slots.primary" class="flex items-center gap-2">
       <slot name="actions" />
       <slot name="primary" />

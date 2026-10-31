@@ -20,10 +20,11 @@ test('design, publish and send a template', async ({ page }) => {
   expect(login.ok()).toBeTruthy()
 
   // New template, then the designer.
-  page.once('dialog', (dialog) => dialog.accept('E2E Designer Template'))
   await page.goto('/sign/templates')
   await page.getByRole('button', { name: 'New template' }).click()
   await page.getByTestId('kind-pdf').click()
+  await page.getByLabel('Template title').fill('E2E Designer Template')
+  await page.getByRole('button', { name: 'Continue' }).click()
   await expect(page.getByTestId('designer')).toBeVisible()
   await page.getByTestId('upload-pdf').setInputFiles(PDF)
   const pageBox = page.getByTestId('page-1')

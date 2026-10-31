@@ -382,20 +382,20 @@ function back() {
               <li
                 v-for="warning in warnings"
                 :key="warning"
-                class="flex gap-2 rounded bg-surface-amber-2 p-2 text-sm text-ink-amber-3"
+                class="flex gap-2 rounded-lg bg-[var(--sign-waiting-soft)] p-2.5 text-sm text-[var(--sign-waiting)]"
               >
                 <span class="lucide-triangle-alert mt-0.5 size-4 shrink-0" aria-hidden="true" />{{ warning }}
               </li>
             </ul>
           </div>
-          <p v-else class="flex items-center gap-2 text-sm text-ink-green-4">
+          <p v-else class="flex items-center gap-2 text-sm font-medium text-[var(--sign-signed)]">
             <span class="lucide-check size-4" aria-hidden="true" />{{
               __('Every person has a field to fill.')
             }}
           </p>
           <p
             v-if="preview && !preview.generator_tested"
-            class="rounded bg-surface-amber-2 p-2 text-sm text-ink-amber-3"
+            class="rounded-lg bg-[var(--sign-waiting-soft)] p-2.5 text-sm text-[var(--sign-waiting)]"
           >
             {{
               __(
@@ -464,12 +464,17 @@ function back() {
             :options="otpModeOptions(readBoot().whatsapp)"
           />
         </template>
-        <ul
-          class="flex flex-col divide-y divide-outline-gray-1 rounded-lg border border-outline-gray-1 bg-surface-base"
-        >
-          <li v-for="row in recipients" :key="row.role_label" class="flex flex-col gap-0.5 px-4 py-3">
-            <span class="text-base text-ink-gray-9">{{ row.full_name }}</span>
-            <span class="text-sm text-ink-gray-6">{{ row.role_label }} · {{ row.email }}</span>
+        <ul class="sign-card flex flex-col divide-y divide-outline-gray-1 overflow-hidden">
+          <li v-for="(row, position) in recipients" :key="row.role_label" class="flex items-center gap-3 px-4 py-3">
+            <span
+              class="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--sign-accent-50)] text-sm font-semibold text-[var(--sign-accent-700)]"
+              aria-hidden="true"
+              >{{ position + 1 }}</span
+            >
+            <span class="flex min-w-0 flex-col gap-0.5">
+              <span class="truncate text-base font-medium text-ink-gray-9">{{ row.full_name }}</span>
+              <span class="truncate text-sm text-ink-gray-6">{{ row.role_label }} · {{ row.email }}</span>
+            </span>
           </li>
         </ul>
         <p v-if="!recipientsValid" class="text-sm text-ink-red-4">

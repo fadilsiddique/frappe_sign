@@ -22,7 +22,7 @@ const fullWidth = computed(() => route.name === 'Designer')
         <AppMobileNav />
       </template>
     </MobileShell>
-    <DesktopShell v-else :scroll="!fullWidth" class="bg-surface-gray-1">
+    <DesktopShell v-else :scroll="!fullWidth" class="!bg-[var(--sign-page)]">
       <template v-if="!fullWidth" #sidebar>
         <AppSidebar />
       </template>

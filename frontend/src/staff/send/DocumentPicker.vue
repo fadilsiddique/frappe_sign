@@ -111,7 +111,7 @@ function choose(value: string | number | null | undefined) {
       @update:model-value="choose"
     >
     </Combobox>
-    <p v-if="noTemplates && !hideDoctype" class="text-sm text-ink-amber-3">
+    <p v-if="noTemplates && !hideDoctype" class="text-sm text-[var(--sign-waiting)]">
       {{ __('There is no published template for {0} yet. Make one in Templates first.', [__(doctype)]) }}
     </p>
   </div>

@@ -27,7 +27,7 @@ async function sign(row: ToSignRow) {
   <section
     id="to-sign"
     aria-labelledby="to-sign-title"
-    class="flex flex-col rounded-lg border border-outline-gray-1 bg-surface-base"
+    class="flex flex-col sign-card"
     data-testid="to-sign"
   >
     <div class="flex items-center gap-2 px-4 pb-2.5 pt-3.5">
@@ -41,6 +41,7 @@ async function sign(row: ToSignRow) {
     <EmptyState
       v-if="!rows.length"
       class="border-t border-outline-gray-1"
+      icon="lucide-circle-check"
       :title="__('You are all caught up')"
       :text="__('Documents that colleagues send you to sign or approve show here.')"
     />

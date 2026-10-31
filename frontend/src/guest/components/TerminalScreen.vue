@@ -92,16 +92,16 @@ const content = computed(() => {
     <GuestHeader :company="company" />
     <section class="mx-auto flex w-full max-w-sm flex-1 flex-col items-center px-6 pt-20 text-center">
       <div
-        class="mb-5 flex size-14 items-center justify-center rounded-full"
+        class="mb-6 flex size-16 items-center justify-center rounded-full ring-8"
         :class="{
-          'bg-surface-green-2 text-ink-green-3': content.tone === 'green',
-          'bg-surface-red-2 text-ink-red-4': content.tone === 'red',
-          'bg-surface-gray-2 text-ink-gray-6': content.tone === 'gray',
+          'bg-[var(--sign-signed-soft)] text-[var(--sign-signed)] ring-[var(--sign-signed-soft)]/50': content.tone === 'green',
+          'bg-[var(--sign-declined-soft)] text-[var(--sign-declined)] ring-[var(--sign-declined-soft)]/50': content.tone === 'red',
+          'bg-[var(--sign-closed-soft)] text-[var(--sign-closed)] ring-[var(--sign-closed-soft)]/50': content.tone === 'gray',
         }"
       >
         <BrandIcon :name="content.icon as any" class="size-7" />
       </div>
-      <h1 class="text-xl font-semibold text-ink-gray-9">{{ content.title }}</h1>
+      <h1 class="text-2xl font-semibold tracking-tight text-ink-gray-9">{{ content.title }}</h1>
       <p class="mt-2 text-base text-ink-gray-6">{{ content.body }}</p>
     </section>
   </div>

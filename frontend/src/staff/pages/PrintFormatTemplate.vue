@@ -242,7 +242,7 @@ async function publish() {
           </p>
           <p
             v-else-if="format"
-            class="flex items-start gap-1.5 text-sm text-ink-amber-3"
+            class="flex items-start gap-1.5 text-sm text-[var(--sign-waiting)]"
             data-testid="format-missing"
           >
             <span class="lucide-triangle-alert mt-0.5 size-4 shrink-0" aria-hidden="true" />

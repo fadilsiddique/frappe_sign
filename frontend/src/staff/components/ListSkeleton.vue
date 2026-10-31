@@ -12,7 +12,8 @@ withDefaults(defineProps<{ rows?: number }>(), { rows: 5 })
         <Skeleton class="h-4 w-2/5 rounded" />
         <Skeleton class="h-3 w-1/4 rounded" />
       </div>
-      <Skeleton class="h-5 w-16 rounded-full" />
+      <Skeleton class="h-1.5 w-24 rounded-full" />
+      <Skeleton class="h-6 w-20 rounded-full" />
     </div>
   </div>
 </template>

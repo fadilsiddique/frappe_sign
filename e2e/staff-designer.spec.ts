@@ -19,10 +19,11 @@ test('drop zone, palette groups, compact people, save state, undo and redo', asy
   const login = await page.request.post('/api/method/login', { data: { usr: 'Administrator', pwd: ADMIN_PASSWORD } })
   expect(login.ok()).toBeTruthy()
   await page.setViewportSize({ width: 1440, height: 900 })
-  page.once('dialog', (dialog) => dialog.accept('E2E Polished Designer'))
   await page.goto('/sign/templates')
   await page.getByRole('button', { name: 'New template' }).click()
   await page.getByTestId('kind-pdf').click()
+  await page.getByLabel('Template title').fill('E2E Polished Designer')
+  await page.getByRole('button', { name: 'Continue' }).click()
 
   // Empty canvas: a drop zone, not a sentence. Palette in two groups.
   await expect(page.getByTestId('pdf-drop')).toBeVisible()

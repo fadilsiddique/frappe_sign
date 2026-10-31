@@ -8,6 +8,7 @@ which starts with an empty cache, passed.
 
 from pathlib import Path
 
+import frappe
 from frappe.tests import UnitTestCase
 
 from frappe_sign import hooks
@@ -32,3 +33,10 @@ class TestDeskAssets(UnitTestCase):
 		# assets.json is keyed by file name: "desk.bundle.js" would resolve to Frappe's own bundle.
 		for path in as_list(hooks.app_include_js):
 			self.assertTrue(Path(path).name.startswith("frappe_sign"), path)
+
+	def test_apps_screen_tile_points_at_files_that_exist(self):
+		for app in hooks.add_to_apps_screen:
+			with self.subTest(app=app["name"]):
+				logo = app["logo"].removeprefix("/assets/frappe_sign/")
+				self.assertTrue((PUBLIC / logo).is_file(), logo)
+				self.assertTrue(frappe.get_attr(app["has_permission"]))

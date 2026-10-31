@@ -23,9 +23,11 @@ const heading = computed(() =>
 )
 
 function tone(person: Person): string {
-  if (person.status === 'Signed') return 'bg-green-500 text-white ring-green-500'
-  if (person.status === 'Declined') return 'bg-surface-red-2 text-ink-red-4 ring-red-500'
-  if (next.value.has(person.name)) return 'bg-surface-base text-ink-blue-6 ring-blue-500'
+  if (person.status === 'Signed') return 'bg-[var(--sign-signed)] text-white ring-[var(--sign-signed)]'
+  if (person.status === 'Declined')
+    return 'bg-[var(--sign-declined-soft)] text-[var(--sign-declined)] ring-[var(--sign-declined)]'
+  if (next.value.has(person.name))
+    return 'bg-[var(--sign-accent-50)] text-[var(--sign-accent-700)] ring-[var(--sign-accent-600)] shadow-[0_0_0_4px_var(--sign-accent-100)]'
   return 'bg-surface-base text-ink-gray-6 ring-gray-300'
 }
 </script>
@@ -43,7 +45,7 @@ function tone(person: Person): string {
         <span
           v-if="index < people.length - 1"
           class="absolute start-[13px] top-8 bottom-0 w-0.5"
-          :class="person.status === 'Signed' ? 'bg-green-500' : 'bg-surface-gray-3'"
+          :class="person.status === 'Signed' ? 'bg-[var(--sign-signed)]' : 'bg-surface-gray-3'"
           aria-hidden="true"
         />
         <span
@@ -61,7 +63,7 @@ function tone(person: Person): string {
           </span>
           <span
             class="text-sm"
-            :class="person.status === 'Declined' ? 'text-ink-red-4' : 'text-ink-gray-6'"
+            :class="person.status === 'Declined' ? 'text-[var(--sign-declined)]' : 'text-ink-gray-6'"
             >{{ personState(person, status) }}</span
           >
           <span v-if="open && canAct && next.has(person.name)" class="flex gap-1.5 pt-1.5">
