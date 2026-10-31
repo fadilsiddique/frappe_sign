@@ -108,7 +108,9 @@ def own_roots_of(chain: list[x509.Certificate]) -> list[x509.Certificate]:
 def online_validation_context(pyhanko_signer: signers.Signer) -> ValidationContext:
 	"""Fetch CRLs and OCSP responses for the chain. Self-signed roots shipped in the PKCS#12
 	(a company's own CA) are trusted on top of the system store."""
-	chain = list(pyhanko_signer.cert_registry)
+	# The registry holds the extra certificates only; a lone self-signed signing certificate is
+	# in `signing_cert` alone and must still be trusted as its own root.
+	chain = [pyhanko_signer.signing_cert, *pyhanko_signer.cert_registry]
 	own_roots = own_roots_of(chain)
 	return ValidationContext(
 		extra_trust_roots=own_roots,

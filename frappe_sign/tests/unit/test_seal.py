@@ -103,3 +103,17 @@ class TestOwnRoots(UnitTestCase):
 		roots = [cert.subject.human_friendly for cert in own_roots_of(chain)]
 		self.assertEqual(len(roots), 1)
 		self.assertIn("Root CA", roots[0])
+
+
+	def test_a_lone_self_signed_signing_certificate_is_trusted_as_its_own_root(self):
+		import asyncio
+		from types import SimpleNamespace
+
+		from pyhanko_certvalidator import CertificateValidator
+
+		from frappe_sign.pdf.seal import online_validation_context
+
+		cert = pki.root_cert()
+		context = online_validation_context(SimpleNamespace(signing_cert=cert, cert_registry=[]))
+		path = asyncio.run(CertificateValidator(cert, validation_context=context).async_validate_path())
+		self.assertEqual(len(path), 1)
