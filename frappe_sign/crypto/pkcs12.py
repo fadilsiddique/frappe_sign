@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs12
 
 
@@ -45,6 +45,17 @@ def inspect(p12: bytes, password: bytes) -> Pkcs12Info:
 		fingerprint_sha256=cert.fingerprint(hashes.SHA256()).hex(),
 		has_key=key is not None,
 	)
+
+
+def public_chain_pem(p12: bytes, password: bytes) -> str:
+	"""The certificates of a PKCS#12 file as PEM, without the private key. Stored on the Sign
+	Certificate so that public verification never needs the password."""
+	try:
+		_key, cert, extra = pkcs12.load_key_and_certificates(p12, password)
+	except ValueError as error:
+		raise Pkcs12Error("wrong_password", "Wrong password, or not a PKCS#12 file") from error
+	certs = [c for c in (cert, *(extra or [])) if c is not None]
+	return "".join(c.public_bytes(serialization.Encoding.PEM).decode() for c in certs)
 
 
 def leaf_of(certs: list[x509.Certificate]) -> x509.Certificate:

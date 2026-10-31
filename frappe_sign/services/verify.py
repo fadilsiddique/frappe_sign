@@ -13,7 +13,7 @@ import frappe
 from pyhanko_certvalidator import ValidationContext
 
 from frappe_sign.pdf.seal import inspect_seal
-from frappe_sign.services import audit, sealing
+from frappe_sign.services import audit, certificates
 from frappe_sign.utils.dates import format_local
 from frappe_sign.utils.files import read_file
 from frappe_sign.utils.hashing import sha256_hex
@@ -120,8 +120,7 @@ def trust_context(envelope: str | None) -> ValidationContext:
 	if envelope:
 		company = frappe.db.get_value("Sign Envelope", envelope, "company")
 		try:
-			signer = sealing.sealing_signer(company)
-			roots = [cert for cert in signer.chain() if cert.self_signed]
+			roots = certificates.trusted_roots(company)
 		except Exception:
 			# Verification still reports integrity when the certificate is gone or unreadable.
 			frappe.log_error(

@@ -21,7 +21,8 @@
   "column_break_details",
   "valid_from",
   "valid_to",
-  "fingerprint_sha256"
+  "fingerprint_sha256",
+  "public_chain"
  ],
  "fields": [
   {
@@ -132,6 +133,13 @@
    "fieldname": "fingerprint_sha256",
    "fieldtype": "Data",
    "label": "Fingerprint (SHA-256)",
+   "read_only": 1
+  },
+  {
+   "description": "The certificates only, never the key. Public verification trusts these roots without opening the seal.",
+   "fieldname": "public_chain",
+   "fieldtype": "Code",
+   "label": "Public certificate chain",
    "read_only": 1
   }
  ],

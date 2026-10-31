@@ -20,7 +20,7 @@ from pypdf import PdfReader
 from frappe_sign.jobs import seal as seal_job
 from frappe_sign.services import audit, sealing, signing
 from frappe_sign.tests.cleanup import purge_envelope, purge_profile, purge_since, purge_template
-from frappe_sign.tests.factories import make_email_account, make_profile, test_company
+from frappe_sign.tests.factories import make_email_account, make_profile, signature_field, test_company
 from frappe_sign.tests.integration.test_sealing import offline_seal
 from frappe_sign.tests.signing_helpers import capture_tokens, make_draft, publish_template, send_now
 from frappe_sign.tests.unit.test_overlay import signature_png
@@ -143,6 +143,73 @@ class TestConcurrency(IntegrationTestCase):
 
 	def purge(self):
 		"""Delete everything setUp and the threads committed."""
+		frappe.db.rollback()
+		for template in purge_envelope(self.envelope):
+			purge_template(template)
+		purge_profile(test_company())
+		purge_since(self.started)
+		frappe.db.commit()  # nosemgrep: frappe-manual-commit (threads need committed rows)
+
+
+class TestParallelOpens(IntegrationTestCase):
+	"""P3.8 (load test): signers who open their links at the same moment must all get in, and the
+	audit chain must stay whole. Before the fix, audit.append read the last event from a stale
+	snapshot, so parallel opens forked the sequence and all but one request failed."""
+
+	SIGNERS = 6
+
+	def setUp(self):
+		super().setUp()
+		self.started = now_datetime()
+		self.envelope = None
+		self.addCleanup(self.purge)
+		roles = [
+			{
+				"role_label": f"Signer {n}",
+				"kind": "Signer",
+				"signer_source": "Ask at Send",
+				"routing_order": 1,
+			}
+			for n in range(self.SIGNERS)
+		]
+		fields = [
+			signature_field(field_key=f"sig_{n}", role_label=f"Signer {n}", y=0.05 + 0.1 * n)
+			for n in range(self.SIGNERS)
+		]
+		people = [
+			{"role_label": f"Signer {n}", "full_name": f"Signer {n}", "email": f"p{n}@example.com"}
+			for n in range(self.SIGNERS)
+		]
+		with run_as("Administrator"):
+			make_email_account()
+			make_profile(test_company())
+			version = publish_template(signing_order="Parallel", roles=roles, fields=fields)
+			draft = make_draft(version, recipients=people, company=test_company())
+			frappe.db.commit()  # nosemgrep: frappe-manual-commit (threads need committed rows)
+			with capture_tokens() as box:
+				send_now(draft.name)
+			self.envelope = draft.name
+			self.tokens = [box[row.name] for row in frappe.get_doc("Sign Envelope", draft.name).recipients]
+		frappe.db.commit()  # nosemgrep: frappe-manual-commit
+
+	def test_parallel_opens_all_succeed_and_the_chain_stays_whole(self):
+		client = Client(ip="203.0.113.12", user_agent="thread")
+		results = run_together(
+			**{f"s{n}": (lambda t=t: signing.open(t, client)) for n, t in enumerate(self.tokens)}
+		)
+		traces = [getattr(value, "trace", "") for value in results.values() if isinstance(value, Exception)]
+		self.assertEqual({type(v) for v in results.values()}, {dict}, "\n".join(traces))
+		frappe.db.rollback()
+		seqs = frappe.get_all(
+			"Sign Event", filters={"envelope": self.envelope}, pluck="seq", order_by="seq asc"
+		)
+		self.assertEqual(seqs, list(range(1, len(seqs) + 1)))
+		self.assertEqual(
+			frappe.db.count("Sign Event", {"envelope": self.envelope, "event": "Viewed"}), self.SIGNERS
+		)
+		self.assertTrue(audit.verify_chain(self.envelope).ok)
+
+	def purge(self):
 		frappe.db.rollback()
 		for template in purge_envelope(self.envelope):
 			purge_template(template)

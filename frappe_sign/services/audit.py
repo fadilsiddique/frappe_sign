@@ -8,6 +8,8 @@ microseconds. Only HASHED_FIELDS are hashed; Frappe metadata and the hash fields
 from __future__ import annotations
 
 import json
+import random
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -32,7 +34,8 @@ class ChainReport:
 	reason: str | None = None
 
 
-LOCK_ATTEMPTS = 3
+LOCK_ATTEMPTS = 5
+RETRY_PAUSE_SECONDS = 0.05
 
 
 def retry_on_conflict[**P, R](fn: Callable[P, R]) -> Callable[P, R]:
@@ -54,6 +57,8 @@ def retry_on_conflict[**P, R](fn: Callable[P, R]) -> Callable[P, R]:
 				if attempt == LOCK_ATTEMPTS:
 					raise
 				frappe.db.rollback()
+				# A short, uneven pause, so signers who collided do not collide again in step.
+				time.sleep(RETRY_PAUSE_SECONDS * attempt * (0.5 + random.random()))
 		raise AssertionError("unreachable")
 
 	return wrapper
@@ -78,8 +83,17 @@ def append(
 	"""Insert the next Sign Event. The caller has already checked access to the envelope."""
 	lock_envelope(envelope)
 	client = client or current_client()
+	# A locking read sees the newest event, not this transaction's older snapshot. Without it two
+	# requests that both waited on the lock read the same last seq and forked the chain (found by
+	# the P3.8 load test). Under snapshot isolation it fails with a conflict when the snapshot is
+	# stale, and the entry point's retry_on_conflict runs it again on a fresh one.
 	last = frappe.db.get_value(
-		"Sign Event", {"envelope": envelope}, ["seq", "hash"], order_by="seq desc", as_dict=True
+		"Sign Event",
+		{"envelope": envelope},
+		["seq", "hash"],
+		order_by="seq desc",
+		as_dict=True,
+		for_update=True,
 	)
 	values: dict[str, Any] = {
 		"envelope": envelope,

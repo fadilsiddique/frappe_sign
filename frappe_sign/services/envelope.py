@@ -667,6 +667,7 @@ def attach_source(envelope: Any) -> None:
 	)
 
 
+@audit.retry_on_conflict
 def download(name: str, kind: str) -> tuple[bytes, str]:
 	"""original, signed or certificate (the certificate pages of the signed PDF)."""
 	doc = frappe.get_doc("Sign Envelope", name)
@@ -684,6 +685,7 @@ def download(name: str, kind: str) -> tuple[bytes, str]:
 	return data, f"{name}-{kind}.pdf"
 
 
+@audit.retry_on_conflict
 def my_signing_link(name: str) -> str:
 	"""The /s/<token> link of the logged-in user when it is their turn (DESIGN 5.1). It is the
 	same link as in their email (D10)."""

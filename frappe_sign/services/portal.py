@@ -59,6 +59,7 @@ def signed_envelope_names(email: str) -> list[str]:
 	)
 
 
+@audit.retry_on_conflict
 def download(name: str) -> tuple[bytes, str]:
 	"""The sealed PDF of one of the user's own documents; records a Downloaded event."""
 	if len(str(name or "")) > MAX_NAME_LENGTH:

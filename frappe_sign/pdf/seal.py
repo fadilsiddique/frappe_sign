@@ -11,6 +11,7 @@ import asyncio
 import io
 from dataclasses import dataclass
 
+from asn1crypto import x509
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.pdf_utils.misc import PdfError as PyhankoPdfError
 from pyhanko.pdf_utils.reader import PdfFileReader
@@ -98,11 +99,17 @@ async def sign(
 		return sealed
 
 
+def own_roots_of(chain: list[x509.Certificate]) -> list[x509.Certificate]:
+	"""The self-signed certificates of a chain. asn1crypto's `self_signed` is the text "no", "maybe"
+	or "yes", so it is compared, never tested as a bool (that made every leaf a trust root)."""
+	return [cert for cert in chain if cert.self_signed != "no"]
+
+
 def online_validation_context(pyhanko_signer: signers.Signer) -> ValidationContext:
 	"""Fetch CRLs and OCSP responses for the chain. Self-signed roots shipped in the PKCS#12
 	(a company's own CA) are trusted on top of the system store."""
 	chain = list(pyhanko_signer.cert_registry)
-	own_roots = [cert for cert in chain if cert.self_signed]
+	own_roots = own_roots_of(chain)
 	return ValidationContext(
 		extra_trust_roots=own_roots,
 		other_certs=chain,

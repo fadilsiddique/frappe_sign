@@ -47,7 +47,9 @@ class Pkcs12Signer:
 		yield self.pyhanko_signer()
 
 	def chain(self) -> list[x509.Certificate]:
-		return list(self.pyhanko_signer().cert_registry)
+		signer = self.pyhanko_signer()
+		found = {cert.dump(): cert for cert in (signer.signing_cert, *signer.cert_registry)}
+		return list(found.values())
 
 	def pyhanko_signer(self) -> signers.SimpleSigner:
 		if self._signer is None:

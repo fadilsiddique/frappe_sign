@@ -66,3 +66,4 @@ e2e/test-results/
 
 # Generated sample for the Gate 1 Adobe check (frappe_sign/tests/sample.py)
 frappe_sign/tests/output/
+frappe_sign/tests/fixtures/pdfs/loadtest_heavy_150.pdf

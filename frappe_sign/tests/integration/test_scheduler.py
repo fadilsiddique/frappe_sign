@@ -28,6 +28,15 @@ def frozen_in(**delta):
 
 
 class SchedulerCase(SignTestCase):
+	def setUp(self):
+		super().setUp()
+		# The dev site may hold real open requests; the scheduler looks at every envelope, so the
+		# test transaction closes them first (it never commits, and rolls back).
+		self.refuse_commits()
+		frappe.db.sql(
+			"update `tabSign Envelope` set status = 'Voided' where status in ('Sent', 'In Progress')"
+		)
+
 	def sent(self, signing_order="Sequential"):
 		version = publish_template(signing_order=signing_order)
 		draft = make_draft(version)

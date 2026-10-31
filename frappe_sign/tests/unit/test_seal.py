@@ -92,3 +92,14 @@ class TestSeal(UnitTestCase):
 	def test_garbage_raises_seal_error(self):
 		with self.assertRaises(SealError):
 			seal(b"not a pdf")
+
+
+class TestOwnRoots(UnitTestCase):
+	def test_only_self_signed_certificates_become_trust_roots(self):
+		from frappe_sign.pdf.seal import own_roots_of
+
+		chain = pki.sealing_signer().chain()
+		self.assertEqual(len(chain), 2)
+		roots = [cert.subject.human_friendly for cert in own_roots_of(chain)]
+		self.assertEqual(len(roots), 1)
+		self.assertIn("Root CA", roots[0])

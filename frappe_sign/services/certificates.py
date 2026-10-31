@@ -11,16 +11,18 @@ import hashlib
 from typing import Any
 
 import frappe
+from asn1crypto import pem, x509
 from frappe import _
 from frappe.utils import get_datetime, now_datetime
 from frappe.utils.password import get_decrypted_password
 
+from frappe_sign.crypto import pkcs12
 from frappe_sign.crypto.remote import RemoteSigner
 from frappe_sign.crypto.selfsigned import MAX_YEARS, make_self_signed
 from frappe_sign.crypto.signer import SignerError
 from frappe_sign.exceptions import CertificateError, throw
 from frappe_sign.services import notify
-from frappe_sign.utils.files import new_private_file
+from frappe_sign.utils.files import new_private_file, read_file_url
 from frappe_sign.utils.remote_config import PKCS11, RemoteConfigError, parse_config
 
 
@@ -171,5 +173,51 @@ def refresh_remote(certificate: str) -> dict[str, str | None]:
 		"valid_to": leaf.not_valid_after.replace(tzinfo=None),
 		"fingerprint_sha256": hashlib.sha256(leaf.dump()).hexdigest().upper(),
 	}
-	doc.db_set(details)
+	doc.db_set(
+		details | {"public_chain": "".join(pem.armor("CERTIFICATE", cert.dump()).decode() for cert in chain)}
+	)
 	return {key: str(value) for key, value in details.items()}
+
+
+def trusted_roots(company: str | None) -> list[x509.Certificate]:
+	"""The self-signed roots of the company's seal, from the chain stored on its Sign Certificate.
+	Public verification uses this instead of opening the seal: no password is decrypted and no
+	token is touched on an anonymous request (DESIGN 5.3)."""
+	profile = company or notify.single_profile()
+	certificate = profile and frappe.db.get_value("Sign Profile", profile, "sealing_certificate")
+	chain = certificate and frappe.db.get_value("Sign Certificate", certificate, "public_chain")
+	if not chain:
+		return []
+	found = [
+		x509.Certificate.load(der) for _type, _headers, der in pem.unarmor(chain.encode(), multiple=True)
+	]
+	return [cert for cert in found if is_root(cert)]
+
+
+def is_root(cert: x509.Certificate) -> bool:
+	"""asn1crypto's `self_signed` is the text "no", "maybe" or "yes", so it must never be tested as a bool."""
+	return bool(cert.self_signed != "no")
+
+
+def backfill_public_chain() -> list[str]:
+	"""Store the public chain of PKCS#12 certificates saved before the field existed (a patch)."""
+	done = []
+	for name in frappe.get_all(
+		"Sign Certificate",
+		filters={"storage": "PKCS#12 File", "public_chain": ["is", "not set"]},
+		pluck="name",
+	):
+		doc = frappe.get_doc("Sign Certificate", name)
+		password = doc.get_password("p12_password", raise_exception=False)
+		if not doc.p12_file or not password:
+			continue
+		try:
+			chain = pkcs12.public_chain_pem(read_file_url(doc.p12_file), password.encode())
+		except (pkcs12.Pkcs12Error, frappe.DoesNotExistError):
+			frappe.log_error(
+				title="Frappe Sign: public chain", reference_doctype="Sign Certificate", reference_name=name
+			)
+			continue
+		doc.db_set("public_chain", chain)
+		done.append(name)
+	return done

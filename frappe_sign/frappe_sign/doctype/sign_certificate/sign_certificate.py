@@ -52,6 +52,7 @@ class SignCertificate(Document):
 		self.valid_from = info.valid_from
 		self.valid_to = info.valid_to
 		self.fingerprint_sha256 = info.fingerprint_sha256
+		self.public_chain = pkcs12.public_chain_pem(read_private_file(self.p12_file), password.encode())
 
 	def plain_password(self) -> str | None:
 		"""The password typed in this save, or the stored one when the field is masked."""

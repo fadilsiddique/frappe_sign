@@ -66,8 +66,11 @@ class Access:
 # Token and session checks
 
 
-def by_token(token: str | None) -> Access:
-	"""The envelope and recipient of a link token. Unknown and expired tokens look the same."""
+def by_token(token: str | None, *, lock: bool = False) -> Access:
+	"""The envelope and recipient of a link token. Unknown and expired tokens look the same.
+
+	`lock` is for requests that will append an event: the envelope row lock is taken before any
+	consistent read, so the read view starts after the wait and is not stale (see audit.append)."""
 	if not token or len(token) > 200:
 		throw(LinkExpired, _("This signing link is not valid. Ask the sender for a new one."))
 	row = frappe.db.get_value(
@@ -75,9 +78,12 @@ def by_token(token: str | None) -> Access:
 		{"token_hash": sha256_hex(token), "parenttype": "Sign Envelope"},
 		["name", "parent", "token_expires_on"],
 		as_dict=True,
+		for_update=lock,
 	)
 	if not row or is_past(row.token_expires_on):
 		throw(LinkExpired, _("This signing link is not valid. Ask the sender for a new one."))
+	if lock:
+		audit.lock_envelope(row.parent)
 	return load(row.parent, row.name)
 
 
@@ -87,8 +93,9 @@ def load(envelope_name: str, recipient_row: str, session: Any = None) -> Access:
 	return Access(envelope, recipient, session)
 
 
-def by_session(secret: str | None) -> Access:
-	"""Check the X-Sign-Session secret: verified, not idle over 30 minutes, under 24 hours old."""
+def by_session(secret: str | None, *, lock: bool = False) -> Access:
+	"""Check the X-Sign-Session secret: verified, not idle over 30 minutes, under 24 hours old.
+	`lock` takes the envelope row lock first, as in by_token."""
 	if not secret or len(secret) > 200:
 		throw(SessionInvalid, _("Your signing session has ended. Open the link again."))
 	session = frappe.db.get_value(
@@ -96,7 +103,10 @@ def by_session(secret: str | None) -> Access:
 		{"session_hash": sha256_hex(secret)},
 		["name", "envelope", "recipient_row", "verified_on", "last_seen_on", "expires_on"],
 		as_dict=True,
+		for_update=lock,
 	)
+	if lock and session:
+		audit.lock_envelope(session.envelope)
 	idle = session and seconds_since(session.last_seen_on) > SESSION_IDLE_MINUTES * 60
 	if not session or not session.verified_on or is_past(session.expires_on) or idle:
 		throw(SessionInvalid, _("Your signing session has ended. Open the link again."))
@@ -150,9 +160,10 @@ def new_session(access: Access, client: Client, *, verified: bool) -> tuple[str,
 # Open and verify
 
 
+@audit.retry_on_conflict
 def open(token: str, client: Client | None = None) -> dict[str, Any]:
 	client = client or current_client()
-	access = by_token(token)
+	access = by_token(token, lock=True)
 	check_can_act(access)
 	result = summary(access)
 	if access.envelope.otp_mode == "Off":
@@ -165,9 +176,10 @@ def open(token: str, client: Client | None = None) -> dict[str, Any]:
 	return result
 
 
+@audit.retry_on_conflict
 def request_otp(token: str, channel: str, client: Client | None = None) -> dict[str, Any]:
 	client = client or current_client()
-	access = by_token(token)
+	access = by_token(token, lock=True)
 	check_can_act(access)
 	envelope, recipient = access.envelope, access.recipient
 	if envelope.otp_mode == "Off" or channel != envelope.otp_mode:
@@ -227,9 +239,10 @@ def deliver_otp(envelope: Any, recipient: Any, code: str, minutes: int) -> str:
 	return mask_email(recipient.email)
 
 
+@audit.retry_on_conflict
 def verify_otp(token: str, code: str, client: Client | None = None) -> dict[str, Any]:
 	client = client or current_client()
-	access = by_token(token)
+	access = by_token(token, lock=True)
 	check_can_act(access)
 	envelope, recipient = access.envelope, access.recipient
 	session = frappe.db.get_value(
@@ -320,8 +333,9 @@ def state(secret: str) -> dict[str, Any]:
 	return summary(access)
 
 
+@audit.retry_on_conflict
 def consent(secret: str, version: int, client: Client | None = None) -> None:
-	access = by_session(secret)
+	access = by_session(secret, lock=True)
 	check_can_act(access)
 	_text, current = settings.consent()
 	if cint(version) != current:
@@ -365,8 +379,9 @@ def own_fields(access: Access) -> dict[str, Any]:
 	}
 
 
+@audit.retry_on_conflict
 def save_fields(secret: str, values: dict[str, Any], client: Client | None = None) -> dict[str, Any]:
-	access = by_session(secret)
+	access = by_session(secret, lock=True)
 	check_can_act(access)
 	require_consent(access)
 	fields = own_fields(access)
@@ -438,6 +453,7 @@ def clean_value(field: Any, value: Any) -> str:
 	return text
 
 
+@audit.retry_on_conflict
 def save_capture(
 	secret: str,
 	field_key: str,
@@ -446,7 +462,7 @@ def save_capture(
 	file_name: str = "",
 	client: Client | None = None,
 ) -> dict[str, Any]:
-	access = by_session(secret)
+	access = by_session(secret, lock=True)
 	check_can_act(access)
 	require_consent(access)
 	field = own_fields(access).get(field_key)
@@ -528,7 +544,7 @@ def clean_attachment(content: bytes, file_name: str) -> tuple[bytes, str]:
 def finish(secret: str, client: Client | None = None) -> dict[str, Any]:
 	"""Complete this recipient: check, render the intermediate PDF under the row lock (D3)."""
 	client = client or current_client()
-	access = locked(by_session(secret))
+	access = locked(by_session(secret, lock=True))
 	check_can_act(access)
 	require_consent(access)
 	envelope, recipient = access.envelope, access.recipient
@@ -616,7 +632,7 @@ def decline(secret: str, reason: str, client: Client | None = None) -> None:
 	reason = (reason or "").strip()
 	if not reason:
 		throw(FieldValidationError, _("Tell the sender why you decline."))
-	access = locked(by_session(secret))
+	access = locked(by_session(secret, lock=True))
 	check_can_act(access)
 	envelope, recipient = access.envelope, access.recipient
 	frappe.db.set_value(
@@ -650,7 +666,7 @@ def can_delegate(access: Access) -> bool:
 @audit.retry_on_conflict
 def delegate(secret: str, full_name: str, email: str, client: Client | None = None) -> None:
 	full_name, email = (full_name or "").strip(), (email or "").strip().lower()
-	access = locked(by_session(secret))
+	access = locked(by_session(secret, lock=True))
 	check_can_act(access)
 	if not can_delegate(access):
 		throw(InvalidTransition, _("This document cannot be passed on to someone else."))
