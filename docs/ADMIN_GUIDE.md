@@ -142,10 +142,66 @@ The document shows **Signature: Sent**, with who it is waiting for, then **Parti
 - Cancel or delete the document: Frappe Sign voids its open envelopes and tells the signers.
 - Edit the document while an envelope is open: Frappe Sign marks the envelope "source changed" and notifies the sender. The envelope keeps the PDF that was sent. To send the new version, void the envelope and send again.
 
+## Reminders and expiry
+
+The scheduler runs every 15 minutes. It expires requests whose expiry date has passed, then sends reminders.
+
+- **Default reminder days** (Settings, Signing): a signer whose turn it is gets the same link again after this many days without a reminder or invitation. 0 switches reminders off.
+- **Default expiry days**: a request ends after this many days. Expired requests tell the sender and write back "Expired" to the document.
+- Every day the scheduler also warns Sign Managers when a seal certificate ends in 30, 14, 7 or 1 days, or has ended; deletes signing sessions that ended more than a day ago; and runs triggers of type Date (a date field plus or minus a number of days, once per document, with a three day catch-up if the scheduler was down).
+
+## Languages
+
+Frappe Sign ships English and Arabic. The staff app follows each user's language. A request has its own language, chosen in the send wizard (default: the sender's). It decides the language of the emails and of the signing page. A signer can switch with the button in the page header; their choice wins.
+
+Emails use the Email Templates "Frappe Sign Invitation", "... (Arabic)" and so on. Edit them in Desk; a deleted template falls back to the built-in text.
+
+## WhatsApp
+
+Install the frappe_whatsapp app, set up its WhatsApp Account, then switch on **WhatsApp enabled** in the company's Sign Profile. Frappe Sign then also sends invitations by WhatsApp to recipients with a mobile number, and the template option "WhatsApp code" appears. Without the app or the switch the option is hidden and WhatsApp codes are refused.
+
+Meta delivers free text only inside a 24 hour conversation. For cold numbers use a message template in frappe_whatsapp. The sender's role needs permission to create WhatsApp Message, or the invitation goes by email only and the sender is told.
+
+## Bulk send
+
+In a list view, select up to 100 documents, then **Actions, Send for Signature**. Frappe Sign creates one request per document in a background job, shows progress, and keeps a **Sign Bulk Run** with the result of each document. A document without an email address for a signer is skipped, with the reason.
+
+## My signed documents
+
+Signers who have an account (a portal user or a Desk user) see the documents they signed at `/my-signatures` and can download the sealed PDF. They see nothing else: no other signers and no source document.
+
+## Hardware and remote seals
+
+A certificate on a smart card or HSM is not a file. In Desk, create a **Sign Certificate** with storage **Remote** and a JSON setting:
+
+```json
+{"type": "pkcs11", "module_path": "/usr/lib/softhsm/libsofthsm2.so", "token_label": "seal", "key_label": "company-seal"}
+```
+
+```json
+{"type": "csc", "service_url": "https://csc.example.com", "credential_id": "abc123"}
+```
+
+Enter the PIN (and for CSC the access token) in their own fields, never in the JSON. Click **Read the certificate**: Frappe Sign reads the certificate from the token or service and stores its end date. The key never leaves the device; only hashes go out and signatures come back.
+
+A PKCS#11 library is loaded into the worker that seals. To allow only known libraries, list them in `site_config.json`:
+
+```json
+{"frappe_sign_pkcs11_modules": ["/usr/lib/softhsm/libsofthsm2.so"]}
+```
+
+The seal job runs in the `long` queue. Make sure that host can reach the token or service.
+
+## Health
+
+Settings, Health shows five checks in one place: seal end dates, timestamp servers (a real request to each, cached ten minutes), the oldest queued seal, failed trigger runs in the last 24 hours, and the sender domain's SPF and DKIM records. A Sign Manager can open it. If SPF or DKIM is missing, invitations may go to spam.
+
 ## Security notes
 
 - The signing link contains a token. Web server access logs record it. Keep those logs private and short-lived.
 - Every PDF that Frappe Sign stores is a private file.
+- The sealing key is opened only in the seal job. Public verification uses the certificates stored on the Sign Certificate, never the key or the password.
+- Run `pip-audit` before each release. `docs/SECURITY_REVIEW.md` lists what was checked and what is open.
 - If you change the site's `encryption_key`, every open signing link stops working. Use **New link** on each open envelope.
 
 ## Troubleshooting
@@ -155,8 +211,12 @@ The document shows **Signature: Sent**, with who it is waiting for, then **Parti
 | "Send failed" on the envelope | Read the reason. A missing `sign_field()` for a required field, a Print Format error or a missing PDF generator are the usual causes. Fix it and send again |
 | The envelope stays "Sending" | Start the workers |
 | "Sealing failed" | Frappe Sign retries after 1, 5 and 30 minutes. Check the Error Log "Frappe Sign: seal": usually the TSA cannot be reached or the certificate expired. A Sign Manager can click **Retry seal** |
+| "Remote signing failed" in the seal error | Check the PIN, that the token or service is reachable from the worker, and the library list in `site_config.json`. Use **Read the certificate** to test it |
+| Reminders do not arrive | Check that the scheduler runs and that default reminder days is above 0 |
 | No invitation email | Check the Email Account and the Email Queue. Use **Remind** or **New link** on the envelope |
 | A trigger did nothing | Open the Sign Trigger Log for the document. "Skipped" shows the reason |
 | The post-sign action did not run | Open the envelope's audit trail. A "Post-Sign Action" event shows the error |
+
+Settings, Health shows most of these problems before a customer finds them.
 
 `bench --site <site> frappe-sign verify <envelope>` checks the audit chain and the file hashes of an envelope.
