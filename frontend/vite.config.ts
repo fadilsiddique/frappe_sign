@@ -19,6 +19,14 @@ export default defineConfig(({ mode }) => ({
         staff: fileURLToPath(new URL('./staff.html', import.meta.url)),
         guest: fileURLToPath(new URL('./guest.html', import.meta.url)),
       },
+      output: {
+        // nginx on Frappe Cloud serves .mjs as application/octet-stream, and browsers refuse a module
+        // worker (and the import() fallback) with that type: every PDF page stayed blank. Use .js.
+        assetFileNames: (asset) =>
+          asset.names.some((name) => name.endsWith('.mjs'))
+            ? 'assets/[name]-[hash].js'
+            : 'assets/[name]-[hash][extname]',
+      },
     },
   },
   resolve: {

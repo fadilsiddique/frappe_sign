@@ -6,6 +6,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { displaySize, type PageMetric } from '@/shared/coords'
 import { openPdf, renderPage } from '@/shared/pdf'
+import { __ } from '@/shared/translate'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +22,7 @@ const emit = defineEmits<{ loaded: [count: number]; error: [error: unknown] }>()
 
 const root = ref<HTMLElement | null>(null)
 const width = ref(0)
+const failed = ref(false)
 const document = shallowRef<PDFDocumentProxy | null>(null)
 const canvases = new Map<number, HTMLCanvasElement>()
 const drawn = new Map<number, number>()
@@ -46,6 +48,7 @@ async function draw(page: number) {
     await renderPage(await document.value.getPage(page), canvas, width.value)
   } catch (error) {
     drawn.delete(page)
+    failed.value = true
     emit('error', error)
   }
 }
@@ -71,6 +74,7 @@ watch(
   () => props.source,
   async (source) => {
     drawn.clear()
+    failed.value = false
     document.value = null
     if (!source) return
     try {
@@ -79,6 +83,7 @@ watch(
       await nextTick()
       observe()
     } catch (error) {
+      failed.value = true
       emit('error', error)
     }
   },
@@ -111,6 +116,9 @@ defineExpose({
 
 <template>
   <div ref="root" class="w-full" dir="ltr">
+    <p v-if="failed" role="alert" class="mb-3 rounded bg-surface-red-2 p-3 text-sm text-ink-red-4">
+      {{ __('The preview could not be drawn. Reload the page; if it stays blank, contact your administrator.') }}
+    </p>
     <div
       v-for="box in boxes"
       :key="box.page"
